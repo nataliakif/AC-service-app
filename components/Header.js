@@ -7,7 +7,7 @@ const Header = ({ title, subtitle, name }) => {
   console.log({ name });
   return (
     <View style={styles.header}>
-      <Image source={require("./images/logo.jpeg")} style={styles.logo} />
+      <Image source={require("../images/logo.jpeg")} style={styles.logo} />
       <Text style={styles.title}>{title}</Text>
       <TouchableOpacity onPress={() => navigation.navigate({ name })}>
         <Text style={styles.subtitle}>{subtitle}</Text>

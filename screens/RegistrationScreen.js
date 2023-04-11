@@ -1,5 +1,5 @@
-import RegistrationForm from "./RegistratonForm";
-import Header from "./Header";
+import RegistrationForm from "../components/RegistratonForm";
+import Header from "../components/Header";
 import { StyleSheet, View, StatusBar } from "react-native";
 
 export default function RegistrationScreen() {
