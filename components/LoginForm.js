@@ -50,11 +50,17 @@ export default function LoginForm() {
           />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <TouchableOpacity
+        activeOpasity={0.7}
+        style={styles.button}
+        onPress={handleLogin}
+      >
         <Text style={styles.buttonText}>Log In</Text>
       </TouchableOpacity>
       <TouchableOpacity>
-        <Text style={styles.link}>Forgot your Password?</Text>
+        <Text activeOpasity={0.7} style={styles.link}>
+          Forgot your Password?
+        </Text>
       </TouchableOpacity>
     </View>
   );

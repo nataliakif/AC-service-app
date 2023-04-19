@@ -95,7 +95,11 @@ export default function RegistrationForm() {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleRegistration}>
+        <TouchableOpacity
+          activeOpasity={0.7}
+          style={styles.button}
+          onPress={handleRegistration}
+        >
           <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
       </View>

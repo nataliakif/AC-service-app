@@ -1,0 +1,63 @@
+[
+    {
+     
+      "photo": "https://i.imgur.com/jL6VwAY.png",
+      "model": "BMW X5",
+      "owner": "John Smith",
+      "date": "2022-01-01"
+    },
+    {
+      "photo": "https://i.imgur.com/7CizVM2.jpeg",
+      "model": "Mercedes-Benz S-Class",
+      "owner": "Jane Doe",
+      "date": "2022-02-14"
+    },
+    {
+      "photo": "https://i.imgur.com/ucBwOnY.jpg",
+      "model": "Audi Q7",
+      "owner": "Bob Johnson",
+      "date": "2022-03-05"
+    },
+    {
+      "photo": "https://i.imgur.com/fLWJHkb.jpg",
+      "model": "Tesla Model S",
+      "owner": "Alice Williams",
+      "date": "2022-04-23"
+    },
+    {
+      "photo": "https://i.imgur.com/0jKZWtG.jpg",
+      "model": "Toyota Camry",
+      "owner": "David Brown",
+      "date": "2022-05-12"
+    },
+    {
+      "photo": "https://i.imgur.com/3LVqIgF.jpg",
+      "model": "Ford Mustang",
+      "owner": "Olivia Davis",
+      "date": "2022-06-30"
+    },
+    {
+      "photo": "https://i.imgur.com/CBPrjy9.jpg",
+      "model": "Honda Civic",
+      "owner": "William Wilson",
+      "date": "2022-07-15"
+    },
+    {
+      "photo": "https://i.imgur.com/7Aqlzmn.jpg",
+      "model": "Chevrolet Camaro",
+      "owner": "Emma Miller",
+      "date": "2022-08-02"
+    },
+    {
+      "photo": "https://i.imgur.com/VeRUz8I.jpg",
+      "model": "Nissan GT-R",
+      "owner": "Lucas Martinez",
+      "date": "2022-09-18"
+    },
+    {
+      "photo": "https://i.imgur.com/mn95gIu.jpg",
+      "model": "Porsche 911",
+      "owner": "Mia Lee",
+      "date": "2022-10-27"
+    }
+  ]
