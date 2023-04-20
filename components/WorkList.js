@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   model: {
     fontSize: 18,
-    fontWeight: "bold",
+    //fontWeight: "bold",
     marginBottom: 4,
   },
   owner: {
