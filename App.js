@@ -18,10 +18,7 @@ export default function App() {
   const isLogin = Math.random() < 0.5;
   return (
     <NavigationContainer>
-      {/* <Stack.Navigator>
-        <Stack.Screen name="Registration" component={RegistrationScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-      </Stack.Navigator> */}
+     
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,

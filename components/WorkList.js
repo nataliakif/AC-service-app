@@ -1,35 +1,33 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { StyleSheet, View, Image, Text } from "react-native";
-import { galleryItems } from "../assets/carsList";
 
 const WorkList = () => {
   // { image, model, owner, startDate, finishDate = null }
   const [data, setData] = useState(null);
-  setData(galleryItems);
 
-  //   useEffect(() => {
-  //     fetch("./assets/carsList.json")
-  //       .then((response) => response.json())
-  //       .then((data) => {
-  //         setData(data);
-  //         console.log(data);
-  //       })
-  //       .catch((error) => console.error(error));
-  //   }, []);
+  useEffect(() => {
+    fetch("../assets/carList.json")
+      .then((response) => response.json())
+      .then((data) => {
+        setData(data);
+        console.log(data);
+      })
+      .catch((error) => console.error(error));
+  }, []);
   return (
     <View style={styles.container}>
       {data ? (
-        data.map(({ id, carPhoto, carModel, owner, startDate, status }) => (
+        data.map(({ id, photo, model, owner, date }) => (
           <View key={id}>
-            <Image source={carPhoto} style={styles.image} />
+            <Image source={photo} style={styles.image} />
             <View style={styles.infoContainer}>
-              <View style={[styles.circle, { backgroundColor: "green" }]}>
+              {/* <View style={[styles.circle, { backgroundColor: "green" }]}>
                 {status}
-              </View>
-              <Text>{carModel}</Text>
+              </View> */}
+              <Text>{model}</Text>
               <Text>{owner}</Text>
-              <Text>{startDate}</Text>
+              <Text>{date}</Text>
             </View>
           </View>
         ))
@@ -64,7 +62,7 @@ const styles = StyleSheet.create({
   },
   model: {
     fontSize: 18,
-    //fontWeight: "bold",
+    fontWeight: "500",
     marginBottom: 4,
   },
   owner: {

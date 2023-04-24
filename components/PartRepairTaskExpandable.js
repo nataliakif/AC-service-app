@@ -82,7 +82,7 @@ export default function PartRepairTaskExpandable({
 
 const styles = StyleSheet.create({
   taskName: {
-    fontWeight: 400,
+    fontWeight: "400",
     fontSize: 18,
     marginLeft: 5,
   },

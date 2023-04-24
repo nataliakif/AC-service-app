@@ -35,13 +35,13 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 30,
-    fontWeight: 600,
+    fontWeight: "600",
     lineHeight: 37,
   },
   subtitle: {
     fontSize: 16,
     color: "#DB5000",
-    fontWeight: 500,
+    fontWeight: "500",
     lineHeight: 20,
   },
 });

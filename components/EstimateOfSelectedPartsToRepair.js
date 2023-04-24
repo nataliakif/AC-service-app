@@ -20,6 +20,7 @@ export default function EstimateOfSelectedPartsToRepair({
         <>
           <Divider style={styles.divider} />
           <PartRepairExpandableItem
+            key={Math.random()}
             selectedPartToRepair={part}
             isExpanded={false}
             canBeRemoved

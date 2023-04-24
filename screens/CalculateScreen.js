@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   totalPrice: {
     fontStyle: "normal",
-    fontWeight: 500,
+    fontWeight: "500",
     fontSize: 24,
     lineHeight: 29,
     color: "#DB5000",

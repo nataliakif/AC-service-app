@@ -133,7 +133,7 @@ export default function PartRepairExpandableItem({
 
 const styles = StyleSheet.create({
   partName: {
-    fontWeight: 500,
+    fontWeight: "500",
     fontSize: 22,
     marginLeft: 5,
   },
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     textAlign: "right",
     paddingRight: 5,
-    fontWeight: 500,
+    fontWeight: "500",
   },
   priceCont: {
     display: "flex",
