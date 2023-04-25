@@ -1,71 +1,94 @@
 import React, { useState } from "react";
 import {
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Text,
   View,
+  TextInput,
+  Keyboard,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
 } from "react-native";
+import { Formik } from "formik";
+import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function LoginForm() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+const LoginSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Введите правильный email")
+    .required("Введите email"),
+  password: Yup.string().required("Пароль обязателен"),
+});
+
+const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-  const handleLogin = () => {
-    // логика
-  };
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={[styles.input, isFocused && styles.inputFocused]}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        placeholder="Email"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <View>
-        <TextInput
-          style={[styles.input]}
-          secureTextEntry={!showPassword}
-          placeholder="Password"
-          value={password}
-          secureTextEntry
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity
-          style={styles.iconContainer}
-          onPress={toggleShowPassword}
-        >
-          <Ionicons
-            name={showPassword ? "eye-off" : "eye"}
-            size={24}
-            color="gray"
-          />
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity
-        activeOpasity={0.7}
-        style={styles.button}
-        onPress={handleLogin}
-      >
-        <Text style={styles.buttonText}>Log In</Text>
-      </TouchableOpacity>
-      <TouchableOpacity>
-        <Text activeOpasity={0.7} style={styles.link}>
-          Forgot your Password?
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
+    <Formik
+      initialValues={{ email: "", password: "" }}
+      validationSchema={LoginSchema}
+      onSubmit={(values) => console.log(values)}
+    >
+      {({
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        values,
+        errors,
+        touched,
+      }) => (
+        <TouchableWithoutFeedback onPress={dismissKeyboard}>
+          <View>
+            <TextInput
+              style={styles.input}
+              onChangeText={handleChange("email")}
+              onBlur={handleBlur("email")}
+              value={values.email}
+              placeholder="Email"
+            />
+            {touched.email && errors.email && (
+              <Text style={styles.error}>{errors.email}</Text>
+            )}
 
+            <View>
+              <TextInput
+                style={[styles.input]}
+                onChangeText={handleChange("password")}
+                onBlur={handleBlur("password")}
+                value={values.password}
+                placeholder="Пароль"
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity
+                style={styles.iconContainer}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={24}
+                  color="gray"
+                />
+              </TouchableOpacity>
+            </View>
+            {touched.password && errors.password && (
+              <Text style={styles.error}>{errors.password}</Text>
+            )}
+
+            <TouchableOpacity
+              activeOpasity={0.7}
+              style={styles.button}
+              onPress={handleSubmit}
+            >
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableWithoutFeedback>
+      )}
+    </Formik>
+  );
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -79,6 +102,20 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 5,
     marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  inputFocused: {
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
+  error: {
+    color: "red",
   },
   button: {
     marginTop: 110,
@@ -91,16 +128,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontWeight: "bold",
+    fontWeight: "500",
     flexDirection: "row",
-  },
-  link: {
-    fontWeight: 600,
-    textAlign: "center",
-    fontSize: 16,
-    lineHeight: 20,
-    marginTop: 10,
-    color: "#DB5000",
   },
   iconContainer: {
     position: "absolute",
@@ -108,3 +137,5 @@ const styles = StyleSheet.create({
     right: 15,
   },
 });
+
+export default LoginForm;

@@ -2,7 +2,7 @@ import Header from "../components/Header";
 import LoginForm from "../components/LoginForm";
 import { StyleSheet, View, StatusBar } from "react-native";
 
-export default function RegistrationScreen() {
+export default function LoginScreen() {
   const isLogin = Math.random() < 0.5;
   return (
     <View style={styles.container}>

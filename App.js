@@ -1,7 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import RegistrationScreen from "./screens/RegistrationScreen";
 import LoginScreen from "./screens/LoginScreen";
 import HomeScreen from "./screens/HomeScreen";
 import DetailsScreen from "./screens/DetailsScreen";
@@ -18,7 +17,6 @@ export default function App() {
   const isLogin = Math.random() < 0.5;
   return (
     <NavigationContainer>
-     
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,
