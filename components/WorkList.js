@@ -1,38 +1,52 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Image, Text } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 
 const WorkList = () => {
-  // { image, model, owner, startDate, finishDate = null }
   const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("../assets/carList.json")
+    fetch("https://6436945c3e4d2b4a12d615cc.mockapi.io/cars")
       .then((response) => response.json())
       .then((data) => {
         setData(data);
-        console.log(data);
+        setIsLoading(false);
       })
       .catch((error) => console.error(error));
   }, []);
+
   return (
     <View style={styles.container}>
-      {data ? (
-        data.map(({ id, photo, model, owner, date }) => (
-          <View key={id}>
-            <Image source={photo} style={styles.image} />
-            <View style={styles.infoContainer}>
-              {/* <View style={[styles.circle, { backgroundColor: "green" }]}>
-                {status}
-              </View> */}
-              <Text>{model}</Text>
-              <Text>{owner}</Text>
-              <Text>{date}</Text>
+      {isLoading ? (
+        <Text>Loading...</Text>
+      ) : data ? (
+        data.map(({ id, photo, model, owner, number, status, startDate }) => (
+          <View key={id} style={styles.carItem}>
+            <Image source={{ uri: photo }} style={styles.carImage} />
+            <View style={styles.carDetails}>
+              <View style={styles.modelWrapper}>
+                <FontAwesome
+                  name="circle"
+                  size={20}
+                  color={
+                    status === "принят"
+                      ? "#34a8eb"
+                      : status === "в работе"
+                      ? "#77eb34"
+                      : "#eb4334"
+                  }
+                />
+                <Text style={styles.carModel}>{model}</Text>
+              </View>
+              <Text style={styles.carInfo}>{number}</Text>
+              <Text style={styles.carInfo}>{owner}</Text>
+              <Text style={styles.carInfo}>Принята: {startDate}</Text>
             </View>
           </View>
         ))
       ) : (
-        <Text>Loading...</Text>
+        <Text>No data...</Text>
       )}
     </View>
   );
@@ -40,34 +54,48 @@ const WorkList = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 8,
-  },
-  image: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginRight: 12,
-  },
-  circle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  infoContainer: {
     flex: 1,
+
+    alignItems: "center",
+    justifyContent: "center",
   },
-  model: {
-    fontSize: 18,
-    fontWeight: "500",
-    marginBottom: 4,
+  carItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    // backgroundColor: "#f5f5f5",
+    marginBottom: 24,
   },
-  owner: {
+  carImage: {
+    width: 150,
+    height: 100,
+  },
+
+  carDetails: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  modelWrapper: {
+    flexDirection: "row",
+  },
+  carModel: {
     fontSize: 16,
-    marginBottom: 2,
+    fontFamily: "Montserrat",
+    fontWeight: "700",
+    lineHeight: 20,
+    marginBottom: 5,
+    marginLeft: 5,
+  },
+  carInfo: {
+    fontSize: 16,
+    color: "#343434",
+    fontWeight: "400",
+    lineHeight: 20,
+    marginBottom: 5,
+  },
+  carStatus: {
+    width: 5,
+    height: 5,
+    borderRadius: 20,
   },
 });
 

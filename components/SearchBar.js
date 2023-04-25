@@ -32,8 +32,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E8E8E8",
     alignItems: "center",
-    marginHorizontal: 20,
-    marginTop: 20,
   },
   input: {
     fontSize: 18,
