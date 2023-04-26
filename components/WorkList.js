@@ -79,7 +79,6 @@ const styles = StyleSheet.create({
   },
   carModel: {
     fontSize: 16,
-    fontFamily: "Montserrat",
     fontWeight: "700",
     lineHeight: 20,
     marginBottom: 5,

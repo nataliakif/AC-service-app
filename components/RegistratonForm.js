@@ -33,7 +33,7 @@ const RegistrationSchema = Yup.object().shape({
     .required("Подтвердите пароль"),
 });
 
-const LoginForm = () => {
+const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -43,7 +43,7 @@ const LoginForm = () => {
   return (
     <Formik
       initialValues={{ name: "", email: "", password: "", confirmPassword: "" }}
-      validationSchema={LoginSchema}
+      validationSchema={RegistrationForm}
       onSubmit={(values) => console.log(values)}
     >
       {({

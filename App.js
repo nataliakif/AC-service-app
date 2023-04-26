@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import LoginScreen from "./screens/LoginScreen";
+import AddCarScreen from "./screens/AddCarScreen";
 import HomeScreen from "./screens/HomeScreen";
 import DetailsScreen from "./screens/DetailsScreen";
 import CalculateScreen from "./screens/CalculateScreen";
@@ -51,7 +52,8 @@ export default function App() {
         <Tab.Screen name="Просчет" component={CalculateScreen} />
         <Tab.Screen name="Сервис" component={ServiceZonesScreen} />
         <Tab.Screen name="Архив" component={DetailsScreen} />
-        <Tab.Screen name="Ещё" component={DetailsScreen} />
+        {/* <Tab.Screen name="Ещё" component={DetailsScreen} /> */}
+        <Tab.Screen name="Ещё" component={AddCarScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );
