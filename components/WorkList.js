@@ -1,21 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { StyleSheet, View, Image, Text } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 
-const WorkList = () => {
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("https://6436945c3e4d2b4a12d615cc.mockapi.io/cars")
-      .then((response) => response.json())
-      .then((data) => {
-        setData(data);
-        setIsLoading(false);
-      })
-      .catch((error) => console.error(error));
-  }, []);
-
+const WorkList = ({ data, isLoading }) => {
   return (
     <View style={styles.container}>
       {isLoading ? (

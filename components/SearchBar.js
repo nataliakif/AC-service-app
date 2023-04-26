@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { TextInput, View, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
-const SearchBar = ({}) => {
+const SearchBar = ({ onSearchChange }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchTermChange = (text) => {
     setSearchTerm(text);
+    onSearchChange(text);
   };
 
   return (
