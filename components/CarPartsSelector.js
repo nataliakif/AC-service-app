@@ -35,19 +35,6 @@ export default function CarPartsSelector({
     };
   };
 
-  const carPartTemplate = {
-    partName: "",
-    workAmount: {
-      mountingTime: 0,
-      assemblingTime: 0,
-      repairTime: 0,
-      paintPrice: 0,
-      //polishingPrice: 0,
-      orderNewDetailPrice: 0,
-    },
-    specific: false,
-  };
-
   return (
     <>
       <View
