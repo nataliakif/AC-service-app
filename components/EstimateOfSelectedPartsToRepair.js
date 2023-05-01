@@ -1,11 +1,4 @@
-import {
-  TouchableOpacity,
-  Animated,
-  Text,
-  StyleSheet,
-  View,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, ScrollView } from "react-native";
 import { Divider } from "@react-native-material/core";
 
 import PartRepairExpandableItem from "./PartRepairExpandableItem";
@@ -35,10 +28,11 @@ export default function EstimateOfSelectedPartsToRepair({
 
 const styles = StyleSheet.create({
   container: { width: "100%" },
+
   divider: {
     marginLeft: 10,
     marginRight: 10,
 
-    backgroundColor: "grey",
+    backgroundColor: "gray",
   },
 });

@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     height: 52,
     borderWidth: 1,
     paddingLeft: 16,
-    fontWeight: "500",
+    //fontWeight: "500",
     borderColor: "#ccc",
     borderRadius: 5,
     marginBottom: 16,
@@ -85,11 +85,11 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontWeight: "bold",
+    //fontWeight: "bold",
     flexDirection: "row",
   },
   link: {
-    fontWeight: 600,
+    //fontWeight: 600,
     textAlign: "center",
     fontSize: 16,
     lineHeight: 20,

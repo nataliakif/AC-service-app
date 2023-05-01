@@ -17,6 +17,7 @@ export default function PartRepairTaskExpandable({
   onPriceChange,
   onSubitemExpand,
   canExpand = true,
+  numericInputStep = 0.1,
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
@@ -53,7 +54,7 @@ export default function PartRepairTaskExpandable({
             </Text>
           </View>
 
-          <Text style={styles.price}>{`$${repairTaskPrice}`}</Text>
+          <Text style={styles.price}>{`${repairTaskPrice}`}</Text>
         </View>
       </TouchableOpacity>
       <Animated.View style={{ height: itemBaseHeight, alignItems: "center" }}>
@@ -71,8 +72,9 @@ export default function PartRepairTaskExpandable({
               });
             }}
             style={styles.priceInput}
-            step={1}
+            step={numericInputStep}
             minValue={0}
+            valueType="real"
           />
         )}
       </Animated.View>
@@ -82,7 +84,7 @@ export default function PartRepairTaskExpandable({
 
 const styles = StyleSheet.create({
   taskName: {
-    fontWeight: 400,
+    fontWeight: "400",
     fontSize: 18,
     marginLeft: 5,
   },
