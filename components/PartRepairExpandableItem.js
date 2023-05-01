@@ -10,15 +10,16 @@ import {
 import Gear from "../assets/gear.svg";
 import PartRepairTaskExpandable from "./PartRepairTaskExpandable";
 import { Divider, IconButton } from "@react-native-material/core";
-import { vocabularyParts } from "./CarPartsSelector";
 import Ionicons from "react-native-vector-icons/Ionicons";
+
+const perHourPay = 500;
 
 export const calculateTotalSumPerPart = (workAmount) => {
   let totalSum = 0;
   for (const key in workAmount) {
-    if (key.includes("Price")) {
-      totalSum += workAmount[key];
-    }
+    if (key.includes("Time")) {
+      totalSum += workAmount[key] * perHourPay;
+    } else totalSum += workAmount[key];
   }
   return totalSum;
 };
@@ -37,11 +38,9 @@ export default function PartRepairExpandableItem({
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
   const [expandedSubItemsCount, setExpandedSubItemsCount] = useState(0);
-  const [specificPartName, setSpecificPartName] = useState("");
 
-  let workAmountToDisplay = Object.keys(selectedPartToRepair.workAmount).filter(
-    (key) => key.includes("Price")
-  );
+  let workAmountToDisplay = Object.keys(selectedPartToRepair.workAmount);
+
   if (!showZeroItems) {
     workAmountToDisplay = workAmountToDisplay.filter(
       (key) => selectedPartToRepair.workAmount[key] > 0
@@ -77,6 +76,7 @@ export default function PartRepairExpandableItem({
             {specificDetailAdding ? (
               <TextInput
                 style={styles.textInput}
+                value={selectedPartToRepair.partName}
                 onChangeText={(value) => {
                   onChangeParamsOfSelectedPart((prevState) => {
                     return { ...prevState, partName: value };
@@ -85,15 +85,13 @@ export default function PartRepairExpandableItem({
               />
             ) : (
               <Text style={styles.partName}>
-                {selectedPartToRepair.specific
-                  ? selectedPartToRepair.partName
-                  : vocabularyParts[selectedPartToRepair.partName] + " "}
+                {selectedPartToRepair.partName}
               </Text>
             )}
           </View>
           <View style={styles.priceCont}>
             <Text style={styles.priceText}>
-              {`$${calculateTotalSumPerPart(selectedPartToRepair.workAmount)}`}
+              {`${calculateTotalSumPerPart(selectedPartToRepair.workAmount)}`}
             </Text>
             {canBeRemoved && (
               <IconButton
@@ -112,16 +110,17 @@ export default function PartRepairExpandableItem({
 
       {expanded && (
         <Animated.View style={{ height: itemBaseHeight }}>
-          {workAmountToDisplay.map((key) => (
-            <View key={key}>
+          {workAmountToDisplay.map((key, index) => (
+            <View key={index}>
               <Divider style={styles.divider} />
               <PartRepairTaskExpandable
-                key={key}
+                key={index}
                 repairTaskName={key}
                 repairTaskPrice={selectedPartToRepair.workAmount[key]}
                 onPriceChange={onChangeParamsOfSelectedPart}
                 onSubitemExpand={setExpandedSubItemsCount}
                 canExpand={canExpandSubItems}
+                numericInputStep={key.includes("Time") ? 0.1 : 1}
               />
             </View>
           ))}

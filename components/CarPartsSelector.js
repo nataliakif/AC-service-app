@@ -1,50 +1,39 @@
 import CarModelImage from "../components/CarModelImage";
 import { TouchableOpacity, Text } from "react-native";
 import { View } from "react-native";
-import { DialogActions } from "@react-native-material/core";
 import { useState } from "react";
-import { Dialog, Button } from "@react-native-material/core";
 import ConfirmPartAddDialog from "./ConfirmPartAddDialog";
 import PartParamsAddDialog from "./PartParamsAddDialog";
 
-export const vocabularyParts = {
-  hood: "Капот",
-  frontBumper: "Пер. бампер",
-  rearBumper: "Задн. бампер",
-  trunk: "Багажник",
-  frontLeftWing: "Пер. лев. крыло",
-  frontRightWing: "Пер. прав. крыло",
-  rearLeftWing: "Зад. лев. крыло",
-  rearRightWing: "Задн. прав. крыло",
-  frontLeftDoor: "Пер. лев. дверь",
-  frontRightDoor: "Пер. прав. дверь",
-  rearRightDoor: "Задн. прав. дверь",
-  rearLeftDoor: "Задн. лев. дверь",
-  roof: "Крыша",
-};
+const partListData = require("../config/price.json");
 
 export default function CarPartsSelector({
   alreadySelectedPartsToRepair,
   onAddPart,
+  currentCarCategory,
+  currentPaintCategory,
 }) {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showParamsDialog, setShowParamsDialog] = useState(false);
   const [selectedPartToRepair, setSelectedPartToRepair] = useState(null);
 
-  const carPartTemplate = {
-    partName: "",
-    workAmount: {
-      mountingPrice: 0,
-      assemblingPrice: 0,
-      repairPrice: 0,
-      paintPrice: 0,
-      polishingPrice: 0,
-      orderNewDetailPrice: 0,
-    },
-    specific: false,
-    note: "",
+  const generatePartTemplate = (partName, partNameToShow = partName) => {
+    const partTemplate = partListData.find(
+      (part) => part.partName === partName
+    );
+    return {
+      partName: partNameToShow,
+      workAmount: {
+        mountingTime: partTemplate.workAmount.mountingTime[currentCarCategory],
+        assemblingTime:
+          partTemplate.workAmount.assemblingTime[currentCarCategory],
+        repairTime: 0,
+        paintPrice: partTemplate.workAmount.paintPrice[currentPaintCategory],
+        orderNewDetailPrice: 0,
+      },
+      specific: false,
+    };
   };
-  //console.log("current part for adding: " + selectedPartToRepair);
 
   return (
     <>
@@ -53,6 +42,7 @@ export default function CarPartsSelector({
           flex: 1,
           alignItems: "center",
           paddingTop: 40,
+          //backgroundColor: "green",
         }}
       >
         <CarModelImage
@@ -63,8 +53,7 @@ export default function CarPartsSelector({
         {/* hood */}
         <TouchableOpacity
           onPress={() => {
-            //show alert to confirm then modal window set mew item
-            setSelectedPartToRepair({ ...carPartTemplate, partName: "hood" });
+            setSelectedPartToRepair(generatePartTemplate("Капот"));
             setShowConfirmDialog(true);
           }}
           style={{
@@ -80,10 +69,7 @@ export default function CarPartsSelector({
         <TouchableOpacity
           onPress={() => {
             //show alert to confirm then modal window set mew item
-            setSelectedPartToRepair({
-              ...carPartTemplate,
-              partName: "frontBumper",
-            });
+            setSelectedPartToRepair(generatePartTemplate("Бампер передний"));
             setShowConfirmDialog(true);
           }}
           style={{
@@ -99,10 +85,9 @@ export default function CarPartsSelector({
         <TouchableOpacity
           onPress={() => {
             //show alert to confirm then modal window set mew item
-            setSelectedPartToRepair({
-              ...carPartTemplate,
-              partName: "frontLeftWing",
-            });
+            setSelectedPartToRepair(
+              generatePartTemplate("Крыло переднее", "Крыло пер. лев.")
+            );
             setShowConfirmDialog(true);
           }}
           style={{
@@ -119,10 +104,9 @@ export default function CarPartsSelector({
         <TouchableOpacity
           onPress={() => {
             //show alert to confirm then modal window set mew item
-            setSelectedPartToRepair({
-              ...carPartTemplate,
-              partName: "frontRightWing",
-            });
+            setSelectedPartToRepair(
+              generatePartTemplate("Крыло переднее", "Крыло пер. прав.")
+            );
             setShowConfirmDialog(true);
           }}
           style={{
@@ -139,10 +123,9 @@ export default function CarPartsSelector({
         <TouchableOpacity
           onPress={() => {
             //show alert to confirm then modal window set mew item
-            setSelectedPartToRepair({
-              ...carPartTemplate,
-              partName: "frontLeftDoor",
-            });
+            setSelectedPartToRepair(
+              generatePartTemplate("Дверь", "Дверь пер. лев.")
+            );
             setShowConfirmDialog(true);
           }}
           style={{
@@ -159,10 +142,9 @@ export default function CarPartsSelector({
         <TouchableOpacity
           onPress={() => {
             //show alert to confirm then modal window set mew item
-            setSelectedPartToRepair({
-              ...carPartTemplate,
-              partName: "frontRightDoor",
-            });
+            setSelectedPartToRepair(
+              generatePartTemplate("Дверь", "Дверь пер. прав.")
+            );
             setShowConfirmDialog(true);
           }}
           style={{
@@ -179,10 +161,7 @@ export default function CarPartsSelector({
         <TouchableOpacity
           onPress={() => {
             //show alert to confirm then modal window set mew item
-            setSelectedPartToRepair({
-              ...carPartTemplate,
-              partName: "roof",
-            });
+            setSelectedPartToRepair(generatePartTemplate("Крыша"));
             setShowConfirmDialog(true);
           }}
           style={{
@@ -200,7 +179,7 @@ export default function CarPartsSelector({
       {selectedPartToRepair && (
         <>
           <ConfirmPartAddDialog
-            partName={vocabularyParts[selectedPartToRepair.partName]}
+            partName={selectedPartToRepair.partName}
             visible={showConfirmDialog}
             showConfirmDialog={setShowConfirmDialog}
             showParamsDialog={setShowParamsDialog}
