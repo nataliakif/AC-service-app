@@ -69,11 +69,19 @@ export default function CalculateScreen() {
     <Provider>
       {showCarStartParamsDialog && (
         <Dialog visible={showCarStartParamsDialog}>
-          <DialogHeader title="Виберите категорию авто и цвета" />
+          <DialogHeader
+            titleWrapperStyle={{
+              alignItems: "center",
+              justifyContent: "center",
+              flex: 1,
+            }}
+            title="Виберите категорию авто и цвета"
+          />
           <View style={styles.paramsSwitcherCont}>
             <View style={styles.paramsSwitcherView}>
               <Ionicons size={30} name="car-outline" />
               <ParamsSwitcher
+                style={{ backgroundColor: "#DB5000" }}
                 curValue={carCategory}
                 onItemChange={setCarCategory}
               />
@@ -93,8 +101,12 @@ export default function CalculateScreen() {
               onPress={() => {
                 setShowCarStartParamsDialog(false);
               }}
-              color="#DB5000"
-              style={{ borderColor: "#DB5000", borderWidth: 1, flex: 2 }}
+              color="#fff"
+              style={{
+                backgroundColor: "#DB5000",
+                flex: 2,
+                textTransform: "none",
+              }}
             />
           </DialogActions>
         </Dialog>
@@ -102,36 +114,60 @@ export default function CalculateScreen() {
 
       {!showCarStartParamsDialog && (
         <>
-          <View
-            style={{
-              height: "100%",
-              alignItems: "center",
-              marginTop: 50,
-              paddingBottom: 49,
-            }}
-          >
-            <TouchableOpacity
-              style={styles.currentCarCategory}
-              onPress={() => setShowCarStartParamsDialog(true)}
-            >
-              <Ionicons size={25} name="car-outline" />
-              <Text style>
-                {" "}
-                - {carCategory === 0 ? "I" : carCategory === 1 ? "II" : "III"}
-              </Text>
-            </TouchableOpacity>
+          <View style={styles.container}>
+            <View style={styles.headerContainer}>
+              <View style={styles.addBtn}>
+                <IconButton
+                  color="#fff"
+                  backgroundColor="#DB5000"
+                  icon={(props) => (
+                    <Ionicons
+                      name="add-outline"
+                      {...props}
+                      onPress={() => {
+                        setShowPartsListDialog(true);
+                      }}
+                    />
+                  )}
+                />
+              </View>
+              <TouchableOpacity
+                style={styles.currentCarCategory}
+                onPress={() => setShowCarStartParamsDialog(true)}
+              >
+                <Ionicons size={25} name="car-outline" />
+                <Text style>
+                  {" "}
+                  - {carCategory === 0 ? "I" : carCategory === 1 ? "II" : "III"}
+                </Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.currentPaintCategory}
-              onPress={() => setShowCarStartParamsDialog(true)}
-            >
-              <Ionicons size={25} name="color-palette-outline" />
-              <Text style>
-                {" "}
-                -{" "}
-                {paintCategory === 0 ? "I" : paintCategory === 1 ? "II" : "III"}
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.currentPaintCategory}
+                onPress={() => setShowCarStartParamsDialog(true)}
+              >
+                <Ionicons size={25} name="color-palette-outline" />
+                <Text style>
+                  {" "}
+                  -{" "}
+                  {paintCategory === 0
+                    ? "I"
+                    : paintCategory === 1
+                    ? "II"
+                    : "III"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.saveBtn}
+                //onPress={() => navigation.navigate("AddCarScreen")}
+              >
+                <IconButton
+                  backgroundColor="#DB5000"
+                  color="#fff"
+                  icon={(props) => <Ionicons name="save-outline" {...props} />}
+                />
+              </TouchableOpacity>
+            </View>
             <GestureRecognizer
               onSwipeUp={() => {
                 setIsPartsSelectorExpanded(false);
@@ -165,13 +201,20 @@ export default function CalculateScreen() {
                       : styles.totalPriceCont
                   }
                 >
-                  <Text style={styles.totalPrice}>
-                    {isPartsSelectorExpanded && "Σ "}
-                    {selectedPartsToRepair
-                      .map((part) => calculateTotalSumPerPart(part.workAmount))
-                      .reduce((prev, cur) => prev + cur, 0)}
-                  </Text>
+                  {!isPartsSelectorExpanded && (
+                    <Text style={styles.totalPrice}>
+                      {selectedPartsToRepair
+                        .map((part) =>
+                          calculateTotalSumPerPart(part.workAmount)
+                        )
+                        .reduce((prev, cur) => prev + cur, 0) + ` UAH`}
+                    </Text>
+                  )}
+                  {!isPartsSelectorExpanded && (
+                    <Text style={styles.priceText}>Стоимость</Text>
+                  )}
                 </View>
+
                 <EstimateOfSelectedPartsToRepair
                   selectedPartsToRepair={selectedPartsToRepair}
                   isPartsSelectorExpanded={false}
@@ -180,26 +223,6 @@ export default function CalculateScreen() {
               </>
             )}
 
-            <View style={styles.addBtn}>
-              <IconButton
-                backgroundColor="#DB5000"
-                icon={(props) => (
-                  <Ionicons
-                    name="add-outline"
-                    {...props}
-                    onPress={() => {
-                      setShowPartsListDialog(true);
-                    }}
-                  />
-                )}
-              />
-            </View>
-            <View style={styles.saveBtn}>
-              <IconButton
-                backgroundColor="#DB5000"
-                icon={(props) => <Ionicons name="save-outline" {...props} />}
-              />
-            </View>
             {!isPartsSelectorExpanded && (
               <View style={styles.expandBtn}>
                 <IconButton
@@ -230,7 +253,6 @@ export default function CalculateScreen() {
               setShowPartsListDialog(false);
             }}
           >
-            <Text>List of parts</Text>
             <ScrollView style={styles.partListDialog}>
               {partListData.map((part) => (
                 <ListItem
@@ -260,11 +282,11 @@ export default function CalculateScreen() {
               <Button
                 title="Отмена"
                 variant="text"
+                color="#fff"
                 onPress={() => {
                   setShowPartsListDialog(false);
                 }}
-                color="#DB5000"
-                style={{ borderColor: "#DB5000", borderWidth: 1, flex: 2 }}
+                style={styles.button}
               />
             </DialogActions>
           </Dialog>
@@ -275,19 +297,25 @@ export default function CalculateScreen() {
 }
 
 const styles = StyleSheet.create({
-  addBtn: {
-    position: "absolute",
-    left: 15,
-    top: 5,
+  container: {
+    height: "100%",
+    alignItems: "center",
+    marginTop: 50,
+    paddingBottom: 49,
+    paddingHorizontal: 20,
   },
-  saveBtn: {
-    position: "absolute",
-    right: 15,
-    top: 5,
+  headerContainer: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
+  button: {
+    backgroundColor: "#DB5000",
+    flex: 1,
+  },
+
   expandBtn: {
-    position: "absolute",
-    top: 5,
     alignItems: "center",
   },
   totalPrice: {
@@ -298,41 +326,41 @@ const styles = StyleSheet.create({
     color: "#DB5000",
   },
   totalPriceCont: {
-    marginTop: 70,
+    marginTop: 30,
     marginBottom: 20,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
-    width: 100,
-    height: 100,
+    width: 150,
+    height: 150,
     borderRadius: 120,
-    borderColor: "gray",
-    borderWidth: 1.5,
+    borderColor: "#DB5000",
+    borderWidth: 2,
   },
   totalPriceContExp: {},
   paramsSwitcherCont: {
-    display: "flex",
     flexDirection: "row",
+  },
+  priceText: {
+    fontWeight: "400",
+    fontSize: 14,
+    lineHeight: 17,
+    color: "#BABABA",
+    marginTop: 8,
   },
   paramsSwitcherView: { flex: 1, alignItems: "center" },
   partListDialog: {
-    height: "60%",
+    height: "70%",
   },
   currentCarCategory: {
-    position: "absolute",
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    left: 80,
-    top: 11,
   },
   currentPaintCategory: {
-    position: "absolute",
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    right: 80,
-    top: 11,
   },
 });

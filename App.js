@@ -52,9 +52,11 @@ export default function App() {
         <Tab.Screen name="Просчет" component={CalculateScreen} />
         <Tab.Screen name="Сервис" component={ServiceZonesScreen} />
         <Tab.Screen name="Архив" component={DetailsScreen} />
-        {/* <Tab.Screen name="Ещё" component={DetailsScreen} /> */}
         <Tab.Screen name="Ещё" component={AddCarScreen} />
       </Tab.Navigator>
+      {/* <Stack.Navigator>
+        <Stack.Screen name="AddCarScreen" component={AddCarScreen} />
+      </Stack.Navigator> */}
     </NavigationContainer>
   );
 }

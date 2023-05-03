@@ -9,8 +9,7 @@ import {
 } from "react-native";
 import Gear from "../assets/gear.svg";
 import PartRepairTaskExpandable from "./PartRepairTaskExpandable";
-import { Divider, IconButton } from "@react-native-material/core";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { Divider } from "@react-native-material/core";
 
 const perHourPay = 500;
 
@@ -71,8 +70,6 @@ export default function PartRepairExpandableItem({
         <View style={styles.titleCont}>
           <View style={styles.partNameTitleCont}>
             <Gear style={styles.icon} />
-
-            {/* <Ionicons style={styles.icon} name={"cog-outline"} /> */}
             {specificDetailAdding ? (
               <TextInput
                 style={styles.textInput}
@@ -91,20 +88,21 @@ export default function PartRepairExpandableItem({
           </View>
           <View style={styles.priceCont}>
             <Text style={styles.priceText}>
-              {`${calculateTotalSumPerPart(selectedPartToRepair.workAmount)}`}
+              {`${calculateTotalSumPerPart(
+                selectedPartToRepair.workAmount
+              )} UAH`}
             </Text>
-            {canBeRemoved && (
-              <IconButton
-                style={styles.removeBtn}
-                icon={(props) => (
-                  <Ionicons name="close-circle-outline" {...props} />
-                )}
-                onPress={() => {
-                  onRemoveFromSelected(selectedPartToRepair.partName);
-                }}
-              />
-            )}
           </View>
+          {canBeRemoved && (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                onRemoveFromSelected(selectedPartToRepair.partName);
+              }}
+            >
+              <Text style={styles.buttonText}>Удалить</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </TouchableOpacity>
 
@@ -132,54 +130,44 @@ export default function PartRepairExpandableItem({
 
 const styles = StyleSheet.create({
   partName: {
-    fontWeight: "500",
-    fontSize: 22,
+    fontWeight: "400",
+    fontSize: 18,
     marginLeft: 5,
   },
   partNameTitleCont: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    //backgroundColor: "yellow",
   },
-  icon: {
-    marginLeft: 5,
-  },
+
   titleCont: {
-    margin: 8,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   priceText: {
-    fontSize: 18,
+    fontSize: 16,
     lineHeight: 20,
-    textAlign: "right",
-    paddingRight: 5,
     fontWeight: "500",
   },
   priceCont: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
+    marginRight: 40,
   },
   divider: {
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 2,
+    marginVertical: 8,
   },
-  removeBtn: {
-    height: 25,
-    width: 25,
-  },
+  buttonText: { color: "#DB5000" },
+
   textInput: {
-    flex: 1,
+    flex: 2,
     alignItems: "flex-end",
     marginLeft: 5,
-    marginRight: 5,
-    paddingLeft: 10,
+    marginRight: 10,
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 5,
   },
 });

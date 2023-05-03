@@ -1,4 +1,4 @@
-import { StyleSheet, ScrollView } from "react-native";
+import { StyleSheet, ScrollView, Text } from "react-native";
 import { Divider } from "@react-native-material/core";
 
 import PartRepairExpandableItem from "./PartRepairExpandableItem";
@@ -9,9 +9,9 @@ export default function EstimateOfSelectedPartsToRepair({
 }) {
   return (
     <ScrollView style={styles.container} alwaysBounceVertical>
+      <Text style={styles.title}>Расчет</Text>
       {selectedPartsToRepair.map((part) => (
         <>
-          <Divider style={styles.divider} />
           <PartRepairExpandableItem
             key={Math.random()}
             selectedPartToRepair={part}
@@ -21,6 +21,8 @@ export default function EstimateOfSelectedPartsToRepair({
             canExpandSubItems={false}
             showZeroItems={false}
           />
+
+          <Divider style={styles.divider} />
         </>
       ))}
     </ScrollView>
@@ -29,11 +31,14 @@ export default function EstimateOfSelectedPartsToRepair({
 
 const styles = StyleSheet.create({
   container: { width: "100%" },
-
+  title: {
+    fontWeight: "500",
+    fontSize: 24,
+    lineHeight: 30,
+    marginBottom: 24,
+  },
   divider: {
-    marginLeft: 10,
-    marginRight: 10,
-
-    backgroundColor: "gray",
+    backgroundColor: "#E8E8E8",
+    marginVertical: 5,
   },
 });

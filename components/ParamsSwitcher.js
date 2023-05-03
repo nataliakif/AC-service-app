@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
 import RadioGroup from "react-native-radio-buttons-group";
 
 export default function ParamsSwitcher({ curValue, onItemChange }) {
@@ -32,6 +33,23 @@ export default function ParamsSwitcher({ curValue, onItemChange }) {
       onPress={(btns) => {
         onItemChange(btns.find((btn) => btn.selected === true).value);
       }}
+      style={styles.option}
+      selectedButtonStyle={styles.activeOption}
     />
   );
 }
+const styles = StyleSheet.create({
+  option: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#757373",
+    backgroundColor: "#fff",
+  },
+
+  activeOption: {
+    backgroundColor: "#DB5000",
+    borderColor: "#DB5000",
+  },
+});

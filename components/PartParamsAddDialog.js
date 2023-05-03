@@ -22,9 +22,9 @@ export default function PartParamsAddDialog({
       <View
         style={{
           backgroundColor: "#fff",
-          borderColor: "#DB5000",
-          borderWidth: 1,
           borderRadius: 15,
+          paddingVertical: 20,
+          paddingHorizontal: 10,
           margin: -5,
           // height: 300,
         }}
@@ -39,12 +39,12 @@ export default function PartParamsAddDialog({
 
         <DialogActions>
           <Button
-            title="Добавить в просчет"
+            title="Добавить"
             variant="text"
             style={{
               backgroundColor: "#DB5000",
               flex: 2,
-              marginRight: 10,
+              marginTop: 60,
             }}
             color="#fff"
             onPress={() => {
@@ -62,7 +62,13 @@ export default function PartParamsAddDialog({
               setSelectedPartToRepair(null);
             }}
             color="#DB5000"
-            style={{ borderColor: "#DB5000", borderWidth: 1, flex: 2 }}
+            style={{
+              borderColor: "#DB5000",
+              borderWidth: 1,
+              flex: 2,
+              marginTop: 60,
+              marginLeft: 8,
+            }}
           />
         </DialogActions>
       </View>
