@@ -109,9 +109,6 @@ const AddCarScreen = () => {
                   value={values.startDate}
                   disabled="true"
                   format="DD-MM-YYYY"
-                  //   mode="date"
-                  //   confirmBtnText="Подтвердить"
-                  //   cancelBtnText="Отменить"
                 />
               </View>
 
@@ -143,9 +140,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
-    paddingHorizontal: 15,
-    paddingVertical: 30,
+    marginTop: 20,
+    paddingBottom: 50,
   },
   formWrapper: {
     alignItems: "center",

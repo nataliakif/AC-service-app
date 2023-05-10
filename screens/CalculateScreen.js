@@ -20,11 +20,13 @@ import {
   ListItem,
   DialogHeader,
 } from "@react-native-material/core";
+import Modal from "react-native-modal";
 import EstimateOfSelectedPartsToRepair from "../components/EstimateOfSelectedPartsToRepair";
 import { calculateTotalSumPerPart } from "../components/PartRepairExpandableItem";
 import PartParamsAddDialog from "../components/PartParamsAddDialog";
 import ParamsSwitcher from "../components/ParamsSwitcher";
 import AddCarInfo from "../components/AddCarInfo";
+import { AntDesign } from "@expo/vector-icons";
 
 const partListData = require("../config/price.json");
 
@@ -293,15 +295,23 @@ export default function CalculateScreen() {
               />
             </DialogActions>
           </Dialog>
-          <Dialog
-            contentContainerStyle={styles.addCarInfoDialog}
-            visible={showAddCarInfoDialog}
-            onDismiss={() => {
+          <Modal
+            style={styles.addCarInfoModal}
+            isVisible={showAddCarInfoDialog}
+            onBackdropPress={() => {
               setshowAddCarInfoDialog(false);
             }}
           >
+            <AntDesign
+              name="arrowleft"
+              size={34}
+              color="#DB5000"
+              onPress={() => {
+                setshowAddCarInfoDialog(false);
+              }}
+            />
             <AddCarInfo></AddCarInfo>
-          </Dialog>
+          </Modal>
         </>
       )}
     </Provider>
@@ -365,12 +375,11 @@ const styles = StyleSheet.create({
   partListDialog: {
     height: "70%",
   },
-  addCarInfoDialog: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+  addCarInfoModal: {
+    margin: 0,
+    backgroundColor: "#fff",
+    paddingVertical: 50,
+    paddingHorizontal: 15,
   },
 
   currentCarCategory: {
