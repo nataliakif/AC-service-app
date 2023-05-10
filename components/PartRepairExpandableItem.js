@@ -86,7 +86,9 @@ export default function PartRepairExpandableItem({
               </Text>
             )}
           </View>
-          <View style={styles.priceCont}>
+          <View
+            style={canExpandSubItems ? styles.priceContModal : styles.priceCont}
+          >
             <Text style={styles.priceText}>
               {`${calculateTotalSumPerPart(
                 selectedPartToRepair.workAmount
@@ -132,7 +134,7 @@ const styles = StyleSheet.create({
   partName: {
     fontWeight: "400",
     fontSize: 18,
-    marginLeft: 5,
+    marginLeft: 8,
   },
   partNameTitleCont: {
     flex: 1,
@@ -144,7 +146,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
   },
   priceText: {
     fontSize: 16,
@@ -154,16 +155,15 @@ const styles = StyleSheet.create({
   priceCont: {
     marginRight: 40,
   },
+  priceContModal: { marginLeft: 20 },
   divider: {
     marginVertical: 8,
   },
   buttonText: { color: "#DB5000" },
 
   textInput: {
-    flex: 2,
-    alignItems: "flex-end",
-    marginLeft: 5,
-    marginRight: 10,
+    flex: 1,
+    marginLeft: 8,
     fontSize: 16,
     paddingHorizontal: 10,
     paddingVertical: 3,
