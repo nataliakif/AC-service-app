@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { Formik } from "formik";
-import ImagePickerForm from "../components/ImagePickerForm";
+import ImagePickerForm from "./ImagePickerForm";
 import { TextInputMask } from "react-native-masked-text";
 import DatePicker from "react-native-datepicker";
 
@@ -18,6 +18,7 @@ const AddCarScreen = () => {
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Formik
@@ -140,8 +141,11 @@ const AddCarScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 15,
-    marginTop: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingHorizontal: 15,
+    paddingVertical: 30,
   },
   formWrapper: {
     alignItems: "center",

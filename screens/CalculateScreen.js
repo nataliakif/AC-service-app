@@ -24,6 +24,7 @@ import EstimateOfSelectedPartsToRepair from "../components/EstimateOfSelectedPar
 import { calculateTotalSumPerPart } from "../components/PartRepairExpandableItem";
 import PartParamsAddDialog from "../components/PartParamsAddDialog";
 import ParamsSwitcher from "../components/ParamsSwitcher";
+import AddCarInfo from "../components/AddCarInfo";
 
 const partListData = require("../config/price.json");
 
@@ -47,6 +48,7 @@ export default function CalculateScreen() {
   const [showPartsListDialog, setShowPartsListDialog] = useState(false);
   const [showCarStartParamsDialog, setShowCarStartParamsDialog] =
     useState(true);
+  const [showAddCarInfoDialog, setshowAddCarInfoDialog] = useState(false);
 
   useEffect(() => {
     Animated.timing(carPartsSelectorBaseHeight, {
@@ -64,6 +66,9 @@ export default function CalculateScreen() {
     setSelectedPartsToRepair((prevState) => [
       ...prevState.filter((part) => part.partName !== partNameToRemove),
     ]);
+  };
+  const handleAddCarInfoDialog = (showDialog) => {
+    setshowAddCarInfoDialog(showDialog);
   };
   return (
     <Provider>
@@ -157,10 +162,7 @@ export default function CalculateScreen() {
                     : "III"}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.saveBtn}
-                //onPress={() => navigation.navigate("AddCarScreen")}
-              >
+              <TouchableOpacity style={styles.saveBtn}>
                 <IconButton
                   backgroundColor="#DB5000"
                   color="#fff"
@@ -219,6 +221,7 @@ export default function CalculateScreen() {
                   selectedPartsToRepair={selectedPartsToRepair}
                   isPartsSelectorExpanded={false}
                   onRemoveFromEstimate={removePartFromSelectedOnes}
+                  handleAddCarInfoDialog={handleAddCarInfoDialog}
                 />
               </>
             )}
@@ -290,6 +293,15 @@ export default function CalculateScreen() {
               />
             </DialogActions>
           </Dialog>
+          <Dialog
+            contentContainerStyle={styles.addCarInfoDialog}
+            visible={showAddCarInfoDialog}
+            onDismiss={() => {
+              setshowAddCarInfoDialog(false);
+            }}
+          >
+            <AddCarInfo></AddCarInfo>
+          </Dialog>
         </>
       )}
     </Provider>
@@ -353,6 +365,14 @@ const styles = StyleSheet.create({
   partListDialog: {
     height: "70%",
   },
+  addCarInfoDialog: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+
   currentCarCategory: {
     display: "flex",
     flexDirection: "row",
