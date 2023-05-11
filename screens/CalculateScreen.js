@@ -276,6 +276,25 @@ export default function CalculateScreen() {
                   title={part.partName}
                 />
               ))}
+              <ListItem
+                onPress={() => {
+                  setShowPartsListDialog(false);
+                  setShowSpecificPartsDialog(true);
+                  setSpecificPartToRepair({
+                    partName: "",
+                    workAmount: {
+                      mountingTime: 0,
+                      assemblingTime: 0,
+                      repairTime: 0,
+                      paintPrice: 0,
+                      repairTime: 0,
+                      orderNewDetailPrice: 0,
+                    },
+                    specific: true,
+                  });
+                }}
+                title={"..."}
+              />
             </ScrollView>
 
             <DialogActions>
