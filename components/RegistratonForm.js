@@ -40,11 +40,24 @@ const RegistrationForm = () => {
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
+
+  const handleRegistrationForm = ({ name, email, password }) => {
+    if (name !== "" && email !== "" && password !== "") {
+      signInWithEmailAndPassword(auth, name, email, password)
+        .then(() => {
+          console.log("login success");
+        })
+        .catch((err) => {
+          Alert.alert("Login Error", err.message);
+        });
+    }
+  };
+
   return (
     <Formik
       initialValues={{ name: "", email: "", password: "", confirmPassword: "" }}
-      validationSchema={RegistrationForm}
-      onSubmit={(values) => console.log(values)}
+      validationSchema={RegistrationSchema}
+      onSubmit={(values) => handleRegistrationForm(values)}
     >
       {({
         handleChange,
@@ -128,7 +141,7 @@ const RegistrationForm = () => {
             )}
 
             <TouchableOpacity
-              activeOpasity={0.7}
+              activeOpacity={0.7}
               style={styles.button}
               onPress={handleSubmit}
             >
