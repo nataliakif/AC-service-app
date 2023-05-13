@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import { createUserWithEmailAndPassword } from "@firebase/auth";
+import { auth } from "../config/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
@@ -43,12 +45,12 @@ const RegistrationForm = () => {
 
   const handleRegistrationForm = ({ name, email, password }) => {
     if (name !== "" && email !== "" && password !== "") {
-      signInWithEmailAndPassword(auth, name, email, password)
+      createUserWithEmailAndPassword(auth, email, password, name)
         .then(() => {
           console.log("login success");
         })
         .catch((err) => {
-          Alert.alert("Login Error", err.message);
+          console.log("Login Error", err.message);
         });
     }
   };

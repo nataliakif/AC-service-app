@@ -9,6 +9,8 @@ import {
   TouchableWithoutFeedback,
   Alert,
 } from "react-native";
+import { signInWithEmailAndPassword } from "@firebase/auth";
+import { auth } from "../config/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";

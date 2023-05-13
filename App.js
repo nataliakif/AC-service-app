@@ -1,9 +1,9 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { onAuthStateChanged } from "firebase/auth";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 import LoginScreen from "./screens/LoginScreen";
 import RegistrationScreen from "./screens/RegistrationScreen";
@@ -11,7 +11,7 @@ import HomeScreen from "./screens/HomeScreen";
 import DetailsScreen from "./screens/DetailsScreen";
 import CalculateScreen from "./screens/CalculateScreen";
 import ServiceZonesScreen from "./screens/ServiceZonesScreen";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { auth } from "./config/firebase";
 
 const Tab = createBottomTabNavigator();
 
@@ -30,7 +30,7 @@ const AuthUserProvider = ({ children }) => {
 
 function AuthStack() {
   return (
-    <Stack.Navigator defaultScreenOptions={LoginScreen}>
+    <Stack.Navigator>
       <Stack.Screen name="Логин" component={LoginScreen} />
       <Stack.Screen name="Регистрация" component={RegistrationScreen} />
     </Stack.Navigator>
@@ -77,14 +77,17 @@ function AppStack() {
     </Tab.Navigator>
   );
 }
-export default function App() {
+
+function RootNavigator() {
   const { user, setUser } = useContext(AuthUserContext);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (authenticatedUser) => {
+    const unsubscribe = auth.onAuthStateChanged((authenticatedUser) => {
       authenticatedUser ? setUser(authenticatedUser) : setUser(null);
       setLoading(false);
     });
+
     return () => unsubscribe();
   }, [user]);
 
@@ -95,11 +98,18 @@ export default function App() {
       </View>
     );
   }
+
+  return (
+    <NavigationContainer>
+      {user ? <AppStack /> : <AuthStack />}
+    </NavigationContainer>
+  );
+}
+
+export default function App() {
   return (
     <AuthUserProvider>
-      <NavigationContainer>
-        {user ? <AppStack /> : <AuthStack />}
-      </NavigationContainer>
+      <RootNavigator />
     </AuthUserProvider>
   );
 }

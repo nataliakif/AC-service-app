@@ -8,11 +8,7 @@ export default function LoginScreen() {
     <View style={styles.container}>
       {isLogin && (
         <>
-          <Header
-            title="Log In"
-            subtitle="Sign Up"
-            name="Registration"
-          ></Header>
+          <Header title="Log In" subtitle="Sign Up" name="Регистрация"></Header>
           <LoginForm></LoginForm>
         </>
       )}

@@ -8,7 +8,7 @@ export default function RegistrationScreen() {
     <View style={styles.container}>
       {!isLogin && (
         <>
-          <Header title="Sign Up" subtitle="Log In" name="Login"></Header>
+          <Header title="Sign Up" subtitle="Log In" name="Логин"></Header>
           <RegistrationForm></RegistrationForm>
         </>
       )}
