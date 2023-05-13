@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import { createUserWithEmailAndPassword } from "@firebase/auth";
+import { auth } from "../config/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
@@ -40,11 +42,24 @@ const RegistrationForm = () => {
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
+
+  const handleRegistrationForm = ({ name, email, password }) => {
+    if (name !== "" && email !== "" && password !== "") {
+      createUserWithEmailAndPassword(auth, email, password, name)
+        .then(() => {
+          console.log("login success");
+        })
+        .catch((err) => {
+          console.log("Login Error", err.message);
+        });
+    }
+  };
+
   return (
     <Formik
       initialValues={{ name: "", email: "", password: "", confirmPassword: "" }}
-      validationSchema={RegistrationForm}
-      onSubmit={(values) => console.log(values)}
+      validationSchema={RegistrationSchema}
+      onSubmit={(values) => handleRegistrationForm(values)}
     >
       {({
         handleChange,
@@ -128,7 +143,7 @@ const RegistrationForm = () => {
             )}
 
             <TouchableOpacity
-              activeOpasity={0.7}
+              activeOpacity={0.7}
               style={styles.button}
               onPress={handleSubmit}
             >

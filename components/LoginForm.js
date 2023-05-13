@@ -7,7 +7,10 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
+import { signInWithEmailAndPassword } from "@firebase/auth";
+import { auth } from "../config/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
@@ -25,11 +28,24 @@ const LoginForm = () => {
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
+
+  const handleLoginForm = ({ email, password }) => {
+    if (email !== "" && password !== "") {
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          console.log("login success");
+        })
+        .catch((err) => {
+          Alert.alert("Login Error", err.message);
+        });
+    }
+  };
+
   return (
     <Formik
       initialValues={{ email: "", password: "" }}
       validationSchema={LoginSchema}
-      onSubmit={(values) => console.log(values)}
+      onSubmit={(values) => handleLoginForm(values)}
     >
       {({
         handleChange,
@@ -54,7 +70,7 @@ const LoginForm = () => {
 
             <View>
               <TextInput
-                style={[styles.input]}
+                style={styles.input}
                 onChangeText={handleChange("password")}
                 onBlur={handleBlur("password")}
                 value={values.password}
@@ -77,7 +93,7 @@ const LoginForm = () => {
             )}
 
             <TouchableOpacity
-              activeOpasity={0.7}
+              activeOpacity={0.7}
               style={styles.button}
               onPress={handleSubmit}
             >
@@ -89,6 +105,7 @@ const LoginForm = () => {
     </Formik>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -98,7 +115,6 @@ const styles = StyleSheet.create({
     height: 52,
     borderWidth: 1,
     paddingLeft: 16,
-    //fontWeight: "500",
     borderColor: "#ccc",
     borderRadius: 5,
     marginBottom: 16,
@@ -117,6 +133,7 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
   },
+
   button: {
     marginTop: 110,
     height: 60,
