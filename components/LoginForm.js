@@ -13,6 +13,7 @@ import { signInWithEmailAndPassword } from "@firebase/auth";
 import { auth } from "../config/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { SvgUri } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 
 const LoginSchema = Yup.object().shape({
@@ -40,69 +41,86 @@ const LoginForm = () => {
         });
     }
   };
+  const handleGoogleSignIn = () => {
+    console.log("Google вход");
+  };
 
   return (
-    <Formik
-      initialValues={{ email: "", password: "" }}
-      validationSchema={LoginSchema}
-      onSubmit={(values) => handleLoginForm(values)}
-    >
-      {({
-        handleChange,
-        handleBlur,
-        handleSubmit,
-        values,
-        errors,
-        touched,
-      }) => (
-        <TouchableWithoutFeedback onPress={dismissKeyboard}>
-          <View>
-            <TextInput
-              style={styles.input}
-              onChangeText={handleChange("email")}
-              onBlur={handleBlur("email")}
-              value={values.email}
-              placeholder="Email"
-            />
-            {touched.email && errors.email && (
-              <Text style={styles.error}>{errors.email}</Text>
-            )}
-
+    <>
+      <Formik
+        initialValues={{ email: "", password: "" }}
+        validationSchema={LoginSchema}
+        onSubmit={(values) => handleLoginForm(values)}
+      >
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
+          <TouchableWithoutFeedback onPress={dismissKeyboard}>
             <View>
               <TextInput
                 style={styles.input}
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
-                value={values.password}
-                placeholder="Пароль"
-                secureTextEntry={!showPassword}
+                onChangeText={handleChange("email")}
+                onBlur={handleBlur("email")}
+                value={values.email}
+                placeholder="Email"
               />
-              <TouchableOpacity
-                style={styles.iconContainer}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? "eye-off" : "eye"}
-                  size={24}
-                  color="gray"
+              {touched.email && errors.email && (
+                <Text style={styles.error}>{errors.email}</Text>
+              )}
+
+              <View>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={handleChange("password")}
+                  onBlur={handleBlur("password")}
+                  value={values.password}
+                  placeholder="Пароль"
+                  secureTextEntry={!showPassword}
                 />
+                <TouchableOpacity
+                  style={styles.iconContainer}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-off" : "eye"}
+                    size={24}
+                    color="gray"
+                  />
+                </TouchableOpacity>
+              </View>
+              {touched.password && errors.password && (
+                <Text style={styles.error}>{errors.password}</Text>
+              )}
+              {/* <View>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.googleButton}
+                  onPress={handleGoogleSignIn}
+                >
+                  <Ionicons name="logo-google" size={24} color="#fff" />
+                  <SvgUri uri="../images/google.svg" width={24} height={24} />
+                  <Text style={styles.googleButtonText}>
+                    Ввойдите с помощью Google
+                  </Text>
+                </TouchableOpacity>
+              </View> */}
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={styles.button}
+                onPress={handleSubmit}
+              >
+                <Text style={styles.buttonText}>Login</Text>
               </TouchableOpacity>
             </View>
-            {touched.password && errors.password && (
-              <Text style={styles.error}>{errors.password}</Text>
-            )}
-
-            <TouchableOpacity
-              activeOpacity={0.7}
-              style={styles.button}
-              onPress={handleSubmit}
-            >
-              <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableWithoutFeedback>
-      )}
-    </Formik>
+          </TouchableWithoutFeedback>
+        )}
+      </Formik>
+    </>
   );
 };
 
@@ -149,7 +167,21 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     flexDirection: "row",
   },
-
+  googleButton: {
+    marginTop: 16,
+    height: 48,
+    paddingHorizontal: 16,
+    borderRadius: 5,
+    backgroundColor: "#DB4437",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  googleButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    marginLeft: 8,
+  },
   iconContainer: {
     position: "absolute",
     top: 15,
