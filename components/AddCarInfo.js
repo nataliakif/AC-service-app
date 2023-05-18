@@ -9,14 +9,36 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import uuid from "react-native-uuid";
 import { Formik } from "formik";
 import ImagePickerForm from "./ImagePickerForm";
 import { TextInputMask } from "react-native-masked-text";
 import DatePicker from "react-native-datepicker";
+import { ref, set } from "firebase/database";
+import { db, firebase } from "../config/firebase";
 
-const AddCarScreen = () => {
+const AddCarScreen = ({ partsToRepair }) => {
+  const [image, setImage] = useState(null);
   const dismissKeyboard = () => {
     Keyboard.dismiss();
+  };
+
+  const uploadImage = async () => {
+    const response = await fetch(image.uri);
+    const blob = await response.blob();
+
+    const filename = image.uri.substring(image.uri.lastIndexOf("/") + 1);
+    const storageRef = firebase.storage().ref().child(filename);
+    let downloadURL = "";
+    try {
+      const uploadTask = storageRef.put(blob);
+      await uploadTask;
+      downloadURL = await storageRef.getDownloadURL();
+    } catch (e) {
+      console.log(e);
+    }
+    setImage(null);
+    return downloadURL;
   };
 
   return (
@@ -31,8 +53,26 @@ const AddCarScreen = () => {
           startDate: new Date(),
           description: "",
         }}
-        onSubmit={(values) => {
-          console.log(values);
+        onSubmit={async (values) => {
+          //console.log(values);
+          const photoURL = await uploadImage();
+          const { model, color, number, owner, phone, startDate, description } =
+            values;
+          set(ref(db, "calcs/" + uuid.v1()), {
+            carInfo: {
+              model,
+              color,
+              number,
+              owner,
+              phone,
+              startDate,
+              description,
+              photoURL,
+            },
+            status: "pending",
+            partsToRepair,
+          });
+          //отсюда нужно делать редирект ....
         }}
       >
         {({
@@ -45,7 +85,11 @@ const AddCarScreen = () => {
         }) => (
           <TouchableWithoutFeedback onPress={dismissKeyboard}>
             <View>
-              <ImagePickerForm value={values.photo}></ImagePickerForm>
+              <ImagePickerForm
+                name={values.photo}
+                image={image}
+                setImage={setImage}
+              ></ImagePickerForm>
               <View style={styles.inputContainer}>
                 <Text style={styles.title}>Основные данные</Text>
                 <Text style={styles.label}>Марка машины:</Text>
@@ -103,7 +147,7 @@ const AddCarScreen = () => {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Дата приема:</Text>
+                <Text style={styles.label}>Дата просчета:</Text>
                 <DatePicker
                   style={styles.datePicker}
                   value={values.startDate}

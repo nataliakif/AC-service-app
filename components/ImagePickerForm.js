@@ -4,8 +4,7 @@ import { useFormikContext } from "formik";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const ImagePickerForm = ({ name }) => {
-  const [image, setImage] = useState(null);
+const ImagePickerForm = ({ name, image, setImage }) => {
   const { setFieldValue } = useFormikContext();
 
   const handleChooseImage = async () => {
@@ -17,7 +16,8 @@ const ImagePickerForm = ({ name }) => {
     });
 
     if (!result.cancelled) {
-      setImage(result.uri);
+      const source = { uri: result.assets[0].uri };
+      setImage(source);
       setFieldValue(name, result.uri);
     }
   };
@@ -29,7 +29,7 @@ const ImagePickerForm = ({ name }) => {
           <MaterialIcons name="add" size={70} color="#fff" />
         </View>
       ) : (
-        <Image source={{ uri: image }} style={styles.image} />
+        <Image source={{ uri: image.uri }} style={styles.image} />
       )}
     </TouchableOpacity>
   );
