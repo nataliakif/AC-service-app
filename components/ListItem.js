@@ -3,6 +3,7 @@ import { database } from "../config/firebase";
 import {
   View,
   Text,
+  Image,
   TextInput,
   StyleSheet,
   Keyboard,
@@ -40,7 +41,10 @@ const ListItem = ({ data }) => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
       <Formik
         initialValues={{
           color: carInfo.color || "",
@@ -59,7 +63,7 @@ const ListItem = ({ data }) => {
         {({ handleChange, handleBlur, handleSubmit, values, dirty }) => (
           <TouchableWithoutFeedback onPress={dismissKeyboard}>
             <View>
-              {/* <Image source={{ uri: image }} style={styles.image} /> */}
+              <Image source={{}} style={styles.image} />
               <View style={styles.inputContainer}>
                 <StatusDropdown
                   value={values.status}
@@ -165,10 +169,10 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   image: {
-    width: 300,
-    height: 200,
+    width: 340,
+    height: 220,
     backgroundColor: "#BABABA",
-    marginHorizontal: 30,
+    marginHorizontal: 0,
   },
   formWrapper: {
     alignItems: "center",

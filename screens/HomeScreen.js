@@ -20,10 +20,7 @@ export default function HomeScreen() {
 
     onValue(dataRef, (snapshot) => {
       const calcs = snapshot.val();
-      const inProgressCalcs = Object.values(calcs).filter(
-        (calc) => calc.status === "inProgress"
-      );
-      setData(inProgressCalcs);
+      setData(calcs);
       setIsLoading(false);
     });
   }, []);
@@ -34,6 +31,8 @@ export default function HomeScreen() {
       .filter((key) =>
         data[key].carInfo.model.toLowerCase().includes(search.toLowerCase())
       )
+      .filter((key) => data[key].status === "inProgress")
+
       .map((key) => ({ key, ...data[key] }));
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>

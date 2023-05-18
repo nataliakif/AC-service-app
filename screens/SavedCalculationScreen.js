@@ -20,10 +20,7 @@ export default function SavedCalculationsScreen() {
 
     onValue(dataRef, (snapshot) => {
       const calcs = snapshot.val();
-      const inProgressCalcs = Object.values(calcs).filter(
-        (calc) => calc.status === "pending"
-      );
-      setData(inProgressCalcs);
+      setData(calcs);
       setIsLoading(false);
     });
   }, []);
@@ -34,6 +31,7 @@ export default function SavedCalculationsScreen() {
       .filter((key) =>
         data[key].carInfo.model.toLowerCase().includes(search.toLowerCase())
       )
+      .filter((key) => data[key].status === "pending")
       .map((key) => ({ key, ...data[key] }));
 
   return (

@@ -35,12 +35,14 @@ const StatusDropdown = ({ value, onChange }) => {
 };
 
 const styles = StyleSheet.create({
-  inputContainer: { heith: 100 },
-
+  input: { height: 160 },
   statusIndicator: {
     width: 20,
     height: 20,
     borderRadius: 10,
+    position: "absolute",
+    left: 20,
+    top: 100,
   },
   inProgressIndicator: {
     backgroundColor: "#77eb34",
