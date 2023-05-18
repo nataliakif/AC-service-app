@@ -1,5 +1,6 @@
 import { ref, update } from "firebase/database";
 import { database } from "../config/firebase";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -14,12 +15,16 @@ import {
 import { Formik } from "formik";
 import { TextInputMask } from "react-native-masked-text";
 import StatusDropdown from "./StatusDropdown";
+import { useNavigation } from "@react-navigation/native";
 
-const ListItem = ({ data }) => {
+const ListItem = ({ data, setModalVisible }) => {
   const { carInfo, status, key } = data;
+  const navigation = useNavigation();
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
+
   function updateInfo(values) {
     update(ref(database, "calcs/" + key), {
       carInfo: {
@@ -34,6 +39,8 @@ const ListItem = ({ data }) => {
     })
       .then(() => {
         console.log("data updated");
+        navigation.navigate("В работе");
+        setModalVisible(false);
       })
       .catch((error) => {
         console.log(error);

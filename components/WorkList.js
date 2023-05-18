@@ -76,7 +76,12 @@ const WorkList = ({ data, isLoading }) => {
           }}
         />
 
-        {selectedItem && <ListItem data={selectedItem}></ListItem>}
+        {selectedItem && (
+          <ListItem
+            data={selectedItem}
+            setModalVisible={setModalVisible}
+          ></ListItem>
+        )}
       </Modal>
     </View>
   );
