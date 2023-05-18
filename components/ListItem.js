@@ -1,6 +1,5 @@
 import { ref, update } from "firebase/database";
-import { database } from "../config/firebase";
-import React, { useState } from "react";
+import { db } from "../config/firebase";
 import {
   View,
   Text,
@@ -26,7 +25,7 @@ const ListItem = ({ data, setModalVisible }) => {
   };
 
   function updateInfo(values) {
-    update(ref(database, "calcs/" + key), {
+    update(ref(db, "calcs/" + key), {
       carInfo: {
         color: values.color,
         description: values.description,
@@ -62,6 +61,7 @@ const ListItem = ({ data, setModalVisible }) => {
           phone: carInfo.phone || "",
           startDate: new Date(),
           status: status,
+          photoURL: carInfo.photoURL,
         }}
         onSubmit={(values) => {
           updateInfo(values);
@@ -70,7 +70,11 @@ const ListItem = ({ data, setModalVisible }) => {
         {({ handleChange, handleBlur, handleSubmit, values, dirty }) => (
           <TouchableWithoutFeedback onPress={dismissKeyboard}>
             <View>
-              <Image source={{}} style={styles.image} />
+              <Image
+                source={{ uri: values.photoURL }}
+                defaultSource={require("../images/plugPhoto.jpeg")}
+                style={styles.image}
+              />
               <View style={styles.inputContainer}>
                 <StatusDropdown
                   value={values.status}

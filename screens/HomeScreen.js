@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { ref, onValue } from "firebase/database";
-import { database } from "../config/firebase";
+import { db } from "../config/firebase";
 import SearchBar from "../components/SearchBar";
 import WorkList from "../components/WorkList";
 
@@ -16,7 +16,7 @@ export default function HomeScreen() {
     Keyboard.dismiss();
   };
   useEffect(() => {
-    const dataRef = ref(database, "calcs/");
+    const dataRef = ref(db, "calcs/");
 
     onValue(dataRef, (snapshot) => {
       const calcs = snapshot.val();

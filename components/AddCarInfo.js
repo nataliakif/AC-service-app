@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import uuid from "react-native-uuid";
 import { Formik } from "formik";
 import ImagePickerForm from "./ImagePickerForm";
@@ -17,8 +18,9 @@ import DatePicker from "react-native-datepicker";
 import { ref, set } from "firebase/database";
 import { db, firebase } from "../config/firebase";
 
-const AddCarScreen = ({ partsToRepair }) => {
+const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
   const [image, setImage] = useState(null);
+  const navigation = useNavigation();
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
@@ -54,7 +56,6 @@ const AddCarScreen = ({ partsToRepair }) => {
           description: "",
         }}
         onSubmit={async (values) => {
-          //console.log(values);
           const photoURL = await uploadImage();
           const { model, color, number, owner, phone, startDate, description } =
             values;
@@ -72,17 +73,11 @@ const AddCarScreen = ({ partsToRepair }) => {
             status: "pending",
             partsToRepair,
           });
-          //отсюда нужно делать редирект ....
+          navigation.navigate("Архив");
+          setshowAddCarInfoDialog(false);
         }}
       >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-        }) => (
+        {({ handleChange, handleBlur, handleSubmit, values }) => (
           <TouchableWithoutFeedback onPress={dismissKeyboard}>
             <View>
               <ImagePickerForm

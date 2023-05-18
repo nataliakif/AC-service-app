@@ -335,6 +335,7 @@ export default function CalculateScreen() {
                 carCategory,
                 paintCategory,
               }}
+              setshowAddCarInfoDialog={setshowAddCarInfoDialog}
             ></AddCarInfo>
           </Modal>
         </>

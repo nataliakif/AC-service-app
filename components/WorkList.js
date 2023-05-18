@@ -31,8 +31,8 @@ const WorkList = ({ data, isLoading }) => {
                   style={styles.carItem}
                 >
                   <Image
-                    source={{ uri: carInfo.photo }}
-                    onError={() => require("../images/plugPhoto.jpeg")}
+                    source={{ uri: carInfo.photoURL }}
+                    defaultSource={require("../images/plugPhoto.jpeg")}
                     style={styles.carImage}
                   />
                   <View style={styles.carDetails}>
@@ -112,7 +112,6 @@ const styles = StyleSheet.create({
   carImage: {
     width: 150,
     height: 100,
-    backgroundColor: "#69BBCD",
   },
   carModel: {
     fontSize: 16,
