@@ -329,7 +329,13 @@ export default function CalculateScreen() {
                 setshowAddCarInfoDialog(false);
               }}
             />
-            <AddCarInfo></AddCarInfo>
+            <AddCarInfo
+              partsToRepair={{
+                ...selectedPartsToRepair,
+                carCategory,
+                paintCategory,
+              }}
+            ></AddCarInfo>
           </Modal>
         </>
       )}
