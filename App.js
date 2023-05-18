@@ -11,6 +11,7 @@ import HomeScreen from "./screens/HomeScreen";
 import DetailsScreen from "./screens/DetailsScreen";
 import CalculateScreen from "./screens/CalculateScreen";
 import ServiceZonesScreen from "./screens/ServiceZonesScreen";
+import SavedCalculationsScreen from "./screens/SavedCalculationScreen";
 import { auth } from "./config/firebase";
 
 const Tab = createBottomTabNavigator();
@@ -72,7 +73,7 @@ function AppStack() {
       <Tab.Screen name="В работе" component={HomeScreen} />
       <Tab.Screen name="Просчет" component={CalculateScreen} />
       <Tab.Screen name="Сервис" component={ServiceZonesScreen} />
-      <Tab.Screen name="Архив" component={DetailsScreen} />
+      <Tab.Screen name="Архив" component={SavedCalculationsScreen} />
       <Tab.Screen name="Ещё" component={DetailsScreen} />
     </Tab.Navigator>
   );

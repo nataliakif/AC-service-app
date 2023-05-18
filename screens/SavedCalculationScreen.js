@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { ref, onValue } from "firebase/database";
 import { database } from "../config/firebase";
+import { View, TouchableWithoutFeedback, Keyboard } from "react-native";
 import SearchBar from "../components/SearchBar";
 import WorkList from "../components/WorkList";
 
-export default function HomeScreen() {
+export default function SavedCalculationsScreen() {
   const [search, setSearch] = useState("");
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +21,7 @@ export default function HomeScreen() {
     onValue(dataRef, (snapshot) => {
       const calcs = snapshot.val();
       const inProgressCalcs = Object.values(calcs).filter(
-        (calc) => calc.status === "inProgress"
+        (calc) => calc.status === "pending"
       );
       setData(inProgressCalcs);
       setIsLoading(false);
@@ -35,13 +35,14 @@ export default function HomeScreen() {
         data[key].carInfo.model.toLowerCase().includes(search.toLowerCase())
       )
       .map((key) => ({ key, ...data[key] }));
+
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <View
         style={{
           flex: 1,
-          alignItems: "flex-start",
           justifyContent: "center",
+          alignItems: "flex-start",
           paddingHorizontal: 20,
           marginTop: 80,
         }}
