@@ -8,6 +8,8 @@ export default {
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
+    owner: "natalka23",
+
     splash: {
       image: "./assets/splash.png",
       resizeMode: "contain",
@@ -33,6 +35,9 @@ export default {
       storageBucket: process.env.STORAGE_BUCKET,
       messagingSenderId: process.env.MESSAGING_SENDER_ID,
       appId: process.env.APP_ID,
+      eas: {
+        projectId: "9c1afb50-3cee-463c-924f-4b2cf94cf484",
+      },
     },
   },
 };
