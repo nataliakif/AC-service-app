@@ -18,11 +18,12 @@ export default {
     assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,
+      bundleIdentifier: "9c1afb50-3cee-463c-924f-4b2cf94cf484",
     },
     android: {
+      package: "com.ac.service",
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#ffffff",
       },
     },
     web: {
