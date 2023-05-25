@@ -1,11 +1,10 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import Constants from "expo-constants";
+// import Constants from "expo-constants";
 import { getDatabase } from "firebase/database";
 import firebase from "firebase/compat/app";
 import "firebase/compat/storage";
-
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -38,4 +37,3 @@ export const database = getFirestore();
 //realtime database
 export const db = getDatabase();
 export { firebase };
-
