@@ -36,9 +36,10 @@ export default function ServiceZonesScreen() {
   }, []);
 
   useEffect(() => {
-    const filteredKeys = Object.keys(data).filter(
-      (key) => data[key].status === "inProgress"
-    );
+    const filteredKeys =
+      data &&
+      Object.keys(data).filter((key) => data[key].status === "inProgress");
+
     switch (selectedZone) {
       case "Assembling":
         const assemblingData = filteredKeys

@@ -11,13 +11,15 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import Gear from "../assets/gear.svg";
 import { Formik } from "formik";
 import { TextInputMask } from "react-native-masked-text";
 import StatusDropdown from "./StatusDropdown";
 import { useNavigation } from "@react-navigation/native";
 
 const ListItem = ({ data, setModalVisible }) => {
-  const { carInfo, status, key } = data;
+  const { carInfo, status, key, partsToRepair } = data;
+  console.log(data);
   const navigation = useNavigation();
 
   const dismissKeyboard = () => {
@@ -155,6 +157,21 @@ const ListItem = ({ data, setModalVisible }) => {
                   onChangeText={handleChange("description")}
                 />
               </View>
+              <View>
+                <Text style={styles.title}>Перечень деталей в работу: </Text>
+                {Object.keys(partsToRepair).map((key) => {
+                  const part = partsToRepair[key];
+                  if (key !== "carCategory" && key !== "paintCategory") {
+                    return (
+                      <View key={key} style={styles.partContainer}>
+                        <Gear style={styles.icon} />
+                        <Text style={styles.partName}>{part.partName}</Text>
+                      </View>
+                    );
+                  }
+                  return null;
+                })}
+              </View>
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={[styles.button, !dirty && styles.disabledButton]} // Add styles based on dirty property
@@ -239,6 +256,18 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.5,
+  },
+
+  partContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    padding: 10,
+  },
+  partName: {
+    fontWeight: "400",
+    fontSize: 18,
+    marginLeft: 8,
   },
 });
 

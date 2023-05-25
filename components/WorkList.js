@@ -12,6 +12,7 @@ const WorkList = ({ data, isLoading }) => {
 
   const handleItemPress = (item) => {
     setSelectedItem(item);
+    console.log(item);
     setModalVisible(true);
   };
   return (
