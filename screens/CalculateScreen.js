@@ -259,8 +259,9 @@ export default function CalculateScreen() {
             }}
           >
             <ScrollView style={styles.partListDialog}>
-              {partListData.map((part) => (
+              {partListData.map((part, index) => (
                 <ListItem
+                  key={index}
                   onPress={() => {
                     setShowPartsListDialog(false);
                     setShowSpecificPartsDialog(true);

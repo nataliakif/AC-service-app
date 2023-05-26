@@ -17,10 +17,9 @@ export default function EstimateOfSelectedPartsToRepair({
   return (
     <ScrollView style={styles.container} alwaysBounceVertical>
       <Text style={styles.title}>Расчет</Text>
-      {selectedPartsToRepair.map((part) => (
-        <>
+      {selectedPartsToRepair.map((part, index) => (
+        <View key={index}>
           <PartRepairExpandableItem
-            key={Math.random()}
             selectedPartToRepair={part}
             isExpanded={false}
             canBeRemoved
@@ -30,7 +29,7 @@ export default function EstimateOfSelectedPartsToRepair({
           />
 
           <Divider style={styles.divider} />
-        </>
+        </View>
       ))}
       <View style={styles.buttonContainer}>
         <TouchableOpacity

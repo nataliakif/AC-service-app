@@ -8,7 +8,15 @@ import {
 } from "react-native";
 import NumericInput from "react-native-numeric-input";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { vocabularyTasks } from "../screens/CalculateScreen";
+
+const vocabularyTasks = {
+  mountingTime: "снятие / установка",
+  assemblingTime: "разборка / сборка",
+  repairTime: "ремонт / рихтовка",
+  paintPrice: "покраска",
+  //polishingPrice: "полировка",
+  orderNewDetailPrice: "заказ новой детали",
+};
 
 export default function PartRepairTaskExpandable({
   repairTaskName,
