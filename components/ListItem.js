@@ -1,5 +1,6 @@
 import { ref, update } from "firebase/database";
 import { db } from "../config/firebase";
+import React from "react";
 import {
   View,
   Text,
@@ -15,11 +16,11 @@ import Gear from "../assets/gear.svg";
 import { Formik } from "formik";
 import { TextInputMask } from "react-native-masked-text";
 import StatusDropdown from "./StatusDropdown";
+
 import { useNavigation } from "@react-navigation/native";
 
 const ListItem = ({ data, setModalVisible }) => {
   const { carInfo, status, key, partsToRepair } = data;
-  console.log(data);
   const navigation = useNavigation();
 
   const dismissKeyboard = () => {
@@ -115,7 +116,7 @@ const ListItem = ({ data, setModalVisible }) => {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Ваделец:</Text>
+                <Text style={styles.label}>Владелец:</Text>
                 <TextInput
                   style={styles.input}
                   value={values.owner}
@@ -135,43 +136,66 @@ const ListItem = ({ data, setModalVisible }) => {
                     mask: " (099) 999-99-99",
                   }}
                   onChangeText={handleChange("phone")}
-                  handleBlur={handleBlur("phone")}
+                  onBlur={handleBlur("phone")}
                 />
               </View>
 
-              {/* <View style={styles.inputContainer}>
-                <Text style={styles.label}>Дата приема:</Text>
-                <DatePicker
-                  style={styles.datePicker}
-                  value={values.startDate}
-                  disabled="true"
-                  format="DD-MM-YYYY"
-                />
-              </View> */}
-
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Допонительная информация:</Text>
+                <Text style={styles.label}>Дополнительная информация:</Text>
                 <TextInput
                   style={{ ...styles.input, ...styles.description }}
-                  value={values.decription}
+                  value={values.description}
                   onChangeText={handleChange("description")}
                 />
               </View>
+
               <View>
-                <Text style={styles.title}>Перечень деталей в работу: </Text>
+                <Text style={styles.title}>Перечень деталей в работу:</Text>
+
                 {Object.keys(partsToRepair).map((key) => {
                   const part = partsToRepair[key];
                   if (key !== "carCategory" && key !== "paintCategory") {
                     return (
                       <View key={key} style={styles.partContainer}>
-                        <Gear style={styles.icon} />
-                        <Text style={styles.partName}>{part.partName}</Text>
+                        <View style={styles.partNameContainer}>
+                          <Gear style={styles.icon} />
+                          <Text style={styles.partName}>{part.partName}</Text>
+                        </View>
+                        <View style={styles.workAmountContainer}>
+                          {part.workAmount.assemblingTime > 0 && (
+                            <Text style={styles.workAmount}>
+                              Снятие/Установка
+                            </Text>
+                          )}
+                          {part.workAmount.mountingTime > 0 && (
+                            <Text style={styles.workAmount}>
+                              Сборка/Разборка
+                            </Text>
+                          )}
+                          {part.workAmount.repairTime > 0 && (
+                            <Text style={styles.workAmount}>
+                              Ремонт/Рихтовка
+                            </Text>
+                          )}
+                          {part.workAmount.paintPrice > 0 && (
+                            <>
+                              <Text style={styles.workAmount}>Покраска</Text>
+                              <Text style={styles.workAmount}>Полировка</Text>
+                            </>
+                          )}
+                          {part.workAmount.orderNewDetailPrice > 0 && (
+                            <Text style={styles.workAmount}>
+                              Заказ новых деталей
+                            </Text>
+                          )}
+                        </View>
                       </View>
                     );
                   }
                   return null;
                 })}
               </View>
+
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={[styles.button, !dirty && styles.disabledButton]} // Add styles based on dirty property
@@ -257,8 +281,10 @@ const styles = StyleSheet.create({
   disabledButton: {
     opacity: 0.5,
   },
-
   partContainer: {
+    flexDirection: "column",
+  },
+  partNameContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
@@ -269,6 +295,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 8,
   },
+  workAmountContainer: {
+    flexDirection: "column",
+    marginLeft: 10,
+  },
+  workAmount: { color: "#757373", marginBottom: 5 },
 });
 
 export default ListItem;
