@@ -16,20 +16,73 @@ import Gear from "../assets/gear.svg";
 import { Formik } from "formik";
 import { TextInputMask } from "react-native-masked-text";
 import StatusDropdown from "./StatusDropdown";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
-import { useNavigation } from "@react-navigation/native";
-
-const ListItem = ({ data, setModalVisible }) => {
-  const { carInfo, status, key, partsToRepair } = data;
+const ListItem = ({ data, setModalVisible, selectedZone }) => {
+  const { carInfo, status, key, partsToRepair, workStatus } = data;
   const navigation = useNavigation();
-
+  const route = useRoute();
+  const { name } = route;
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
 
   function updateInfo(values) {
     if (values.status === "inProgress") {
-      // Обновление информации о машине
+      // Создание нового объекта с информацией о машине
+      const updatedCarInfo = {
+        color: values.color,
+        description: values.description,
+        model: values.model,
+        number: values.number,
+        owner: values.owner,
+        phone: values.phone,
+        vinCode: values.vinCode,
+        startDate: values.startDate,
+        photoURL: values.photoURL,
+      };
+      console.log(selectedZone);
+      console.log(values.workStatus);
+      // Создание нового объекта с информацией о статусе работы
+      const workStatus = {
+        assemblingStatus:
+          selectedZone === "Assembling" ? values.workStatus : "pending",
+        mountingStatus:
+          selectedZone === "Mounting" ? values.workStatus : "pending",
+        paintStatus: selectedZone === "Paint" ? values.workStatus : "pending",
+        polishingStatus:
+          selectedZone === "Polishing" ? values.workStatus : "pending",
+        repairStatus: selectedZone === "Repair" ? values.workStatus : "pending",
+        orderNewDetailStatus:
+          selectedZone === "orderNewDetail" ? values.workStatus : "pending",
+      };
+
+      // Обновление информации о машине и статусе работы
+      update(ref(db, "calcs/" + key), {
+        carInfo: updatedCarInfo,
+        partsToRepair: partsToRepair,
+        workStatus: workStatus,
+        status: values.status,
+      })
+        .then(() => {
+          console.log("Object updated");
+          navigation.navigate("В работе");
+          setModalVisible(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (values.status === "delete") {
+      // Удаление объекта
+      remove(ref(db, "calcs/" + key))
+        .then(() => {
+          console.log("Object deleted");
+          setModalVisible(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (values.status === "pending") {
       update(ref(db, "calcs/" + key), {
         carInfo: {
           color: values.color,
@@ -45,18 +98,8 @@ const ListItem = ({ data, setModalVisible }) => {
         status: values.status,
       })
         .then(() => {
-          console.log("Data updated");
-          navigation.navigate("В работе");
-          setModalVisible(false);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else if (values.status === "delete") {
-      // Удаление объекта
-      remove(ref(db, "calcs/" + key))
-        .then(() => {
-          console.log("Object deleted");
+          console.log("Object updated");
+          navigation.navigate("Архив");
           setModalVisible(false);
         })
         .catch((error) => {
@@ -81,7 +124,8 @@ const ListItem = ({ data, setModalVisible }) => {
           vinCode: carInfo.vinCode || "",
           startDate: new Date().toLocaleDateString(),
           status: status,
-          photoURL: carInfo.photoURL,
+          workStatus: workStatus,
+          photoURL: carInfo.photoURL || "",
         }}
         onSubmit={(values) => {
           updateInfo(values);
@@ -95,12 +139,15 @@ const ListItem = ({ data, setModalVisible }) => {
                 defaultSource={require("../images/plugPhoto.jpeg")}
                 style={styles.image}
               />
-              <View style={styles.inputContainer}>
-                <StatusDropdown
-                  value={values.status}
-                  onChange={handleChange("status")}
-                />
-              </View>
+              {name !== "Сервис" && (
+                <View style={styles.inputContainer}>
+                  <StatusDropdown
+                    value={values.status}
+                    onChange={handleChange("status")}
+                    label="Удалить"
+                  />
+                </View>
+              )}
               <View style={styles.inputContainer}>
                 <Text style={styles.title}>Основные данные</Text>
                 <Text style={styles.label}>Марка машины:</Text>
@@ -136,7 +183,7 @@ const ListItem = ({ data, setModalVisible }) => {
                 <TextInput
                   style={styles.input}
                   value={values.vinCode}
-                  placeholder="AB0000BA"
+                  placeholder=""
                   onChangeText={handleChange("vinCode")}
                 />
               </View>
@@ -181,53 +228,60 @@ const ListItem = ({ data, setModalVisible }) => {
                   onChangeText={handleChange("description")}
                 />
               </View>
+              {name === "Сервис" && (
+                <View>
+                  <Text style={styles.title}>Перечень деталей в работу:</Text>
 
-              <View>
-                <Text style={styles.title}>Перечень деталей в работу:</Text>
+                  <StatusDropdown
+                    value={values.workStatus}
+                    onChange={handleChange("workStatus")}
+                    label="Завершить"
+                  />
 
-                {Object.keys(partsToRepair).map((key) => {
-                  const part = partsToRepair[key];
-                  if (key !== "carCategory" && key !== "paintCategory") {
-                    return (
-                      <View key={key} style={styles.partContainer}>
-                        <View style={styles.partNameContainer}>
-                          <Gear style={styles.icon} />
-                          <Text style={styles.partName}>{part.partName}</Text>
+                  {Object.keys(partsToRepair).map((key) => {
+                    const part = partsToRepair[key];
+                    if (key !== "carCategory" && key !== "paintCategory") {
+                      return (
+                        <View key={key} style={styles.partContainer}>
+                          <View style={styles.partNameContainer}>
+                            <Gear style={styles.icon} />
+                            <Text style={styles.partName}>{part.partName}</Text>
+                          </View>
+                          <View style={styles.workAmountContainer}>
+                            {part.workAmount.assemblingTime > 0 && (
+                              <Text style={styles.workAmount}>
+                                Снятие/Установка
+                              </Text>
+                            )}
+                            {part.workAmount.mountingTime > 0 && (
+                              <Text style={styles.workAmount}>
+                                Сборка/Разборка
+                              </Text>
+                            )}
+                            {part.workAmount.repairTime > 0 && (
+                              <Text style={styles.workAmount}>
+                                Ремонт/Рихтовка
+                              </Text>
+                            )}
+                            {part.workAmount.paintPrice > 0 && (
+                              <>
+                                <Text style={styles.workAmount}>Покраска</Text>
+                                <Text style={styles.workAmount}>Полировка</Text>
+                              </>
+                            )}
+                            {part.workAmount.orderNewDetailPrice > 0 && (
+                              <Text style={styles.workAmount}>
+                                Заказ новых деталей
+                              </Text>
+                            )}
+                          </View>
                         </View>
-                        <View style={styles.workAmountContainer}>
-                          {part.workAmount.assemblingTime > 0 && (
-                            <Text style={styles.workAmount}>
-                              Снятие/Установка
-                            </Text>
-                          )}
-                          {part.workAmount.mountingTime > 0 && (
-                            <Text style={styles.workAmount}>
-                              Сборка/Разборка
-                            </Text>
-                          )}
-                          {part.workAmount.repairTime > 0 && (
-                            <Text style={styles.workAmount}>
-                              Ремонт/Рихтовка
-                            </Text>
-                          )}
-                          {part.workAmount.paintPrice > 0 && (
-                            <>
-                              <Text style={styles.workAmount}>Покраска</Text>
-                              <Text style={styles.workAmount}>Полировка</Text>
-                            </>
-                          )}
-                          {part.workAmount.orderNewDetailPrice > 0 && (
-                            <Text style={styles.workAmount}>
-                              Заказ новых деталей
-                            </Text>
-                          )}
-                        </View>
-                      </View>
-                    );
-                  }
-                  return null;
-                })}
-              </View>
+                      );
+                    }
+                    return null;
+                  })}
+                </View>
+              )}
 
               <TouchableOpacity
                 activeOpacity={0.7}

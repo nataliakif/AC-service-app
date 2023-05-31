@@ -47,6 +47,8 @@ export default function ServiceZonesScreen() {
             const item = data[key];
 
             return (
+              item.workStatus &&
+              item.workStatus.assemblingStatus !== "" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
                 .filter(
@@ -67,6 +69,9 @@ export default function ServiceZonesScreen() {
             const item = data[key];
 
             return (
+              item.workStatus &&
+              item.workStatus.mountingStatus === "pending" &&
+              item.workStatus.assemblingStatus === "delete" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
                 .filter(
@@ -87,6 +92,9 @@ export default function ServiceZonesScreen() {
             const item = data[key];
 
             return (
+              item.workStatus &&
+              item.workStatus.mountingStatus === "delete" &&
+              item.workStatus.repairStatus === "pending" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
                 .filter((part) => part.workAmount && part.workAmount.repairTime)
@@ -105,6 +113,9 @@ export default function ServiceZonesScreen() {
             const item = data[key];
 
             return (
+              item.workStatus &&
+              item.workStatus.repairStatus === "delete" &&
+              item.workStatus.paintStatus === "pending" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
                 .filter((part) => part.workAmount && part.workAmount.paintPrice)
@@ -122,6 +133,9 @@ export default function ServiceZonesScreen() {
           .filter((key) => {
             const item = data[key];
             return (
+              item.workStatus &&
+              item.workStatus.paintStatus === "delete" &&
+              item.workStatus.polishingStatus === "pending" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
                 .filter((part) => part.workAmount && part.workAmount.paintPrice)
@@ -140,6 +154,8 @@ export default function ServiceZonesScreen() {
             const item = data[key];
 
             return (
+              item.workStatus &&
+              item.workStatus.orderNewDetailsStatus === "pending" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
                 .filter(
@@ -223,7 +239,11 @@ export default function ServiceZonesScreen() {
                 setModalVisible(false);
               }}
             />
-            <WorkList data={filteredData} isLoading={isLoading}></WorkList>
+            <WorkList
+              data={filteredData}
+              isLoading={isLoading}
+              selectedZone={selectedZone}
+            ></WorkList>
           </View>
         </TouchableWithoutFeedback>
       </Modal>

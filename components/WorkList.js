@@ -6,7 +6,7 @@ import Modal from "react-native-modal";
 import { AntDesign } from "@expo/vector-icons";
 import ListItem from "../components/ListItem";
 
-const WorkList = ({ data, isLoading }) => {
+const WorkList = ({ data, isLoading, selectedZone }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -81,6 +81,7 @@ const WorkList = ({ data, isLoading }) => {
           <ListItem
             data={selectedItem}
             setModalVisible={setModalVisible}
+            selectedZone={selectedZone}
           ></ListItem>
         )}
       </Modal>

@@ -57,7 +57,7 @@ const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
         }}
         onSubmit={async (values) => {
           const photoURL = await uploadImage();
-          const { model, color, number, owner, phone, startDate, description } =
+          const { model, color, number, owner, phone, vinCode, description } =
             values;
           set(ref(db, "calcs/" + uuid.v1()), {
             carInfo: {
