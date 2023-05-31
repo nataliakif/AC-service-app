@@ -14,7 +14,6 @@ import uuid from "react-native-uuid";
 import { Formik } from "formik";
 import ImagePickerForm from "./ImagePickerForm";
 import { TextInputMask } from "react-native-masked-text";
-import DatePicker from "react-native-datepicker";
 import { ref, set } from "firebase/database";
 import { db, firebase } from "../config/firebase";
 
@@ -51,6 +50,7 @@ const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
           color: "",
           number: "",
           owner: "",
+          vinCode: "",
           phone: "",
           startDate: new Date(),
           description: "",
@@ -64,9 +64,9 @@ const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
               model,
               color,
               number,
+              vinCode,
               owner,
               phone,
-              startDate,
               description,
               photoURL,
             },
@@ -115,6 +115,15 @@ const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
                   onChangeText={handleChange("number")}
                 />
               </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>VIN код:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={values.vinCode}
+                  placeholder=""
+                  onChangeText={handleChange("vinCode")}
+                />
+              </View>
 
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Ваделец:</Text>
@@ -138,16 +147,6 @@ const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
                   }}
                   onChangeText={handleChange("phone")}
                   handleBlur={handleBlur("phone")}
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Дата просчета:</Text>
-                <DatePicker
-                  style={styles.datePicker}
-                  value={values.startDate}
-                  disabled="true"
-                  format="DD-MM-YYYY"
                 />
               </View>
 

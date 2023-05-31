@@ -6,13 +6,11 @@ import { getDatabase } from "firebase/database";
 import firebase from "firebase/compat/app";
 import "firebase/compat/storage";
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCpUhWBwEV3UN6w9Gm48KfLdakuyB-a6hc",
   authDomain: "ac-service-33617.firebaseapp.com",
   databaseURL:
     "https://ac-service-33617-default-rtdb.europe-west1.firebasedatabase.app",
-  storageBucket: "gs://ac-service-33617.appspot.com",
   projectId: "ac-service-33617",
   storageBucket: "ac-service-33617.appspot.com",
   messagingSenderId: "930416677434",

@@ -1,4 +1,4 @@
-import { ref, update } from "firebase/database";
+import { ref, update, remove } from "firebase/database";
 import { db } from "../config/firebase";
 import React from "react";
 import {
@@ -28,25 +28,41 @@ const ListItem = ({ data, setModalVisible }) => {
   };
 
   function updateInfo(values) {
-    update(ref(db, "calcs/" + key), {
-      carInfo: {
-        color: values.color,
-        description: values.description,
-        model: values.model,
-        number: values.number,
-        owner: values.owner,
-        phone: values.phone,
-      },
-      status: values.status,
-    })
-      .then(() => {
-        console.log("data updated");
-        navigation.navigate("В работе");
-        setModalVisible(false);
+    if (values.status === "inProgress") {
+      // Обновление информации о машине
+      update(ref(db, "calcs/" + key), {
+        carInfo: {
+          color: values.color,
+          description: values.description,
+          model: values.model,
+          number: values.number,
+          owner: values.owner,
+          phone: values.phone,
+          vinCode: values.vinCode,
+          startDate: values.startDate,
+          photoURL: values.photoURL,
+        },
+        status: values.status,
       })
-      .catch((error) => {
-        console.log(error);
-      });
+        .then(() => {
+          console.log("Data updated");
+          navigation.navigate("В работе");
+          setModalVisible(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (values.status === "delete") {
+      // Удаление объекта
+      remove(ref(db, "calcs/" + key))
+        .then(() => {
+          console.log("Object deleted");
+          setModalVisible(false);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
   return (
@@ -62,7 +78,8 @@ const ListItem = ({ data, setModalVisible }) => {
           number: carInfo.number || "",
           owner: carInfo.owner || "",
           phone: carInfo.phone || "",
-          startDate: new Date(),
+          vinCode: carInfo.vinCode || "",
+          startDate: new Date().toLocaleDateString(),
           status: status,
           photoURL: carInfo.photoURL,
         }}
@@ -110,8 +127,17 @@ const ListItem = ({ data, setModalVisible }) => {
                 <TextInput
                   style={styles.input}
                   value={values.number}
-                  placeholder="AB0000BA"
+                  placeholder=""
                   onChangeText={handleChange("number")}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>VIN код:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={values.vinCode}
+                  placeholder="AB0000BA"
+                  onChangeText={handleChange("vinCode")}
                 />
               </View>
 
@@ -124,7 +150,14 @@ const ListItem = ({ data, setModalVisible }) => {
                   onChangeText={handleChange("owner")}
                 />
               </View>
-
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Дата приема:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={values.startDate}
+                  editable={false} // Запретить редактирование поля ввода
+                />
+              </View>
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Контактный номер:</Text>
                 <TextInputMask

@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Импортируйте AsyncStorage
 
 import LoginScreen from "./screens/LoginScreen";
 import RegistrationScreen from "./screens/RegistrationScreen";
@@ -15,15 +16,52 @@ import SavedCalculationsScreen from "./screens/SavedCalculationScreen";
 import { auth } from "./config/firebase";
 
 const Tab = createBottomTabNavigator();
-
 const Stack = createStackNavigator();
 
 const AuthUserContext = createContext();
 
 const AuthUserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // При загрузке приложения получаем информацию о пользователе из AsyncStorage
+    const fetchUser = async () => {
+      try {
+        const userData = await AsyncStorage.getItem("user");
+        const parsedUser = JSON.parse(userData);
+        if (parsedUser) {
+          setUser(parsedUser);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleLogin = async (user) => {
+    // При успешной авторизации сохраняем информацию о пользователе в AsyncStorage
+    try {
+      await AsyncStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleLogout = async () => {
+    // При выходе из учетной записи удаляем информацию о пользователе из AsyncStorage
+    try {
+      await AsyncStorage.removeItem("user");
+      setUser(null);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <AuthUserContext.Provider value={{ user, setUser }}>
+    <AuthUserContext.Provider value={{ user, handleLogin, handleLogout }}>
       {children}
     </AuthUserContext.Provider>
   );
@@ -80,17 +118,19 @@ function AppStack() {
 }
 
 function RootNavigator() {
-  const { user, setUser } = useContext(AuthUserContext);
+  const { user, handleLogin } = useContext(AuthUserContext);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authenticatedUser) => {
-      authenticatedUser ? setUser(authenticatedUser) : setUser(null);
+      if (authenticatedUser) {
+        handleLogin(authenticatedUser);
+      }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, []);
 
   if (loading) {
     return (

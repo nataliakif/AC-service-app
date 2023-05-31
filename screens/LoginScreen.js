@@ -1,21 +1,26 @@
+import React, { useState } from "react";
 import Header from "../components/Header";
 import LoginForm from "../components/LoginForm";
 import { StyleSheet, View, StatusBar } from "react-native";
 
 export default function LoginScreen() {
-  const isLogin = Math.random() < 0.5;
+  const [isLogin, setIsLogin] = useState(true);
+
   return (
     <View style={styles.container}>
-      {isLogin && (
+      {isLogin ? (
         <>
-          <Header title="Log In" subtitle="Sign Up" name="Регистрация"></Header>
-          <LoginForm></LoginForm>
+          <Header title="Log In" subtitle="Sign Up" name="Регистрация" />
+          <LoginForm />
         </>
+      ) : (
+        <View>{/* Разметка для другого состояния */}</View>
       )}
       <StatusBar style="auto" />
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

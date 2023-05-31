@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "930416677434",
+    "firebase_url": "https://ac-service-33617-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "ac-service-33617",
+    "storage_bucket": "ac-service-33617.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:930416677434:android:754e55668d6975c4d25b03",
+        "android_client_info": {
+          "package_name": "com.ac.service"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "930416677434-l8l4i8vtdro7p4qnanu6f4je8v0eibrd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDntRJ211Qle-AXfaQ_8NvzEhSHTfW1GBA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "930416677434-05e1icpsp9jsuiad19a03d8b06qd3sfg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "930416677434-837asvd5gtbct45p851uvt9ekiq5uvpq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "AC-service"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
