@@ -22,12 +22,18 @@ const WorkList = ({ data, isLoading, selectedZone }) => {
       ) : (
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
           {data &&
-            data.map(({ key, carInfo, status, partsToRepair }) => {
+            data.map(({ key, carInfo, status, partsToRepair, workStatus }) => {
               return (
                 <TouchableOpacity
                   key={key}
                   onPress={() =>
-                    handleItemPress({ key, carInfo, status, partsToRepair })
+                    handleItemPress({
+                      key,
+                      carInfo,
+                      status,
+                      partsToRepair,
+                      workStatus,
+                    })
                   }
                   style={styles.carItem}
                 >

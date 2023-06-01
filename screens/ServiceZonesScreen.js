@@ -48,7 +48,7 @@ export default function ServiceZonesScreen() {
 
             return (
               item.workStatus &&
-              item.workStatus.assemblingStatus !== "" &&
+              item.workStatus.assemblingStatus !== "delete" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
                 .filter(
@@ -70,7 +70,7 @@ export default function ServiceZonesScreen() {
 
             return (
               item.workStatus &&
-              item.workStatus.mountingStatus === "pending" &&
+              item.workStatus.mountingStatus !== "delete" &&
               item.workStatus.assemblingStatus === "delete" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
@@ -94,7 +94,7 @@ export default function ServiceZonesScreen() {
             return (
               item.workStatus &&
               item.workStatus.mountingStatus === "delete" &&
-              item.workStatus.repairStatus === "pending" &&
+              item.workStatus.repairStatus !== "delete" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
                 .filter((part) => part.workAmount && part.workAmount.repairTime)
@@ -115,7 +115,7 @@ export default function ServiceZonesScreen() {
             return (
               item.workStatus &&
               item.workStatus.repairStatus === "delete" &&
-              item.workStatus.paintStatus === "pending" &&
+              item.workStatus.paintStatus !== "delete" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
                 .filter((part) => part.workAmount && part.workAmount.paintPrice)
@@ -135,7 +135,7 @@ export default function ServiceZonesScreen() {
             return (
               item.workStatus &&
               item.workStatus.paintStatus === "delete" &&
-              item.workStatus.polishingStatus === "pending" &&
+              item.workStatus.polishingStatus !== "delete" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
                 .filter((part) => part.workAmount && part.workAmount.paintPrice)
@@ -155,7 +155,7 @@ export default function ServiceZonesScreen() {
 
             return (
               item.workStatus &&
-              item.workStatus.orderNewDetailsStatus === "pending" &&
+              item.workStatus.orderNewDetailsStatus !== "delete" &&
               item.partsToRepair &&
               Object.values(item.partsToRepair)
                 .filter(

@@ -1,6 +1,6 @@
 import { ref, update, remove } from "firebase/database";
 import { db } from "../config/firebase";
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -41,27 +41,48 @@ const ListItem = ({ data, setModalVisible, selectedZone }) => {
         startDate: values.startDate,
         photoURL: values.photoURL,
       };
-      console.log(selectedZone);
-      console.log(values.workStatus);
-      // Создание нового объекта с информацией о статусе работы
-      const workStatus = {
-        assemblingStatus:
-          selectedZone === "Assembling" ? values.workStatus : "pending",
-        mountingStatus:
-          selectedZone === "Mounting" ? values.workStatus : "pending",
-        paintStatus: selectedZone === "Paint" ? values.workStatus : "pending",
-        polishingStatus:
-          selectedZone === "Polishing" ? values.workStatus : "pending",
-        repairStatus: selectedZone === "Repair" ? values.workStatus : "pending",
-        orderNewDetailStatus:
-          selectedZone === "orderNewDetail" ? values.workStatus : "pending",
-      };
+
+      const updatedWorkStatus = workStatus
+        ? {
+            assemblingStatus:
+              selectedZone === "Assembling"
+                ? values.workStatus
+                : workStatus.assemblingStatus,
+            mountingStatus:
+              selectedZone === "Mounting"
+                ? values.workStatus
+                : workStatus.mountingStatus,
+            paintStatus:
+              selectedZone === "Paint"
+                ? values.workStatus
+                : workStatus.paintStatus,
+            polishingStatus:
+              selectedZone === "Polishing"
+                ? values.workStatus
+                : workStatus.polishingStatus,
+            repairStatus:
+              selectedZone === "Repair"
+                ? values.workStatus
+                : workStatus.repairStatus,
+            orderNewDetailStatus:
+              selectedZone === "orderNewDetail"
+                ? values.workStatus
+                : workStatus.orderNewDetailStatus,
+          }
+        : {
+            assemblingStatus: "pending",
+            mountingStatus: "pending",
+            paintStatus: "pending",
+            polishingStatus: "pending",
+            repairStatus: "pending",
+            orderNewDetailStatus: "pending",
+          };
 
       // Обновление информации о машине и статусе работы
       update(ref(db, "calcs/" + key), {
         carInfo: updatedCarInfo,
         partsToRepair: partsToRepair,
-        workStatus: workStatus,
+        workStatus: updatedWorkStatus,
         status: values.status,
       })
         .then(() => {
