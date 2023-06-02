@@ -17,28 +17,38 @@ import { TextInputMask } from "react-native-masked-text";
 import { ref, set } from "firebase/database";
 import { db, firebase } from "../config/firebase";
 
+export const uploadImage = async (uri) => {
+  const response = await fetch(uri);
+  const blob = await response.blob();
+
+  const filename = uri.substring(uri.lastIndexOf("/") + 1);
+  const storageRef = firebase.storage().ref().child(filename);
+  let downloadURL = "";
+  try {
+    const uploadTask = storageRef.put(blob);
+    await uploadTask;
+    downloadURL = await storageRef.getDownloadURL();
+  } catch (e) {
+    console.log(e);
+  }
+  return downloadURL;
+};
+
+export const deletePhotoFromStorage = async (photoURL) => {
+  try {
+    const storageRef = firebase.storage().refFromURL(photoURL);
+    await storageRef.delete();
+    console.log("Photo deleted successfully");
+  } catch (error) {
+    console.log("Error deleting photo:", error);
+  }
+};
+
 const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
   const [image, setImage] = useState(null);
   const navigation = useNavigation();
   const dismissKeyboard = () => {
     Keyboard.dismiss();
-  };
-
-  const uploadImage = async (uri) => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-
-    const filename = uri.substring(image.uri.lastIndexOf("/") + 1);
-    const storageRef = firebase.storage().ref().child(filename);
-    let downloadURL = "";
-    try {
-      const uploadTask = storageRef.put(blob);
-      await uploadTask;
-      downloadURL = await storageRef.getDownloadURL();
-    } catch (e) {
-      console.log(e);
-    }
-    return downloadURL;
   };
 
   return (
@@ -78,7 +88,7 @@ const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
             partsToRepair,
           });
           navigation.navigate("Архив");
-          setshowAddCarInfoDialog(false);
+          setShowAddCarInfoDialog(false);
         }}
       >
         {({ handleChange, handleBlur, handleSubmit, values }) => (

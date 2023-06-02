@@ -7,9 +7,12 @@ import {
   View,
   TextInput,
 } from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import * as ImagePicker from "expo-image-picker";
 import Gear from "../assets/gear.svg";
 import PartRepairTaskExpandable from "./PartRepairTaskExpandable";
 import { Divider } from "@react-native-material/core";
+import { uploadImage } from "./AddCarInfo";
 
 const perHourPay = 500;
 
@@ -33,6 +36,8 @@ export default function PartRepairExpandableItem({
   onRemoveFromSelected,
   showZeroItems = true,
   specificDetailAdding = false,
+  canAddPhoto = false,
+  itemIndex,
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
@@ -68,7 +73,33 @@ export default function PartRepairExpandableItem({
       >
         <View style={styles.titleCont}>
           <View style={styles.partNameTitleCont}>
-            <Gear style={styles.icon} />
+            {canAddPhoto && (
+              <TouchableOpacity
+                onPress={async () => {
+                  //console.log("start choosing of image");
+                  const result = await ImagePicker.launchImageLibraryAsync({
+                    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                    allowsEditing: true,
+                    aspect: [4, 3],
+                    quality: 1,
+                  });
+
+                  if (!result.canceled) {
+                    const photoURL = await uploadImage(result.assets[0].uri);
+                    onChangeParamsOfSelectedPart(photoURL, itemIndex);
+                  }
+                }}
+              >
+                {selectedPartToRepair.photoURL.length > 0 ? (
+                  <Ionicons size={20} name="camera" />
+                ) : (
+                  <Ionicons size={20} name="camera-outline" />
+                )}
+              </TouchableOpacity>
+            )}
+
+            {!canAddPhoto && <Gear style={styles.icon} />}
+
             {specificDetailAdding ? (
               <TextInput
                 style={styles.textInput}

@@ -6,19 +6,28 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Divider } from "@react-native-material/core";
-
+import ImagePreview from "./ImagePreview";
 import PartRepairExpandableItem from "./PartRepairExpandableItem";
+import React from "react";
+import { Dimensions } from "react-native";
 
 export default function EstimateOfSelectedPartsToRepair({
   selectedPartsToRepair,
+  setPhotoURLToSelectedPart,
+  removePhotoURLFromSelectedPart,
   onRemoveFromEstimate,
   handleAddCarInfoDialog,
 }) {
+  const screenWidth = Dimensions.get("window").width;
+
+  // Calculate the width and height of each photo
+  const photoWidth = screenWidth * 0.3;
+  const photoHeight = (photoWidth / 4) * 3;
   return (
     <ScrollView style={styles.container} alwaysBounceVertical>
       <Text style={styles.title}>Расчет</Text>
-      {selectedPartsToRepair.map((part, index) => (
-        <View key={index}>
+      {selectedPartsToRepair.map((part, partIndex) => (
+        <View key={partIndex}>
           <PartRepairExpandableItem
             selectedPartToRepair={part}
             isExpanded={false}
@@ -26,7 +35,32 @@ export default function EstimateOfSelectedPartsToRepair({
             onRemoveFromSelected={onRemoveFromEstimate}
             canExpandSubItems={false}
             showZeroItems={false}
+            canAddPhoto={true}
+            onChangeParamsOfSelectedPart={setPhotoURLToSelectedPart}
+            itemIndex={partIndex}
           />
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {part.photoURL.map((url, index) => (
+              <View
+                key={index}
+                style={{
+                  width: photoWidth,
+                  height: photoHeight,
+                  padding: 5,
+                  borderColor: "orange",
+                  borderWidth: 1,
+                }}
+              >
+                <ImagePreview
+                  removePhotoURLFromSelectedPart={
+                    removePhotoURLFromSelectedPart
+                  }
+                  itemIndex={partIndex}
+                  imageUrl={url}
+                />
+              </View>
+            ))}
+          </View>
 
           <Divider style={styles.divider} />
         </View>

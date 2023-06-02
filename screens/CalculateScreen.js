@@ -25,7 +25,7 @@ import EstimateOfSelectedPartsToRepair from "../components/EstimateOfSelectedPar
 import { calculateTotalSumPerPart } from "../components/PartRepairExpandableItem";
 import PartParamsAddDialog from "../components/PartParamsAddDialog";
 import ParamsSwitcher from "../components/ParamsSwitcher";
-import AddCarInfo from "../components/AddCarInfo";
+import AddCarInfo, { deletePhotoFromStorage } from "../components/AddCarInfo";
 import { AntDesign } from "@expo/vector-icons";
 
 const partListData = require("../config/price.json");
@@ -50,7 +50,7 @@ export default function CalculateScreen() {
   const [showPartsListDialog, setShowPartsListDialog] = useState(false);
   const [showCarStartParamsDialog, setShowCarStartParamsDialog] =
     useState(true);
-  const [showAddCarInfoDialog, setshowAddCarInfoDialog] = useState(false);
+  const [showAddCarInfoDialog, setShowAddCarInfoDialog] = useState(false);
 
   useEffect(() => {
     Animated.timing(carPartsSelectorBaseHeight, {
@@ -60,17 +60,39 @@ export default function CalculateScreen() {
     }).start();
   }, [isPartsSelectorExpanded, carPartsSelectorBaseHeight]);
 
+  const setPhotoURLToSelectedPart = (url, itemIndex) => {
+    setSelectedPartsToRepair((prevState) => {
+      const modifiedParts = [...prevState];
+      modifiedParts[itemIndex].photoURL.push(url);
+      return modifiedParts;
+    });
+  };
+  const removePhotoURLFromSelectedPart = (url, itemIndex) => {
+    setSelectedPartsToRepair((prevState) => {
+      const modifiedParts = [...prevState];
+      modifiedParts[itemIndex].photoURL.splice(
+        modifiedParts[itemIndex].photoURL.indexOf(url),
+        1
+      );
+
+      return modifiedParts;
+    });
+  };
+
   const addPartToSelectedOnes = (partToRepair) => {
     setSelectedPartsToRepair((prevState) => [...prevState, partToRepair]);
   };
 
   const removePartFromSelectedOnes = (partNameToRemove) => {
+    selectedPartsToRepair
+      .find((item) => item.partName === partNameToRemove)
+      .photoURL.map((url) => deletePhotoFromStorage(url));
     setSelectedPartsToRepair((prevState) => [
       ...prevState.filter((part) => part.partName !== partNameToRemove),
     ]);
   };
   const handleAddCarInfoDialog = (showDialog) => {
-    setshowAddCarInfoDialog(showDialog);
+    setShowAddCarInfoDialog(showDialog);
   };
   return (
     <Provider>
@@ -224,6 +246,10 @@ export default function CalculateScreen() {
                   isPartsSelectorExpanded={false}
                   onRemoveFromEstimate={removePartFromSelectedOnes}
                   handleAddCarInfoDialog={handleAddCarInfoDialog}
+                  setPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
+                  removePhotoURLFromSelectedPart={
+                    removePhotoURLFromSelectedPart
+                  }
                 />
               </>
             )}
@@ -277,6 +303,7 @@ export default function CalculateScreen() {
                         orderNewDetailPrice: 0,
                       },
                       specific: true,
+                      photoURL: [],
                     });
                   }}
                   title={part.partName}
@@ -296,6 +323,7 @@ export default function CalculateScreen() {
                       repairTime: 0,
                       orderNewDetailPrice: 0,
                     },
+                    photoURL: [],
                     specific: true,
                   });
                 }}
@@ -319,7 +347,7 @@ export default function CalculateScreen() {
             style={styles.addCarInfoModal}
             isVisible={showAddCarInfoDialog}
             onBackdropPress={() => {
-              setshowAddCarInfoDialog(false);
+              setShowAddCarInfoDialog(false);
             }}
           >
             <AntDesign
@@ -327,7 +355,7 @@ export default function CalculateScreen() {
               size={34}
               color="#DB5000"
               onPress={() => {
-                setshowAddCarInfoDialog(false);
+                setShowAddCarInfoDialog(false);
               }}
             />
             <AddCarInfo
@@ -336,7 +364,7 @@ export default function CalculateScreen() {
                 carCategory,
                 paintCategory,
               }}
-              setshowAddCarInfoDialog={setshowAddCarInfoDialog}
+              setShowAddCarInfoDialog={setShowAddCarInfoDialog}
             ></AddCarInfo>
           </Modal>
         </>

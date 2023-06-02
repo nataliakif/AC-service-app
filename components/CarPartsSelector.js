@@ -32,6 +32,7 @@ export default function CarPartsSelector({
         orderNewDetailPrice: 0,
       },
       specific: false,
+      photoURL: [],
     };
   };
 
