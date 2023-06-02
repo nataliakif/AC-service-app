@@ -45,13 +45,12 @@ export default function PartRepairExpandableItem({
       (key) => selectedPartToRepair.workAmount[key] > 0
     );
   }
-  const subItemHeight = canExpandSubItems ? 28 : 24;
+  const subItemHeight = 50;
   useEffect(() => {
     Animated.timing(itemBaseHeight, {
       toValue: expanded
-        ? 40 +
-          subItemHeight * workAmountToDisplay.length +
-          expandedSubItemsCount * 40
+        ? subItemHeight * workAmountToDisplay.length +
+          expandedSubItemsCount * 30
         : 0,
       duration: 300,
       useNativeDriver: false,
@@ -109,7 +108,11 @@ export default function PartRepairExpandableItem({
       </TouchableOpacity>
 
       {expanded && (
-        <Animated.View style={{ height: itemBaseHeight }}>
+        <Animated.View
+          style={{
+            height: itemBaseHeight,
+          }}
+        >
           {workAmountToDisplay.map((key, index) => (
             <View key={index}>
               <Divider style={styles.divider} />
@@ -153,7 +156,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   priceCont: {
-    marginRight: 40,
+    marginRight: 20,
   },
   priceContModal: { marginLeft: 20 },
   divider: {

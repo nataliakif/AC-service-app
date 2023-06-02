@@ -38,7 +38,11 @@ const WorkList = ({ data, isLoading, selectedZone }) => {
                   style={styles.carItem}
                 >
                   <Image
-                    source={{ uri: carInfo.photoURL }}
+                    source={
+                      carInfo.photoURL
+                        ? { uri: carInfo.photoURL }
+                        : require("../images/plugPhoto.jpeg")
+                    }
                     defaultSource={require("../images/plugPhoto.jpeg")}
                     style={styles.carImage}
                   />

@@ -32,7 +32,7 @@ export default function PartRepairTaskExpandable({
 
   useEffect(() => {
     Animated.timing(itemBaseHeight, {
-      toValue: expanded ? 40 : 0,
+      toValue: expanded ? 30 : 0,
       duration: 200,
       useNativeDriver: false,
     }).start();
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 8,
+    marginBottom: 5,
   },
   price: {
     fontSize: 14,

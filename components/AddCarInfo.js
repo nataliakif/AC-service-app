@@ -24,11 +24,11 @@ const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
     Keyboard.dismiss();
   };
 
-  const uploadImage = async () => {
-    const response = await fetch(image.uri);
+  const uploadImage = async (uri) => {
+    const response = await fetch(uri);
     const blob = await response.blob();
 
-    const filename = image.uri.substring(image.uri.lastIndexOf("/") + 1);
+    const filename = uri.substring(image.uri.lastIndexOf("/") + 1);
     const storageRef = firebase.storage().ref().child(filename);
     let downloadURL = "";
     try {
@@ -38,7 +38,6 @@ const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
     } catch (e) {
       console.log(e);
     }
-    setImage(null);
     return downloadURL;
   };
 
@@ -56,7 +55,12 @@ const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
           description: "",
         }}
         onSubmit={async (values) => {
-          const photoURL = await uploadImage();
+          let photoURL = "";
+          if (image?.uri) {
+            photoURL = await uploadImage(image.uri);
+            setImage(null);
+          }
+
           const { model, color, number, owner, phone, vinCode, description } =
             values;
           set(ref(db, "calcs/" + uuid.v1()), {

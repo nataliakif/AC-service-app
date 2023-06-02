@@ -26,7 +26,6 @@ export default function PartParamsAddDialog({
           paddingVertical: 20,
           paddingHorizontal: 10,
           margin: -5,
-          // height: 300,
         }}
       >
         <PartRepairExpandableItem
@@ -37,14 +36,13 @@ export default function PartParamsAddDialog({
           specificDetailAdding={specificDetailAdding}
         />
 
-        <DialogActions>
+        <DialogActions style={{ marginTop: 60 }}>
           <Button
             title="Добавить"
             variant="text"
             style={{
               backgroundColor: "#DB5000",
               flex: 2,
-              marginTop: 60,
             }}
             color="#fff"
             onPress={() => {
@@ -66,7 +64,6 @@ export default function PartParamsAddDialog({
               borderColor: "#DB5000",
               borderWidth: 1,
               flex: 2,
-              marginTop: 60,
               marginLeft: 8,
             }}
           />
