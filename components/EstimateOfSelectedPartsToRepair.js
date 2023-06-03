@@ -6,10 +6,11 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Divider } from "@react-native-material/core";
-import ImagePreview from "./ImagePreview";
+
 import PartRepairExpandableItem from "./PartRepairExpandableItem";
 import React from "react";
-import { Dimensions } from "react-native";
+
+import { calculateTotalSumPerPart } from "../components/PartRepairExpandableItem";
 
 export default function EstimateOfSelectedPartsToRepair({
   selectedPartsToRepair,
@@ -17,64 +18,59 @@ export default function EstimateOfSelectedPartsToRepair({
   removePhotoURLFromSelectedPart,
   onRemoveFromEstimate,
   handleAddCarInfoDialog,
+  isPartsSelectorExpanded = false,
 }) {
-  const screenWidth = Dimensions.get("window").width;
-
-  // Calculate the width and height of each photo
-  const photoWidth = screenWidth * 0.3;
-  const photoHeight = (photoWidth / 4) * 3;
   return (
-    <ScrollView style={styles.container} alwaysBounceVertical>
-      <Text style={styles.title}>Расчет</Text>
-      {selectedPartsToRepair.map((part, partIndex) => (
-        <View key={partIndex}>
-          <PartRepairExpandableItem
-            selectedPartToRepair={part}
-            isExpanded={false}
-            canBeRemoved
-            onRemoveFromSelected={onRemoveFromEstimate}
-            canExpandSubItems={false}
-            showZeroItems={false}
-            canAddPhoto={true}
-            onChangeParamsOfSelectedPart={setPhotoURLToSelectedPart}
-            itemIndex={partIndex}
-          />
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            {part.photoURL.map((url, index) => (
-              <View
-                key={index}
-                style={{
-                  width: photoWidth,
-                  height: photoHeight,
-                  padding: 5,
-                  borderColor: "orange",
-                  borderWidth: 1,
-                }}
-              >
-                <ImagePreview
-                  removePhotoURLFromSelectedPart={
-                    removePhotoURLFromSelectedPart
-                  }
-                  itemIndex={partIndex}
-                  imageUrl={url}
-                />
-              </View>
-            ))}
-          </View>
-
-          <Divider style={styles.divider} />
-        </View>
-      ))}
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.button}
-          onPress={() => handleAddCarInfoDialog(true)}
-        >
-          <Text style={styles.buttonText}>Далее</Text>
-        </TouchableOpacity>
+    <>
+      <View
+        style={
+          isPartsSelectorExpanded
+            ? styles.totalPriceContExp
+            : styles.totalPriceCont
+        }
+      >
+        {!isPartsSelectorExpanded && (
+          <>
+            <Text style={styles.totalPrice}>
+              {selectedPartsToRepair
+                .map((part) => calculateTotalSumPerPart(part.workAmount))
+                .reduce((prev, cur) => prev + cur, 0) + ` UAH`}
+            </Text>
+            <Text style={styles.priceText}>Стоимость</Text>
+          </>
+        )}
       </View>
-    </ScrollView>
+      <ScrollView style={styles.container} alwaysBounceVertical>
+        <Text style={styles.title}>Расчет</Text>
+        {selectedPartsToRepair.map((part, partIndex) => (
+          <View key={partIndex}>
+            <PartRepairExpandableItem
+              selectedPartToRepair={part}
+              isExpanded={false}
+              canBeRemoved
+              onRemoveFromSelected={onRemoveFromEstimate}
+              canExpandSubItems={false}
+              showZeroItems={false}
+              canAddPhoto={true}
+              onChangeParamsOfSelectedPart={setPhotoURLToSelectedPart}
+              removePhotoURLFromSelectedPart={removePhotoURLFromSelectedPart}
+              partIndex={partIndex}
+            />
+
+            <Divider style={styles.divider} />
+          </View>
+        ))}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.button}
+            onPress={() => handleAddCarInfoDialog(true)}
+          >
+            <Text style={styles.buttonText}>Далее</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </>
   );
 }
 
@@ -108,5 +104,26 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "500",
     fontSize: 16,
+  },
+  totalPriceCont: {
+    marginTop: 30,
+    marginBottom: 20,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 150,
+    height: 150,
+    borderRadius: 120,
+    borderColor: "#DB5000",
+    borderWidth: 2,
+  },
+  totalPriceContExp: {},
+  totalPrice: {
+    fontStyle: "normal",
+    fontWeight: "500",
+    fontSize: 24,
+    lineHeight: 29,
+    color: "#DB5000",
   },
 });

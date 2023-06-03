@@ -8,11 +8,11 @@ import {
   TextInput,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import * as ImagePicker from "expo-image-picker";
+
+import PartPhotosManager from "./PartPhotosManager";
 import Gear from "../assets/gear.svg";
 import PartRepairTaskExpandable from "./PartRepairTaskExpandable";
 import { Divider } from "@react-native-material/core";
-import { uploadImage } from "./AddCarInfo";
 
 const perHourPay = 500;
 
@@ -37,11 +37,13 @@ export default function PartRepairExpandableItem({
   showZeroItems = true,
   specificDetailAdding = false,
   canAddPhoto = false,
-  itemIndex,
+  partIndex,
+  removePhotoURLFromSelectedPart,
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
   const [expandedSubItemsCount, setExpandedSubItemsCount] = useState(0);
+  const [showPhotoManger, setShowPhotoManager] = useState(false);
 
   let workAmountToDisplay = Object.keys(selectedPartToRepair.workAmount);
 
@@ -76,18 +78,8 @@ export default function PartRepairExpandableItem({
             {canAddPhoto && (
               <TouchableOpacity
                 onPress={async () => {
-                  //console.log("start choosing of image");
-                  const result = await ImagePicker.launchImageLibraryAsync({
-                    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                    allowsEditing: true,
-                    aspect: [4, 3],
-                    quality: 1,
-                  });
-
-                  if (!result.canceled) {
-                    const photoURL = await uploadImage(result.assets[0].uri);
-                    onChangeParamsOfSelectedPart(photoURL, itemIndex);
-                  }
+                  //show part photo manager
+                  setShowPhotoManager(!showPhotoManger);
                 }}
               >
                 {selectedPartToRepair.photoURL.length > 0 ? (
@@ -139,27 +131,41 @@ export default function PartRepairExpandableItem({
       </TouchableOpacity>
 
       {expanded && (
-        <Animated.View
-          style={{
-            height: itemBaseHeight,
-          }}
-        >
-          {workAmountToDisplay.map((key, index) => (
-            <View key={index}>
-              <Divider style={styles.divider} />
-              <PartRepairTaskExpandable
-                key={index}
-                repairTaskName={key}
-                repairTaskPrice={selectedPartToRepair.workAmount[key]}
-                onPriceChange={onChangeParamsOfSelectedPart}
-                onSubitemExpand={setExpandedSubItemsCount}
-                canExpand={canExpandSubItems}
-                numericInputStep={key.includes("Time") ? 0.1 : 1}
-              />
-            </View>
-          ))}
-        </Animated.View>
+        <>
+          <Animated.View
+            style={{
+              height: itemBaseHeight,
+            }}
+          >
+            {workAmountToDisplay.map((key, index) => (
+              <View key={index}>
+                <Divider style={styles.divider} />
+                <PartRepairTaskExpandable
+                  key={index}
+                  repairTaskName={key}
+                  repairTaskPrice={selectedPartToRepair.workAmount[key]}
+                  onPriceChange={onChangeParamsOfSelectedPart}
+                  onSubitemExpand={setExpandedSubItemsCount}
+                  canExpand={canExpandSubItems}
+                  numericInputStep={key.includes("Time") ? 0.1 : 1}
+                />
+              </View>
+            ))}
+          </Animated.View>
+        </>
       )}
+      {/* Фото начало */}
+
+      {showPhotoManger && (
+        <PartPhotosManager
+          photoURL={selectedPartToRepair.photoURL}
+          removePhotoURLFromSelectedPart={removePhotoURLFromSelectedPart}
+          partIndex={partIndex}
+          addPhotoURLToSelectedPart={onChangeParamsOfSelectedPart}
+        />
+      )}
+
+      {/* Фото конец */}
     </>
   );
 }

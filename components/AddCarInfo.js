@@ -44,7 +44,7 @@ export const deletePhotoFromStorage = async (photoURL) => {
   }
 };
 
-const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
+const AddCarScreen = ({ partsToRepair, setShowAddCarInfoDialog }) => {
   const [image, setImage] = useState(null);
   const navigation = useNavigation();
   const dismissKeyboard = () => {

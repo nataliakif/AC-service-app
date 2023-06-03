@@ -22,7 +22,6 @@ import {
 } from "@react-native-material/core";
 import Modal from "react-native-modal";
 import EstimateOfSelectedPartsToRepair from "../components/EstimateOfSelectedPartsToRepair";
-import { calculateTotalSumPerPart } from "../components/PartRepairExpandableItem";
 import PartParamsAddDialog from "../components/PartParamsAddDialog";
 import ParamsSwitcher from "../components/ParamsSwitcher";
 import AddCarInfo, { deletePhotoFromStorage } from "../components/AddCarInfo";
@@ -220,30 +219,9 @@ export default function CalculateScreen() {
 
             {selectedPartsToRepair.length > 0 && (
               <>
-                <View
-                  style={
-                    isPartsSelectorExpanded
-                      ? styles.totalPriceContExp
-                      : styles.totalPriceCont
-                  }
-                >
-                  {!isPartsSelectorExpanded && (
-                    <Text style={styles.totalPrice}>
-                      {selectedPartsToRepair
-                        .map((part) =>
-                          calculateTotalSumPerPart(part.workAmount)
-                        )
-                        .reduce((prev, cur) => prev + cur, 0) + ` UAH`}
-                    </Text>
-                  )}
-                  {!isPartsSelectorExpanded && (
-                    <Text style={styles.priceText}>Стоимость</Text>
-                  )}
-                </View>
-
                 <EstimateOfSelectedPartsToRepair
                   selectedPartsToRepair={selectedPartsToRepair}
-                  isPartsSelectorExpanded={false}
+                  isPartsSelectorExpanded={isPartsSelectorExpanded}
                   onRemoveFromEstimate={removePartFromSelectedOnes}
                   handleAddCarInfoDialog={handleAddCarInfoDialog}
                   setPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
@@ -343,6 +321,7 @@ export default function CalculateScreen() {
               />
             </DialogActions>
           </Dialog>
+          {/* информация о клиентк */}
           <Modal
             style={styles.addCarInfoModal}
             isVisible={showAddCarInfoDialog}
@@ -395,27 +374,7 @@ const styles = StyleSheet.create({
   expandBtn: {
     alignItems: "center",
   },
-  totalPrice: {
-    fontStyle: "normal",
-    fontWeight: "500",
-    fontSize: 24,
-    lineHeight: 29,
-    color: "#DB5000",
-  },
-  totalPriceCont: {
-    marginTop: 30,
-    marginBottom: 20,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 150,
-    height: 150,
-    borderRadius: 120,
-    borderColor: "#DB5000",
-    borderWidth: 2,
-  },
-  totalPriceContExp: {},
+
   paramsSwitcherCont: {
     flexDirection: "row",
   },

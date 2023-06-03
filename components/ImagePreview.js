@@ -7,6 +7,7 @@ export const ImagePreview = ({
   imageUrl,
   itemIndex,
   removePhotoURLFromSelectedPart,
+  showDeletePhotoBtn = true,
 }) => {
   const [isImageViewVisible, setIsImageViewVisible] = useState(false);
 
@@ -26,15 +27,17 @@ export const ImagePreview = ({
             source={{ uri: imageUrl }}
             style={{ width: "100%", height: "100%" }}
           />
-          <TouchableOpacity
-            onPress={() => {
-              deletePhotoFromStorage(imageUrl);
-              removePhotoURLFromSelectedPart(imageUrl, itemIndex);
-            }}
-            style={{ position: "absolute", top: 1, right: 1 }}
-          >
-            <Ionicons style={{ color: "#DB5000" }} size={20} name="close" />
-          </TouchableOpacity>
+          {showDeletePhotoBtn && (
+            <TouchableOpacity
+              onPress={() => {
+                deletePhotoFromStorage(imageUrl);
+                removePhotoURLFromSelectedPart(imageUrl, itemIndex);
+              }}
+              style={{ position: "absolute", top: 1, right: 1 }}
+            >
+              <Ionicons style={{ color: "#DB5000" }} size={20} name="close" />
+            </TouchableOpacity>
+          )}
         </View>
       </TouchableOpacity>
 
