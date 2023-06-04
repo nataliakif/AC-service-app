@@ -22,7 +22,7 @@ import GestureRecognizer from "react-native-swipe-detect";
 import Modal from "react-native-modal";
 import { AntDesign } from "@expo/vector-icons";
 import uuid from "react-native-uuid";
-import { ref, set } from "firebase/database";
+import { ref, set, update } from "firebase/database";
 import { db } from "../config/firebase";
 
 import CarPartsSelector from "../components/CarPartsSelector";
@@ -31,12 +31,7 @@ import PartParamsAddDialog from "../components/PartParamsAddDialog";
 import ParamsSwitcher from "../components/ParamsSwitcher";
 import AddCarInfo, { deletePhotoFromStorage } from "../components/AddCarInfo";
 
-import {
-  useNavigation,
-  useRoute,
-  useNavigationState,
-  useIsFocused,
-} from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const partListData = require("../config/price.json");
 
@@ -72,45 +67,21 @@ export default function CalculateScreen() {
     useState(true);
   const [showAddCarInfoForm, setShowAddCarInfoForm] = useState(false);
   const route = useRoute();
-  console.log(route.params);
   const navigation = useNavigation();
+  const [editMode, setEditMode] = useState(false);
 
-  const hasUnsavedChanges = true;
-  useEffect(
-    () =>
-      navigation.addListener("beforeRemove", (e) => {
-        if (!hasUnsavedChanges) {
-          // If we don't have unsaved changes, then we don't need to do anything
-          return;
-        }
-
-        // Prevent default behavior of leaving the screen
-        e.preventDefault();
-
-        // Prompt the user before leaving the screen
-        Alert.alert(
-          "Discard changes?",
-          "You have unsaved changes. Are you sure to discard them and leave the screen?",
-          [
-            {
-              text: "Don't leave",
-              style: "cancel",
-              onPress: () => {
-                console.log("don't leave pressed");
-              },
-            },
-            {
-              text: "Discard",
-              style: "destructive",
-              // If the user confirmed, then we dispatch the action we blocked earlier
-              // This will continue the action that had triggered the removal of the screen
-              onPress: () => navigation.dispatch(e.data.action),
-            },
-          ]
-        );
-      }),
-    [navigation, hasUnsavedChanges]
-  );
+  useEffect(() => {
+    if (!route.params) {
+      return;
+    }
+    setEditMode(true);
+    const { carInfo, partsToRepair } = route.params;
+    setCarInfo(carInfo);
+    setSelectedPartsToRepair(partsToRepair.selectedPartsToRepair);
+    setCarCategory(partsToRepair.carCategory);
+    setPaintCategory(partsToRepair.paintCategory);
+    setShowCarStartParamsDialog(false);
+  }, []);
 
   useEffect(() => {
     Animated.timing(carPartsSelectorBaseHeight, {
@@ -120,25 +91,11 @@ export default function CalculateScreen() {
     }).start();
   }, [isPartsSelectorExpanded, carPartsSelectorBaseHeight]);
 
-  const clearCalculation = () => {
-    setCarCategory(1);
-    setPaintCategory(1);
-    setSelectedPartsToRepair([]);
-    setCarInfo({
-      model: "",
-      color: "",
-      number: "",
-      owner: "",
-      vinCode: "",
-      phone: "",
-      description: "",
-      photoURL: "",
-    });
-  };
-
   const setPhotoURLToSelectedPart = (url, itemIndex) => {
     setSelectedPartsToRepair((prevState) => {
       const modifiedParts = [...prevState];
+      if (!modifiedParts[itemIndex].photoURL?.length)
+        modifiedParts[itemIndex].photoURL = [];
       modifiedParts[itemIndex].photoURL.push(url);
       return modifiedParts;
     });
@@ -167,13 +124,38 @@ export default function CalculateScreen() {
         carCategory,
         paintCategory,
       },
-    });
+    })
+      .then(() => {
+        console.log("item created in firebase db");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const updateItemInDB = async () => {
+    update(ref(db, "calcs/" + route.params.key), {
+      carInfo,
+      partsToRepair: {
+        selectedPartsToRepair,
+        carCategory,
+        paintCategory,
+      },
+      workStatus: route.params.workStatus ? route.params.workStatus : {},
+      status: route.params.status,
+    })
+      .then(() => {
+        console.log("item updated in firebase db");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const removePartFromSelectedOnes = (partNameToRemove) => {
     selectedPartsToRepair
       .find((item) => item.partName === partNameToRemove)
-      .photoURL.map((url) => deletePhotoFromStorage(url));
+      .photoURL?.map((url) => deletePhotoFromStorage(url));
     setSelectedPartsToRepair((prevState) => [
       ...prevState.filter((part) => part.partName !== partNameToRemove),
     ]);
@@ -229,6 +211,31 @@ export default function CalculateScreen() {
       {!showCarStartParamsDialog && (
         <>
           <View style={styles.container}>
+            <AntDesign
+              name="arrowleft"
+              size={34}
+              color="#DB5000"
+              style={styles.backBtn}
+              onPress={() => {
+                Alert.alert(
+                  "Подтверждение",
+                  "Вы уверени что хотите выйти без сохранения данных?",
+                  [
+                    {
+                      text: "Отмена",
+                      style: "cancel",
+                    },
+                    {
+                      text: "Да",
+                      style: "destructive",
+                      onPress: () => navigation.goBack(),
+                    },
+                  ],
+                  { cancelable: false }
+                );
+              }}
+            />
+
             <View style={styles.headerContainer}>
               <View style={styles.addBtn}>
                 <IconButton
@@ -282,8 +289,11 @@ export default function CalculateScreen() {
                 color="#fff"
                 icon={(props) => <Ionicons name="save-outline" {...props} />}
                 onPress={async () => {
-                  await saveNewItemToDB();
-                  clearCalculation();
+                  //при добавлении нового просчета
+                  if (editMode) {
+                    await updateItemInDB();
+                  } else await saveNewItemToDB();
+
                   navigation.navigate("Архив");
                 }}
               />
@@ -325,6 +335,7 @@ export default function CalculateScreen() {
                       removePhotoURLFromSelectedPart
                     }
                     carModel={carInfo.model}
+                    canAddPhoto={editMode}
                   />
 
                   <View style={styles.buttonContainer}>
@@ -471,13 +482,16 @@ export default function CalculateScreen() {
 const styles = StyleSheet.create({
   scrollContainer: { width: "100%" },
   container: {
+    position: "relative",
     height: "100%",
     alignItems: "center",
-    marginTop: 10,
-    paddingBottom: 5,
+    paddingTop: 5,
+    paddingBottom: 55,
     paddingHorizontal: 20,
   },
   headerContainer: {
+    position: "absolute",
+    bottom: 5,
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
@@ -525,7 +539,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 26,
+    marginVertical: 20,
   },
   button: {
     alignItems: "center",
@@ -539,5 +553,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "500",
     fontSize: 16,
+  },
+
+  backBtn: {
+    position: "absolute",
+    left: 10,
+    top: 10,
   },
 });

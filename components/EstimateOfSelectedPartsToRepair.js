@@ -22,7 +22,7 @@ export default function EstimateOfSelectedPartsToRepair({
   carModel = "",
 }) {
   return (
-    <View style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
+    <View style={{ display: "flex", alignItems: "center", paddingTop: 15 }}>
       <View
         style={
           isPartsSelectorExpanded

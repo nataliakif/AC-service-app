@@ -59,7 +59,7 @@ export default function PartPhotosManager({
           </View>
         </TouchableOpacity>
       )}
-      {photoURL.map((url, index) => (
+      {photoURL?.map((url, index) => (
         <View key={index} style={styles.photoContainer}>
           <ImagePreview
             removePhotoURLFromSelectedPart={removePhotoURLFromSelectedPart}

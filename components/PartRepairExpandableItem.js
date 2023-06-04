@@ -64,6 +64,8 @@ export default function PartRepairExpandableItem({
     }).start();
   }, [expanded, itemBaseHeight, expandedSubItemsCount]);
 
+  // console.log(selectedPartToRepair);
+
   return (
     <>
       <TouchableOpacity
@@ -82,7 +84,7 @@ export default function PartRepairExpandableItem({
                   setShowPhotoManager(!showPhotoManger);
                 }}
               >
-                {selectedPartToRepair.photoURL.length > 0 ? (
+                {selectedPartToRepair.photoURL?.length > 0 ? (
                   <Ionicons size={20} name="camera" />
                 ) : (
                   <Ionicons size={20} name="camera-outline" />

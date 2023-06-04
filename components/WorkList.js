@@ -5,11 +5,11 @@ import { TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 import { AntDesign } from "@expo/vector-icons";
 import ListItem from "../components/ListItem";
-
+import { useNavigation } from "@react-navigation/native";
 const WorkList = ({ data, isLoading, selectedZone }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const navigation = useNavigation();
   const handleItemPress = (item) => {
     setSelectedItem(item);
 
@@ -26,15 +26,23 @@ const WorkList = ({ data, isLoading, selectedZone }) => {
               return (
                 <TouchableOpacity
                   key={key}
-                  onPress={() =>
-                    handleItemPress({
+                  onPress={() => {
+                    navigation.navigate("Просчет", {
+                      key,
+                      status,
+                      carInfo,
+                      partsToRepair,
+                      workStatus,
+                    });
+
+                    /* handleItemPress({
                       key,
                       carInfo,
                       status,
                       partsToRepair,
                       workStatus,
-                    })
-                  }
+                    }) */
+                  }}
                   style={styles.carItem}
                 >
                   <Image
