@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   totalPriceCont: {
-    marginTop: 30,
+    marginTop: 45,
     marginBottom: 20,
     display: "flex",
     flexDirection: "column",

@@ -487,11 +487,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 5,
     paddingBottom: 55,
+    paddingTop: 20,
     paddingHorizontal: 20,
   },
   headerContainer: {
     position: "absolute",
-    bottom: 5,
+    bottom: 15,
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
@@ -501,7 +502,7 @@ const styles = StyleSheet.create({
   expandBtn: {
     alignItems: "center",
     position: "absolute",
-    top: 0,
+    top: 30,
   },
 
   paramsSwitcherCont: {
@@ -558,6 +559,6 @@ const styles = StyleSheet.create({
   backBtn: {
     position: "absolute",
     left: 10,
-    top: 10,
+    top: 40,
   },
 });
