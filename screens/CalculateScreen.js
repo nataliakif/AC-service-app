@@ -1,6 +1,4 @@
-import * as React from "react";
-import { IconButton } from "@react-native-material/core";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Animated,
@@ -8,11 +6,10 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
-import CarPartsSelector from "../components/CarPartsSelector";
-import { useState, useEffect } from "react";
-import GestureRecognizer from "react-native-swipe-detect";
 import {
+  IconButton,
   Provider,
   DialogActions,
   Dialog,
@@ -20,17 +17,26 @@ import {
   ListItem,
   DialogHeader,
 } from "@react-native-material/core";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import GestureRecognizer from "react-native-swipe-detect";
 import Modal from "react-native-modal";
+import { AntDesign } from "@expo/vector-icons";
+import uuid from "react-native-uuid";
+import { ref, set } from "firebase/database";
+import { db } from "../config/firebase";
+
+import CarPartsSelector from "../components/CarPartsSelector";
 import EstimateOfSelectedPartsToRepair from "../components/EstimateOfSelectedPartsToRepair";
 import PartParamsAddDialog from "../components/PartParamsAddDialog";
 import ParamsSwitcher from "../components/ParamsSwitcher";
 import AddCarInfo, { deletePhotoFromStorage } from "../components/AddCarInfo";
-import { useNavigation } from "@react-navigation/native";
-import { AntDesign } from "@expo/vector-icons";
 
-import uuid from "react-native-uuid";
-import { ref, set } from "firebase/database";
-import { db } from "../config/firebase";
+import {
+  useNavigation,
+  useRoute,
+  useNavigationState,
+  useIsFocused,
+} from "@react-navigation/native";
 
 const partListData = require("../config/price.json");
 
@@ -65,7 +71,47 @@ export default function CalculateScreen() {
   const [showCarStartParamsDialog, setShowCarStartParamsDialog] =
     useState(true);
   const [showAddCarInfoForm, setShowAddCarInfoForm] = useState(false);
+  const route = useRoute();
+  console.log(route.params);
   const navigation = useNavigation();
+
+  const hasUnsavedChanges = true;
+  useEffect(
+    () =>
+      navigation.addListener("beforeRemove", (e) => {
+        if (!hasUnsavedChanges) {
+          // If we don't have unsaved changes, then we don't need to do anything
+          return;
+        }
+
+        // Prevent default behavior of leaving the screen
+        e.preventDefault();
+
+        // Prompt the user before leaving the screen
+        Alert.alert(
+          "Discard changes?",
+          "You have unsaved changes. Are you sure to discard them and leave the screen?",
+          [
+            {
+              text: "Don't leave",
+              style: "cancel",
+              onPress: () => {
+                console.log("don't leave pressed");
+              },
+            },
+            {
+              text: "Discard",
+              style: "destructive",
+              // If the user confirmed, then we dispatch the action we blocked earlier
+              // This will continue the action that had triggered the removal of the screen
+              onPress: () => navigation.dispatch(e.data.action),
+            },
+          ]
+        );
+      }),
+    [navigation, hasUnsavedChanges]
+  );
+
   useEffect(() => {
     Animated.timing(carPartsSelectorBaseHeight, {
       toValue: isPartsSelectorExpanded ? 510 : 0,
@@ -289,7 +335,7 @@ export default function CalculateScreen() {
                         setShowAddCarInfoForm(true);
                       }}
                     >
-                      <Text style={styles.buttonText}>Общая инфо</Text>
+                      <Text style={styles.buttonText}>Инфо о авто</Text>
                     </TouchableOpacity>
                   </View>
                 </>
@@ -329,7 +375,11 @@ export default function CalculateScreen() {
               setShowPartsListDialog(false);
             }}
           >
-            <ScrollView style={styles.partListDialog}>
+            <ScrollView
+              style={{
+                ...styles.partListDialog,
+              }}
+            >
               {partListData.map((part, index) => (
                 <ListItem
                   key={index}
@@ -377,15 +427,17 @@ export default function CalculateScreen() {
             </ScrollView>
 
             <DialogActions>
-              <Button
-                title="Отмена"
-                variant="text"
-                color="#fff"
-                onPress={() => {
-                  setShowPartsListDialog(false);
-                }}
-                style={styles.button}
-              />
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.button}
+                  onPress={() => {
+                    setShowPartsListDialog(false);
+                  }}
+                >
+                  <Text style={styles.buttonText}>Отмена</Text>
+                </TouchableOpacity>
+              </View>
             </DialogActions>
           </Dialog>
 
@@ -422,7 +474,7 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: "center",
     marginTop: 10,
-    paddingBottom: 49,
+    paddingBottom: 5,
     paddingHorizontal: 20,
   },
   headerContainer: {
@@ -430,10 +482,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-  },
-  button: {
-    backgroundColor: "#DB5000",
-    flex: 1,
   },
 
   expandBtn: {

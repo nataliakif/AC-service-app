@@ -49,6 +49,7 @@ const AddCarInfoForm = ({
   initialValues,
 }) => {
   const [image, setImage] = useState(null);
+  const [isSbtBtnActive, setIsSbtBtnActive] = useState(true);
 
   useEffect(() => {
     if (initialValues.photoURL) {
@@ -64,6 +65,7 @@ const AddCarInfoForm = ({
       <Formik
         initialValues={initialValues}
         onSubmit={async (values) => {
+          setIsSbtBtnActive(false);
           let photoURL = initialValues.photoURL;
           if (image?.uri && initialValues.photoURL !== image.uri) {
             photoURL = await uploadImage(image.uri);
@@ -169,8 +171,12 @@ const AddCarInfoForm = ({
                 />
               </View>
               <TouchableOpacity
+                disabled={!isSbtBtnActive}
                 activeOpacity={0.7}
-                style={styles.button}
+                style={{
+                  ...styles.button,
+                  opacity: isSbtBtnActive ? 1 : 0.2,
+                }}
                 onPress={handleSubmit}
               >
                 <Text style={styles.buttonText}>Cохранить инфо</Text>

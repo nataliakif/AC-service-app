@@ -109,7 +109,11 @@ function AppStack() {
       })}
     >
       <Tab.Screen name="В работе" component={HomeScreen} />
-      <Tab.Screen name="Просчет" component={CalculateScreen} />
+      <Tab.Screen
+        name="Просчет"
+        component={CalculateScreen}
+        options={{ unmountOnBlur: true, tabBarStyle: { display: "none" } }}
+      />
       <Tab.Screen name="Сервис" component={ServiceZonesScreen} />
       <Tab.Screen name="Архив" component={SavedCalculationsScreen} />
       <Tab.Screen name="Ещё" component={DetailsScreen} />
