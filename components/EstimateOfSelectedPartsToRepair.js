@@ -17,11 +17,12 @@ export default function EstimateOfSelectedPartsToRepair({
   setPhotoURLToSelectedPart,
   removePhotoURLFromSelectedPart,
   onRemoveFromEstimate,
-  handleAddCarInfoDialog,
   isPartsSelectorExpanded = false,
+  canAddPhoto = false,
+  carModel = "",
 }) {
   return (
-    <>
+    <View style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
       <View
         style={
           isPartsSelectorExpanded
@@ -40,8 +41,8 @@ export default function EstimateOfSelectedPartsToRepair({
           </>
         )}
       </View>
-      <ScrollView style={styles.container} alwaysBounceVertical>
-        <Text style={styles.title}>Расчет</Text>
+      <View style={styles.container}>
+        <Text style={styles.title}>Расчет {carModel}</Text>
         {selectedPartsToRepair.map((part, partIndex) => (
           <View key={partIndex}>
             <PartRepairExpandableItem
@@ -51,7 +52,7 @@ export default function EstimateOfSelectedPartsToRepair({
               onRemoveFromSelected={onRemoveFromEstimate}
               canExpandSubItems={false}
               showZeroItems={false}
-              canAddPhoto={true}
+              canAddPhoto={canAddPhoto}
               onChangeParamsOfSelectedPart={setPhotoURLToSelectedPart}
               removePhotoURLFromSelectedPart={removePhotoURLFromSelectedPart}
               partIndex={partIndex}
@@ -60,17 +61,8 @@ export default function EstimateOfSelectedPartsToRepair({
             <Divider style={styles.divider} />
           </View>
         ))}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.button}
-            onPress={() => handleAddCarInfoDialog(true)}
-          >
-            <Text style={styles.buttonText}>Далее</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </>
+      </View>
+    </View>
   );
 }
 
@@ -85,25 +77,6 @@ const styles = StyleSheet.create({
   divider: {
     backgroundColor: "#E8E8E8",
     marginVertical: 5,
-  },
-  buttonContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 26,
-  },
-  button: {
-    alignItems: "center",
-    justifyContent: "center",
-    height: 46,
-    width: 200,
-    backgroundColor: "#DB5000",
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "500",
-    fontSize: 16,
   },
   totalPriceCont: {
     marginTop: 30,

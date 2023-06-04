@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,13 +9,12 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import uuid from "react-native-uuid";
+
 import { Formik } from "formik";
 import ImagePickerForm from "./ImagePickerForm";
 import { TextInputMask } from "react-native-masked-text";
-import { ref, set } from "firebase/database";
-import { db, firebase } from "../config/firebase";
+
+import { firebase } from "../config/firebase";
 
 export const uploadImage = async (uri) => {
   const response = await fetch(uri);
@@ -44,9 +43,18 @@ export const deletePhotoFromStorage = async (photoURL) => {
   }
 };
 
-const AddCarScreen = ({ partsToRepair, setShowAddCarInfoDialog }) => {
+const AddCarInfoForm = ({
+  setShowAddCarInfoForm,
+  onCarInfoFormSubmit,
+  initialValues,
+}) => {
   const [image, setImage] = useState(null);
-  const navigation = useNavigation();
+
+  useEffect(() => {
+    if (initialValues.photoURL) {
+      setImage({ uri: initialValues.photoURL });
+    }
+  }, []);
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
@@ -54,41 +62,29 @@ const AddCarScreen = ({ partsToRepair, setShowAddCarInfoDialog }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Formik
-        initialValues={{
-          model: "",
-          color: "",
-          number: "",
-          owner: "",
-          vinCode: "",
-          phone: "",
-          startDate: new Date(),
-          description: "",
-        }}
+        initialValues={initialValues}
         onSubmit={async (values) => {
-          let photoURL = "";
-          if (image?.uri) {
+          let photoURL = initialValues.photoURL;
+          if (image?.uri && initialValues.photoURL !== image.uri) {
             photoURL = await uploadImage(image.uri);
             setImage(null);
           }
 
           const { model, color, number, owner, phone, vinCode, description } =
             values;
-          set(ref(db, "calcs/" + uuid.v1()), {
-            carInfo: {
-              model,
-              color,
-              number,
-              vinCode,
-              owner,
-              phone,
-              description,
-              photoURL,
-            },
-            status: "pending",
-            partsToRepair,
+
+          onCarInfoFormSubmit({
+            model,
+            color,
+            number,
+            vinCode,
+            owner,
+            phone,
+            description,
+            photoURL,
           });
-          navigation.navigate("Архив");
-          setShowAddCarInfoDialog(false);
+
+          setShowAddCarInfoForm(false);
         }}
       >
         {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -177,7 +173,7 @@ const AddCarScreen = ({ partsToRepair, setShowAddCarInfoDialog }) => {
                 style={styles.button}
                 onPress={handleSubmit}
               >
-                <Text style={styles.buttonText}>Подтвердить</Text>
+                <Text style={styles.buttonText}>Cохранить инфо</Text>
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>
@@ -236,7 +232,7 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 36,
     height: 60,
-    paddingHorizontal: 130,
+    alignItems: "center",
     paddingVertical: 20,
     textAlign: "center",
     backgroundColor: "#DB5000",
@@ -245,8 +241,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "500",
-    flexDirection: "row",
   },
 });
 
-export default AddCarScreen;
+export default AddCarInfoForm;

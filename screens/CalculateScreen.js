@@ -25,7 +25,12 @@ import EstimateOfSelectedPartsToRepair from "../components/EstimateOfSelectedPar
 import PartParamsAddDialog from "../components/PartParamsAddDialog";
 import ParamsSwitcher from "../components/ParamsSwitcher";
 import AddCarInfo, { deletePhotoFromStorage } from "../components/AddCarInfo";
+import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
+
+import uuid from "react-native-uuid";
+import { ref, set } from "firebase/database";
+import { db } from "../config/firebase";
 
 const partListData = require("../config/price.json");
 
@@ -42,6 +47,16 @@ export default function CalculateScreen() {
   const [carCategory, setCarCategory] = useState(1);
   const [paintCategory, setPaintCategory] = useState(1);
   const [selectedPartsToRepair, setSelectedPartsToRepair] = useState([]);
+  const [carInfo, setCarInfo] = useState({
+    model: "",
+    color: "",
+    number: "",
+    owner: "",
+    vinCode: "",
+    phone: "",
+    description: "",
+    photoURL: "",
+  });
   const [carPartsSelectorBaseHeight] = useState(new Animated.Value(0));
   const [isPartsSelectorExpanded, setIsPartsSelectorExpanded] = useState(true);
   const [showSpecificPartsDialog, setShowSpecificPartsDialog] = useState(false);
@@ -49,8 +64,8 @@ export default function CalculateScreen() {
   const [showPartsListDialog, setShowPartsListDialog] = useState(false);
   const [showCarStartParamsDialog, setShowCarStartParamsDialog] =
     useState(true);
-  const [showAddCarInfoDialog, setShowAddCarInfoDialog] = useState(false);
-
+  const [showAddCarInfoForm, setShowAddCarInfoForm] = useState(false);
+  const navigation = useNavigation();
   useEffect(() => {
     Animated.timing(carPartsSelectorBaseHeight, {
       toValue: isPartsSelectorExpanded ? 510 : 0,
@@ -58,6 +73,22 @@ export default function CalculateScreen() {
       useNativeDriver: false,
     }).start();
   }, [isPartsSelectorExpanded, carPartsSelectorBaseHeight]);
+
+  const clearCalculation = () => {
+    setCarCategory(1);
+    setPaintCategory(1);
+    setSelectedPartsToRepair([]);
+    setCarInfo({
+      model: "",
+      color: "",
+      number: "",
+      owner: "",
+      vinCode: "",
+      phone: "",
+      description: "",
+      photoURL: "",
+    });
+  };
 
   const setPhotoURLToSelectedPart = (url, itemIndex) => {
     setSelectedPartsToRepair((prevState) => {
@@ -73,13 +104,24 @@ export default function CalculateScreen() {
         modifiedParts[itemIndex].photoURL.indexOf(url),
         1
       );
-
       return modifiedParts;
     });
   };
 
   const addPartToSelectedOnes = (partToRepair) => {
     setSelectedPartsToRepair((prevState) => [...prevState, partToRepair]);
+  };
+
+  const saveNewItemToDB = async () => {
+    set(ref(db, "calcs/" + uuid.v1()), {
+      carInfo,
+      status: "pending",
+      partsToRepair: {
+        selectedPartsToRepair,
+        carCategory,
+        paintCategory,
+      },
+    });
   };
 
   const removePartFromSelectedOnes = (partNameToRemove) => {
@@ -90,9 +132,7 @@ export default function CalculateScreen() {
       ...prevState.filter((part) => part.partName !== partNameToRemove),
     ]);
   };
-  const handleAddCarInfoDialog = (showDialog) => {
-    setShowAddCarInfoDialog(showDialog);
-  };
+
   return (
     <Provider>
       {showCarStartParamsDialog && (
@@ -107,7 +147,7 @@ export default function CalculateScreen() {
           />
           <View style={styles.paramsSwitcherCont}>
             <View style={styles.paramsSwitcherView}>
-              <Ionicons size={30} name="car-outline" />
+              <Ionicons size={25} name="car-outline" />
               <ParamsSwitcher
                 style={{ backgroundColor: "#DB5000" }}
                 curValue={carCategory}
@@ -115,7 +155,7 @@ export default function CalculateScreen() {
               />
             </View>
             <View style={styles.paramsSwitcherView}>
-              <Ionicons size={30} name="color-palette-outline" />
+              <Ionicons size={25} name="color-palette-outline" />
               <ParamsSwitcher
                 curValue={paintCategory}
                 onItemChange={setPaintCategory}
@@ -185,13 +225,22 @@ export default function CalculateScreen() {
                     : "III"}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn}>
-                <IconButton
-                  backgroundColor="#DB5000"
-                  color="#fff"
-                  icon={(props) => <Ionicons name="save-outline" {...props} />}
-                />
-              </TouchableOpacity>
+
+              <IconButton
+                disabled={!(carInfo.model && selectedPartsToRepair.length > 0)}
+                style={{
+                  opacity:
+                    carInfo.model && selectedPartsToRepair.length > 0 ? 1 : 0.2,
+                }}
+                backgroundColor="#DB5000"
+                color="#fff"
+                icon={(props) => <Ionicons name="save-outline" {...props} />}
+                onPress={async () => {
+                  await saveNewItemToDB();
+                  clearCalculation();
+                  navigation.navigate("Архив");
+                }}
+              />
             </View>
             <GestureRecognizer
               onSwipeUp={() => {
@@ -217,20 +266,35 @@ export default function CalculateScreen() {
               </Animated.View>
             </GestureRecognizer>
 
-            {selectedPartsToRepair.length > 0 && (
-              <>
-                <EstimateOfSelectedPartsToRepair
-                  selectedPartsToRepair={selectedPartsToRepair}
-                  isPartsSelectorExpanded={isPartsSelectorExpanded}
-                  onRemoveFromEstimate={removePartFromSelectedOnes}
-                  handleAddCarInfoDialog={handleAddCarInfoDialog}
-                  setPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
-                  removePhotoURLFromSelectedPart={
-                    removePhotoURLFromSelectedPart
-                  }
-                />
-              </>
-            )}
+            <ScrollView style={styles.scrollContainer} alwaysBounceVertical>
+              {selectedPartsToRepair.length > 0 && (
+                <>
+                  <EstimateOfSelectedPartsToRepair
+                    selectedPartsToRepair={selectedPartsToRepair}
+                    isPartsSelectorExpanded={isPartsSelectorExpanded}
+                    onRemoveFromEstimate={removePartFromSelectedOnes}
+                    setShowAddCarInfoForm={setShowAddCarInfoForm}
+                    setPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
+                    removePhotoURLFromSelectedPart={
+                      removePhotoURLFromSelectedPart
+                    }
+                    carModel={carInfo.model}
+                  />
+
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      style={styles.button}
+                      onPress={() => {
+                        setShowAddCarInfoForm(true);
+                      }}
+                    >
+                      <Text style={styles.buttonText}>Общая инфо</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              )}
+            </ScrollView>
 
             {!isPartsSelectorExpanded && (
               <View style={styles.expandBtn}>
@@ -240,7 +304,10 @@ export default function CalculateScreen() {
                   )}
                   onPress={() => setIsPartsSelectorExpanded(true)}
                 />
-                <Ionicons name="chevron-down-outline" />
+                <Ionicons
+                  style={{ position: "absolute", top: 35 }}
+                  name="chevron-down-outline"
+                />
               </View>
             )}
           </View>
@@ -321,12 +388,12 @@ export default function CalculateScreen() {
               />
             </DialogActions>
           </Dialog>
-          {/* информация о клиентк */}
+
           <Modal
             style={styles.addCarInfoModal}
-            isVisible={showAddCarInfoDialog}
+            isVisible={showAddCarInfoForm}
             onBackdropPress={() => {
-              setShowAddCarInfoDialog(false);
+              setShowAddCarInfoForm(false);
             }}
           >
             <AntDesign
@@ -334,17 +401,14 @@ export default function CalculateScreen() {
               size={34}
               color="#DB5000"
               onPress={() => {
-                setShowAddCarInfoDialog(false);
+                setShowAddCarInfoForm(false);
               }}
             />
             <AddCarInfo
-              partsToRepair={{
-                ...selectedPartsToRepair,
-                carCategory,
-                paintCategory,
-              }}
-              setShowAddCarInfoDialog={setShowAddCarInfoDialog}
-            ></AddCarInfo>
+              setShowAddCarInfoForm={setShowAddCarInfoForm}
+              onCarInfoFormSubmit={setCarInfo}
+              initialValues={carInfo}
+            />
           </Modal>
         </>
       )}
@@ -353,10 +417,11 @@ export default function CalculateScreen() {
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: { width: "100%" },
   container: {
     height: "100%",
     alignItems: "center",
-    marginTop: 50,
+    marginTop: 10,
     paddingBottom: 49,
     paddingHorizontal: 20,
   },
@@ -373,6 +438,8 @@ const styles = StyleSheet.create({
 
   expandBtn: {
     alignItems: "center",
+    position: "absolute",
+    top: 0,
   },
 
   paramsSwitcherCont: {
@@ -405,5 +472,24 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+  },
+  buttonContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 26,
+  },
+  button: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 46,
+    width: 200,
+    backgroundColor: "#DB5000",
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "500",
+    fontSize: 16,
   },
 });
