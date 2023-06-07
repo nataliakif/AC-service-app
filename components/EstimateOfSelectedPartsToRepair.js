@@ -1,10 +1,4 @@
-import {
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { Divider } from "@react-native-material/core";
 
 import PartRepairExpandableItem from "./PartRepairExpandableItem";
@@ -20,6 +14,7 @@ export default function EstimateOfSelectedPartsToRepair({
   isPartsSelectorExpanded = false,
   canAddPhoto = false,
   carModel = "",
+  changeParamsOfPartFromEstimate,
 }) {
   return (
     <View style={{ display: "flex", alignItems: "center", paddingTop: 15 }}>
@@ -50,12 +45,13 @@ export default function EstimateOfSelectedPartsToRepair({
               isExpanded={false}
               canBeRemoved
               onRemoveFromSelected={onRemoveFromEstimate}
-              canExpandSubItems={false}
+              /* canExpandSubItems={false} */
               showZeroItems={false}
               canAddPhoto={canAddPhoto}
-              onChangeParamsOfSelectedPart={setPhotoURLToSelectedPart}
+              setPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
               removePhotoURLFromSelectedPart={removePhotoURLFromSelectedPart}
               partIndex={partIndex}
+              changeParamsOfPartFromEstimate={changeParamsOfPartFromEstimate}
             />
 
             <Divider style={styles.divider} />

@@ -10,6 +10,8 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
+import Toast from "react-native-toast-message";
+
 import { Formik } from "formik";
 import ImagePickerForm from "./ImagePickerForm";
 import { TextInputMask } from "react-native-masked-text";
@@ -26,9 +28,18 @@ export const uploadImage = async (uri) => {
   try {
     const uploadTask = storageRef.put(blob);
     await uploadTask;
+    Toast.show({
+      type: "success",
+      text1: "Фото загружено в облако",
+      visibilityTime: 2000,
+    });
     downloadURL = await storageRef.getDownloadURL();
   } catch (e) {
-    console.log(e);
+    Toast.show({
+      type: "error",
+      text1: e,
+      visibilityTime: 2000,
+    });
   }
   return downloadURL;
 };
@@ -37,9 +48,17 @@ export const deletePhotoFromStorage = async (photoURL) => {
   try {
     const storageRef = firebase.storage().refFromURL(photoURL);
     await storageRef.delete();
-    console.log("Photo deleted successfully");
+    Toast.show({
+      type: "info",
+      text1: "Фото удалено из облака",
+      visibilityTime: 2000,
+    });
   } catch (error) {
-    console.log("Error deleting photo:", error);
+    Toast.show({
+      type: "error",
+      text1: error,
+      visibilityTime: 2000,
+    });
   }
 };
 
@@ -195,7 +214,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
-    paddingBottom: 50,
+    padding: 20,
   },
   formWrapper: {
     alignItems: "center",

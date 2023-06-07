@@ -43,7 +43,7 @@ export default function CarPartsSelector({
           flex: 1,
           alignItems: "center",
           paddingTop: 40,
-          //backgroundColor: "green",
+          //backgroundColor: "yellow",
         }}
       >
         <CarModelImage
@@ -139,6 +139,25 @@ export default function CarPartsSelector({
           }}
         />
 
+        {/* rear left door */}
+        <TouchableOpacity
+          onPress={() => {
+            //show alert to confirm then modal window set mew item
+            setSelectedPartToRepair(
+              generatePartTemplate("Дверь", "Дверь зад. лев.")
+            );
+            setShowConfirmDialog(true);
+          }}
+          style={{
+            position: "absolute",
+            width: 30,
+            height: 75,
+            //backgroundColor: "green",
+            left: 10,
+            top: 290,
+          }}
+        />
+
         {/* front right door */}
         <TouchableOpacity
           onPress={() => {
@@ -155,6 +174,93 @@ export default function CarPartsSelector({
             //backgroundColor: "green",
             right: 10,
             top: 210,
+          }}
+        />
+
+        {/* rear right door */}
+        <TouchableOpacity
+          onPress={() => {
+            //show alert to confirm then modal window set mew item
+            setSelectedPartToRepair(
+              generatePartTemplate("Дверь", "Дверь зад. прав.")
+            );
+            setShowConfirmDialog(true);
+          }}
+          style={{
+            position: "absolute",
+            width: 30,
+            height: 75,
+            //backgroundColor: "green",
+            right: 10,
+            top: 290,
+          }}
+        />
+
+        {/* rear right wing */}
+        <TouchableOpacity
+          onPress={() => {
+            //show alert to confirm then modal window set mew item
+            setSelectedPartToRepair(
+              generatePartTemplate("Крыло заднее", "Крыло зад. прав.")
+            );
+            setShowConfirmDialog(true);
+          }}
+          style={{
+            position: "absolute",
+            width: 30,
+            height: 75,
+            //backgroundColor: "green",
+            right: 10,
+            top: 370,
+          }}
+        />
+
+        {/* rear right wing */}
+        <TouchableOpacity
+          onPress={() => {
+            //show alert to confirm then modal window set mew item
+            setSelectedPartToRepair(
+              generatePartTemplate("Крыло заднее", "Крыло зад. лев.")
+            );
+            setShowConfirmDialog(true);
+          }}
+          style={{
+            position: "absolute",
+            width: 30,
+            height: 75,
+            //backgroundColor: "green",
+            left: 10,
+            top: 370,
+          }}
+        />
+
+        {/* trunk */}
+        <TouchableOpacity
+          onPress={() => {
+            setSelectedPartToRepair(generatePartTemplate("Багажник"));
+            setShowConfirmDialog(true);
+          }}
+          style={{
+            position: "absolute",
+            width: 100,
+            height: 35,
+            //backgroundColor: "green",
+            top: 435,
+          }}
+        />
+
+        {/* Rear bumper */}
+        <TouchableOpacity
+          onPress={() => {
+            setSelectedPartToRepair(generatePartTemplate("Бампер задний"));
+            setShowConfirmDialog(true);
+          }}
+          style={{
+            position: "absolute",
+            width: 140,
+            height: 25,
+            //backgroundColor: "green",
+            top: 480,
           }}
         />
 

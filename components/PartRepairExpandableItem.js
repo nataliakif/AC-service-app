@@ -39,6 +39,8 @@ export default function PartRepairExpandableItem({
   canAddPhoto = false,
   partIndex,
   removePhotoURLFromSelectedPart,
+  changeParamsOfPartFromEstimate,
+  setPhotoURLToSelectedPart,
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
@@ -146,10 +148,14 @@ export default function PartRepairExpandableItem({
                   key={index}
                   repairTaskName={key}
                   repairTaskPrice={selectedPartToRepair.workAmount[key]}
-                  onPriceChange={onChangeParamsOfSelectedPart}
+                  onPriceChangeDuringAdd={onChangeParamsOfSelectedPart}
                   onSubitemExpand={setExpandedSubItemsCount}
                   canExpand={canExpandSubItems}
                   numericInputStep={key.includes("Time") ? 0.1 : 1}
+                  partIndex={partIndex}
+                  changeParamsOfPartFromEstimate={
+                    changeParamsOfPartFromEstimate
+                  }
                 />
               </View>
             ))}
@@ -163,7 +169,7 @@ export default function PartRepairExpandableItem({
           photoURL={selectedPartToRepair.photoURL}
           removePhotoURLFromSelectedPart={removePhotoURLFromSelectedPart}
           partIndex={partIndex}
-          addPhotoURLToSelectedPart={onChangeParamsOfSelectedPart}
+          addPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
         />
       )}
 
@@ -201,7 +207,7 @@ const styles = StyleSheet.create({
   divider: {
     marginVertical: 8,
   },
-  buttonText: { color: "#DB5000" },
+  buttonText: { marginLeft: 5, color: "#DB5000" },
 
   textInput: {
     flex: 1,

@@ -11,7 +11,7 @@ const photoWidth = screenWidth * 0.28;
 const photoHeight = (photoWidth / 4) * 3;
 
 export default function PartPhotosManager({
-  photoURL,
+  photoURL /*массив фоток*/,
   removePhotoURLFromSelectedPart,
   addPhotoURLToSelectedPart,
   showAddPhotoBtn = true,

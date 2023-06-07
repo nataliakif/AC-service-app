@@ -22,10 +22,12 @@ export default function PartRepairTaskExpandable({
   repairTaskName,
   repairTaskPrice,
   isExpanded = false,
-  onPriceChange,
+  onPriceChangeDuringAdd,
   onSubitemExpand,
   canExpand = true,
   numericInputStep = 0.1,
+  changeParamsOfPartFromEstimate,
+  partIndex,
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
@@ -72,12 +74,20 @@ export default function PartRepairTaskExpandable({
             totalHeight={35}
             initValue={repairTaskPrice}
             onChange={(value) => {
-              onPriceChange((prevState) => {
-                return {
-                  ...prevState,
-                  ...(prevState.workAmount[repairTaskName] = value),
-                };
-              });
+              if (changeParamsOfPartFromEstimate) {
+                changeParamsOfPartFromEstimate(
+                  partIndex,
+                  repairTaskName,
+                  value
+                );
+              } else {
+                onPriceChangeDuringAdd((prevState) => {
+                  return {
+                    ...prevState,
+                    ...(prevState.workAmount[repairTaskName] = value),
+                  };
+                });
+              }
             }}
             style={styles.priceInput}
             step={numericInputStep}

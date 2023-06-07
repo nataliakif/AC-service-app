@@ -17,12 +17,13 @@ import {
   ListItem,
   DialogHeader,
 } from "@react-native-material/core";
+import Toast from "react-native-toast-message";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import GestureRecognizer from "react-native-swipe-detect";
 import Modal from "react-native-modal";
 import { AntDesign } from "@expo/vector-icons";
 import uuid from "react-native-uuid";
-import { ref, set, update } from "firebase/database";
+import { ref, set, update, remove } from "firebase/database";
 import { db } from "../config/firebase";
 
 import CarPartsSelector from "../components/CarPartsSelector";
@@ -30,8 +31,16 @@ import EstimateOfSelectedPartsToRepair from "../components/EstimateOfSelectedPar
 import PartParamsAddDialog from "../components/PartParamsAddDialog";
 import ParamsSwitcher from "../components/ParamsSwitcher";
 import AddCarInfo, { deletePhotoFromStorage } from "../components/AddCarInfo";
-
+import { Divider } from "@react-native-material/core";
 import { useNavigation, useRoute } from "@react-navigation/native";
+
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+  MenuProvider,
+} from "react-native-popup-menu";
 
 const partListData = require("../config/price.json");
 
@@ -69,18 +78,21 @@ export default function CalculateScreen() {
   const route = useRoute();
   const navigation = useNavigation();
   const [editMode, setEditMode] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     if (!route.params) {
+      clearCalculation();
       return;
+    } else {
+      setEditMode(true);
+      const { carInfo, partsToRepair } = route.params;
+      setCarInfo(carInfo);
+      setSelectedPartsToRepair(partsToRepair.selectedPartsToRepair);
+      setCarCategory(partsToRepair.carCategory);
+      setPaintCategory(partsToRepair.paintCategory);
+      setShowCarStartParamsDialog(false);
     }
-    setEditMode(true);
-    const { carInfo, partsToRepair } = route.params;
-    setCarInfo(carInfo);
-    setSelectedPartsToRepair(partsToRepair.selectedPartsToRepair);
-    setCarCategory(partsToRepair.carCategory);
-    setPaintCategory(partsToRepair.paintCategory);
-    setShowCarStartParamsDialog(false);
   }, []);
 
   useEffect(() => {
@@ -100,6 +112,32 @@ export default function CalculateScreen() {
       return modifiedParts;
     });
   };
+
+  const clearCalculation = () => {
+    setCarCategory(1);
+    setPaintCategory(1);
+    setSelectedPartsToRepair([]);
+    setCarInfo({
+      model: "",
+      color: "",
+      number: "",
+      owner: "",
+      vinCode: "",
+      phone: "",
+      description: "",
+      photoURL: "",
+    });
+    setShowCarStartParamsDialog(true);
+  };
+
+  const changeParamsOfPartFromEstimate = (itemIndex, repairTaskName, value) => {
+    setSelectedPartsToRepair((prevState) => {
+      const modifiedParts = [...prevState];
+      modifiedParts[itemIndex].workAmount[repairTaskName] = value;
+      return modifiedParts;
+    });
+  };
+
   const removePhotoURLFromSelectedPart = (url, itemIndex) => {
     setSelectedPartsToRepair((prevState) => {
       const modifiedParts = [...prevState];
@@ -117,7 +155,7 @@ export default function CalculateScreen() {
 
   const saveNewItemToDB = async () => {
     set(ref(db, "calcs/" + uuid.v1()), {
-      carInfo,
+      carInfo: { ...carInfo, startDate: new Date().toLocaleDateString() },
       status: "pending",
       partsToRepair: {
         selectedPartsToRepair,
@@ -126,14 +164,22 @@ export default function CalculateScreen() {
       },
     })
       .then(() => {
-        console.log("item created in firebase db");
+        Toast.show({
+          type: "success",
+          text1: "Сохранено в базу данных",
+          visibilityTime: 2000,
+        });
       })
       .catch((error) => {
-        console.log(error);
+        Toast.show({
+          type: "error",
+          text1: error,
+          visibilityTime: 2000,
+        });
       });
   };
 
-  const updateItemInDB = async () => {
+  const updateItemInDB = async (status) => {
     update(ref(db, "calcs/" + route.params.key), {
       carInfo,
       partsToRepair: {
@@ -142,13 +188,45 @@ export default function CalculateScreen() {
         paintCategory,
       },
       workStatus: route.params.workStatus ? route.params.workStatus : {},
-      status: route.params.status,
+      status,
     })
       .then(() => {
-        console.log("item updated in firebase db");
+        Toast.show({
+          type: "success",
+          text1: "Изменения сохранены в базе данных",
+          visibilityTime: 2000,
+        });
       })
       .catch((error) => {
-        console.log(error);
+        Toast.show({
+          type: "error",
+          text1: error,
+          visibilityTime: 2000,
+        });
+      });
+  };
+
+  const deleteItemFromDB = async () => {
+    selectedPartsToRepair.map((item) =>
+      item.photoURL?.map((url) => deletePhotoFromStorage(url))
+    );
+    if (carInfo.photoURL) {
+      deletePhotoFromStorage(carInfo.photoURL);
+    }
+    remove(ref(db, "calcs/" + route.params.key))
+      .then(() => {
+        Toast.show({
+          type: "success",
+          text1: "Просчет удален из базы данных",
+          visibilityTime: 2000,
+        });
+      })
+      .catch((error) => {
+        Toast.show({
+          type: "error",
+          text1: error,
+          visibilityTime: 2000,
+        });
       });
   };
 
@@ -162,82 +240,57 @@ export default function CalculateScreen() {
   };
 
   return (
-    <Provider>
-      {showCarStartParamsDialog && (
-        <Dialog visible={showCarStartParamsDialog}>
-          <DialogHeader
-            titleWrapperStyle={{
-              alignItems: "center",
-              justifyContent: "center",
-              flex: 1,
-            }}
-            title="Виберите категорию авто и цвета"
-          />
-          <View style={styles.paramsSwitcherCont}>
-            <View style={styles.paramsSwitcherView}>
-              <Ionicons size={25} name="car-outline" />
-              <ParamsSwitcher
-                style={{ backgroundColor: "#DB5000" }}
-                curValue={carCategory}
-                onItemChange={setCarCategory}
-              />
-            </View>
-            <View style={styles.paramsSwitcherView}>
-              <Ionicons size={25} name="color-palette-outline" />
-              <ParamsSwitcher
-                curValue={paintCategory}
-                onItemChange={setPaintCategory}
-              />
-            </View>
-          </View>
-          <DialogActions>
-            <Button
-              title="Сохранить"
-              variant="text"
-              onPress={() => {
-                setShowCarStartParamsDialog(false);
+    <MenuProvider>
+      <Provider>
+        {showCarStartParamsDialog && (
+          <Dialog visible={showCarStartParamsDialog}>
+            <DialogHeader
+              titleWrapperStyle={{
+                alignItems: "center",
+                justifyContent: "center",
+                flex: 1,
               }}
-              color="#fff"
-              style={{
-                backgroundColor: "#DB5000",
-                flex: 2,
-                textTransform: "none",
-              }}
+              title="Виберите категорию авто и цвета"
             />
-          </DialogActions>
-        </Dialog>
-      )}
+            <View style={styles.paramsSwitcherCont}>
+              <View style={styles.paramsSwitcherView}>
+                <Ionicons size={25} name="car-outline" />
+                <ParamsSwitcher
+                  style={{ backgroundColor: "#DB5000" }}
+                  curValue={carCategory}
+                  onItemChange={setCarCategory}
+                />
+              </View>
+              <View style={styles.paramsSwitcherView}>
+                <Ionicons size={25} name="color-palette-outline" />
+                <ParamsSwitcher
+                  curValue={paintCategory}
+                  onItemChange={setPaintCategory}
+                />
+              </View>
+            </View>
+            <DialogActions>
+              <Button
+                title="Сохранить"
+                variant="text"
+                onPress={() => {
+                  setShowCarStartParamsDialog(false);
+                }}
+                color="#fff"
+                style={{
+                  backgroundColor: "#DB5000",
+                  flex: 2,
+                  textTransform: "none",
+                }}
+              />
+            </DialogActions>
+          </Dialog>
+        )}
 
-      {!showCarStartParamsDialog && (
-        <>
-          <View style={styles.container}>
-            <AntDesign
-              name="arrowleft"
-              size={34}
-              color="#DB5000"
-              style={styles.backBtn}
-              onPress={() => {
-                Alert.alert(
-                  "Подтверждение",
-                  "Вы уверени что хотите выйти без сохранения данных?",
-                  [
-                    {
-                      text: "Отмена",
-                      style: "cancel",
-                    },
-                    {
-                      text: "Да",
-                      style: "destructive",
-                      onPress: () => navigation.goBack(),
-                    },
-                  ],
-                  { cancelable: false }
-                );
-              }}
-            />
-
-            <View style={styles.headerContainer}>
-              <View style={styles.addBtn}>
+        {!showCarStartParamsDialog && (
+          <>
+            <View style={styles.container}>
+              <View style={styles.headerContainer}>
                 <IconButton
                   color="#fff"
                   backgroundColor="#DB5000"
@@ -251,95 +304,122 @@ export default function CalculateScreen() {
                     />
                   )}
                 />
-              </View>
-              <TouchableOpacity
-                style={styles.currentCarCategory}
-                onPress={() => setShowCarStartParamsDialog(true)}
-              >
-                <Ionicons size={25} name="car-outline" />
-                <Text style>
-                  {" "}
-                  - {carCategory === 0 ? "I" : carCategory === 1 ? "II" : "III"}
-                </Text>
-              </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.currentPaintCategory}
-                onPress={() => setShowCarStartParamsDialog(true)}
-              >
-                <Ionicons size={25} name="color-palette-outline" />
-                <Text style>
-                  {" "}
-                  -{" "}
-                  {paintCategory === 0
-                    ? "I"
-                    : paintCategory === 1
-                    ? "II"
-                    : "III"}
-                </Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.currentCarCategory}
+                  onPress={() => setShowCarStartParamsDialog(true)}
+                >
+                  <Ionicons size={25} name="car-outline" />
+                  <Text style>
+                    {" "}
+                    -{" "}
+                    {carCategory === 0 ? "I" : carCategory === 1 ? "II" : "III"}
+                  </Text>
+                </TouchableOpacity>
 
-              <IconButton
-                disabled={!(carInfo.model && selectedPartsToRepair.length > 0)}
-                style={{
-                  opacity:
-                    carInfo.model && selectedPartsToRepair.length > 0 ? 1 : 0.2,
-                }}
-                backgroundColor="#DB5000"
-                color="#fff"
-                icon={(props) => <Ionicons name="save-outline" {...props} />}
-                onPress={async () => {
-                  //при добавлении нового просчета
-                  if (editMode) {
-                    await updateItemInDB();
-                  } else await saveNewItemToDB();
+                <TouchableOpacity
+                  style={styles.currentPaintCategory}
+                  onPress={() => setShowCarStartParamsDialog(true)}
+                >
+                  <Ionicons size={25} name="color-palette-outline" />
+                  <Text style>
+                    {" "}
+                    -{" "}
+                    {paintCategory === 0
+                      ? "I"
+                      : paintCategory === 1
+                      ? "II"
+                      : "III"}
+                  </Text>
+                </TouchableOpacity>
 
-                  navigation.navigate("Архив");
-                }}
-              />
-            </View>
-            <GestureRecognizer
-              onSwipeUp={() => {
-                setIsPartsSelectorExpanded(false);
-              }}
-              onSwipeDown={() => {
-                setIsPartsSelectorExpanded(true);
-              }}
-            >
-              <Animated.View
-                style={{
-                  height: carPartsSelectorBaseHeight,
-                }}
-              >
-                {isPartsSelectorExpanded && (
-                  <CarPartsSelector
-                    alreadySelectedPartsToRepair={selectedPartsToRepair}
-                    onAddPart={addPartToSelectedOnes}
-                    currentCarCategory={carCategory}
-                    currentPaintCategory={paintCategory}
+                {!editMode && (
+                  <IconButton
+                    disabled={
+                      !(carInfo.model && selectedPartsToRepair.length > 0)
+                    }
+                    style={{
+                      opacity:
+                        carInfo.model && selectedPartsToRepair.length > 0
+                          ? 1
+                          : 0.2,
+                      marginRight: 5,
+                    }}
+                    backgroundColor={editMode ? "transparent" : "#DB5000"}
+                    color={editMode ? "black" : "#fff"}
+                    icon={(props) => (
+                      <Ionicons name="save-outline" {...props} />
+                    )}
+                    onPress={async () => {
+                      if (editMode) {
+                        await updateItemInDB(route.params.status);
+                      } else await saveNewItemToDB();
+                      navigation.navigate("Архив");
+                    }}
                   />
                 )}
-              </Animated.View>
-            </GestureRecognizer>
 
-            <ScrollView style={styles.scrollContainer} alwaysBounceVertical>
-              {selectedPartsToRepair.length > 0 && (
-                <>
-                  <EstimateOfSelectedPartsToRepair
-                    selectedPartsToRepair={selectedPartsToRepair}
-                    isPartsSelectorExpanded={isPartsSelectorExpanded}
-                    onRemoveFromEstimate={removePartFromSelectedOnes}
-                    setShowAddCarInfoForm={setShowAddCarInfoForm}
-                    setPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
-                    removePhotoURLFromSelectedPart={
-                      removePhotoURLFromSelectedPart
-                    }
-                    carModel={carInfo.model}
-                    canAddPhoto={editMode}
+                {editMode && (
+                  <IconButton
+                    color="#fff"
+                    backgroundColor="#DB5000"
+                    icon={(props) => (
+                      <Ionicons
+                        name="settings-outline"
+                        {...props}
+                        onPress={() => {
+                          setShowMenu(true);
+                        }}
+                      />
+                    )}
                   />
+                )}
+              </View>
+              <GestureRecognizer
+                onSwipeUp={() => {
+                  setIsPartsSelectorExpanded(false);
+                }}
+                onSwipeDown={() => {
+                  setIsPartsSelectorExpanded(true);
+                }}
+              >
+                <Animated.View
+                  style={{
+                    height: carPartsSelectorBaseHeight,
+                  }}
+                >
+                  {isPartsSelectorExpanded && (
+                    <CarPartsSelector
+                      alreadySelectedPartsToRepair={selectedPartsToRepair}
+                      onAddPart={addPartToSelectedOnes}
+                      currentCarCategory={carCategory}
+                      currentPaintCategory={paintCategory}
+                    />
+                  )}
+                </Animated.View>
+              </GestureRecognizer>
 
-                  <View style={styles.buttonContainer}>
-                    <TouchableOpacity
+              <ScrollView style={styles.scrollContainer} alwaysBounceVertical>
+                {selectedPartsToRepair.length > 0 && (
+                  <>
+                    <EstimateOfSelectedPartsToRepair
+                      selectedPartsToRepair={selectedPartsToRepair}
+                      isPartsSelectorExpanded={isPartsSelectorExpanded}
+                      onRemoveFromEstimate={removePartFromSelectedOnes}
+                      setShowAddCarInfoForm={setShowAddCarInfoForm}
+                      setPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
+                      removePhotoURLFromSelectedPart={
+                        removePhotoURLFromSelectedPart
+                      }
+                      carModel={carInfo.model}
+                      canAddPhoto={editMode}
+                      changeParamsOfPartFromEstimate={
+                        changeParamsOfPartFromEstimate
+                      }
+                    />
+
+                    <View style={styles.buttonContainer}>
+                      {/* <TouchableOpacity
                       activeOpacity={0.7}
                       style={styles.button}
                       onPress={() => {
@@ -347,135 +427,262 @@ export default function CalculateScreen() {
                       }}
                     >
                       <Text style={styles.buttonText}>Инфо о авто</Text>
-                    </TouchableOpacity>
-                  </View>
-                </>
+                    </TouchableOpacity> */}
+                      <IconButton
+                        /* color="#fff"
+                      backgroundColor="#DB5000" */
+                        icon={(props) => (
+                          <Ionicons
+                            name={
+                              carInfo.model
+                                ? "document-text"
+                                : "document-text-outline"
+                            }
+                            {...props}
+                            onPress={() => {
+                              setShowAddCarInfoForm(true);
+                            }}
+                          />
+                        )}
+                      />
+                    </View>
+                  </>
+                )}
+              </ScrollView>
+
+              {!isPartsSelectorExpanded && (
+                <View style={styles.expandBtn}>
+                  <IconButton
+                    icon={(props) => (
+                      <Ionicons name="car-sport-outline" {...props} />
+                    )}
+                    onPress={() => setIsPartsSelectorExpanded(true)}
+                  />
+                  <Ionicons
+                    style={{ position: "absolute", top: 35 }}
+                    name="chevron-down-outline"
+                  />
+                </View>
               )}
-            </ScrollView>
+              <AntDesign
+                name="arrowleft"
+                size={34}
+                color="#DB5000"
+                style={styles.backBtn}
+                onPress={() => {
+                  Alert.alert(
+                    "Подтверждение",
+                    "Вы уверени что хотите выйти без сохранения данных?",
+                    [
+                      {
+                        text: "Отмена",
+                        style: "cancel",
+                      },
+                      {
+                        text: "Да",
+                        style: "destructive",
+                        onPress: () => {
+                          clearCalculation();
+                          navigation.navigate("Просчет");
+                          navigation.navigate("В работе");
+                        },
+                      },
+                    ],
+                    { cancelable: false }
+                  );
+                }}
+              />
+            </View>
 
-            {!isPartsSelectorExpanded && (
-              <View style={styles.expandBtn}>
-                <IconButton
-                  icon={(props) => (
-                    <Ionicons name="car-sport-outline" {...props} />
-                  )}
-                  onPress={() => setIsPartsSelectorExpanded(true)}
-                />
-                <Ionicons
-                  style={{ position: "absolute", top: 35 }}
-                  name="chevron-down-outline"
-                />
-              </View>
+            {showSpecificPartsDialog && (
+              <PartParamsAddDialog
+                visible={showSpecificPartsDialog}
+                selectedPartToRepair={specificPartToRepair}
+                setShowParamsDialog={setShowSpecificPartsDialog}
+                setSelectedPartToRepair={setSpecificPartToRepair}
+                onAddPart={addPartToSelectedOnes}
+                specificDetailAdding={true}
+              />
             )}
-          </View>
 
-          {showSpecificPartsDialog && (
-            <PartParamsAddDialog
-              visible={showSpecificPartsDialog}
-              selectedPartToRepair={specificPartToRepair}
-              setShowParamsDialog={setShowSpecificPartsDialog}
-              setSelectedPartToRepair={setSpecificPartToRepair}
-              onAddPart={addPartToSelectedOnes}
-              specificDetailAdding={true}
-            />
-          )}
-
-          <Dialog
-            visible={showPartsListDialog}
-            onDismiss={() => {
-              setShowPartsListDialog(false);
-            }}
-          >
-            <ScrollView
-              style={{
-                ...styles.partListDialog,
+            <Dialog
+              visible={showPartsListDialog}
+              onDismiss={() => {
+                setShowPartsListDialog(false);
               }}
             >
-              {partListData.map((part, index) => (
+              <ScrollView
+                style={{
+                  ...styles.partListDialog,
+                }}
+              >
+                {partListData.map((part, index) => (
+                  <ListItem
+                    key={index}
+                    onPress={() => {
+                      setShowPartsListDialog(false);
+                      setShowSpecificPartsDialog(true);
+                      setSpecificPartToRepair({
+                        partName: part.partName,
+                        workAmount: {
+                          mountingTime:
+                            part.workAmount.mountingTime[carCategory],
+                          assemblingTime:
+                            part.workAmount.assemblingTime[carCategory],
+                          repairTime: part.workAmount.repairTime,
+                          paintPrice: part.workAmount.paintPrice[paintCategory],
+                          repairTime: 0,
+                          orderNewDetailPrice: 0,
+                        },
+                        specific: true,
+                        photoURL: [],
+                      });
+                    }}
+                    title={part.partName}
+                  />
+                ))}
                 <ListItem
-                  key={index}
                   onPress={() => {
                     setShowPartsListDialog(false);
                     setShowSpecificPartsDialog(true);
                     setSpecificPartToRepair({
-                      partName: part.partName,
+                      partName: "",
                       workAmount: {
-                        mountingTime: part.workAmount.mountingTime[carCategory],
-                        assemblingTime:
-                          part.workAmount.assemblingTime[carCategory],
-                        repairTime: part.workAmount.repairTime,
-                        paintPrice: part.workAmount.paintPrice[paintCategory],
+                        mountingTime: 0,
+                        assemblingTime: 0,
+                        repairTime: 0,
+                        paintPrice: 0,
                         repairTime: 0,
                         orderNewDetailPrice: 0,
                       },
-                      specific: true,
                       photoURL: [],
+                      specific: true,
                     });
                   }}
-                  title={part.partName}
+                  title={"..."}
                 />
-              ))}
-              <ListItem
-                onPress={() => {
-                  setShowPartsListDialog(false);
-                  setShowSpecificPartsDialog(true);
-                  setSpecificPartToRepair({
-                    partName: "",
-                    workAmount: {
-                      mountingTime: 0,
-                      assemblingTime: 0,
-                      repairTime: 0,
-                      paintPrice: 0,
-                      repairTime: 0,
-                      orderNewDetailPrice: 0,
-                    },
-                    photoURL: [],
-                    specific: true,
-                  });
-                }}
-                title={"..."}
-              />
-            </ScrollView>
+              </ScrollView>
 
-            <DialogActions>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={styles.button}
-                  onPress={() => {
-                    setShowPartsListDialog(false);
-                  }}
-                >
-                  <Text style={styles.buttonText}>Отмена</Text>
-                </TouchableOpacity>
-              </View>
-            </DialogActions>
-          </Dialog>
+              <DialogActions>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={styles.button}
+                    onPress={() => {
+                      setShowPartsListDialog(false);
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Отмена</Text>
+                  </TouchableOpacity>
+                </View>
+              </DialogActions>
+            </Dialog>
 
-          <Modal
-            style={styles.addCarInfoModal}
-            isVisible={showAddCarInfoForm}
-            onBackdropPress={() => {
-              setShowAddCarInfoForm(false);
-            }}
-          >
-            <AntDesign
-              name="arrowleft"
-              size={34}
-              color="#DB5000"
-              onPress={() => {
+            <Modal
+              style={styles.addCarInfoModal}
+              isVisible={showAddCarInfoForm}
+              onBackdropPress={() => {
                 setShowAddCarInfoForm(false);
               }}
+            >
+              <AntDesign
+                name="arrowleft"
+                size={34}
+                color="#DB5000"
+                onPress={() => {
+                  setShowAddCarInfoForm(false);
+                }}
+              />
+              <AddCarInfo
+                setShowAddCarInfoForm={setShowAddCarInfoForm}
+                onCarInfoFormSubmit={setCarInfo}
+                initialValues={carInfo}
+              />
+            </Modal>
+          </>
+        )}
+      </Provider>
+
+      <View style={{ position: "absolute", bottom: 0, right: 0 }}>
+        <Menu opened={showMenu} onBackdropPress={() => setShowMenu(false)}>
+          <MenuTrigger onPress={() => setShowMenu(true)} />
+          <MenuOptions>
+            <MenuOption
+              onSelect={async () => {
+                await updateItemInDB(route.params.status);
+                setShowMenu(false);
+              }}
+              text="Сохранить изменения"
             />
-            <AddCarInfo
-              setShowAddCarInfoForm={setShowAddCarInfoForm}
-              onCarInfoFormSubmit={setCarInfo}
-              initialValues={carInfo}
+            <Divider />
+            <MenuOption
+              onSelect={async () => {
+                await updateItemInDB(route.params.status);
+                navigation.navigate("Архив");
+              }}
+              text="Сохранить изменения и перейти в архив"
             />
-          </Modal>
-        </>
-      )}
-    </Provider>
+            <Divider />
+            <MenuOption
+              onSelect={() => {
+                Alert.alert(
+                  "Подтверждение",
+                  "Отправить в работу данный заказ?",
+                  [
+                    {
+                      text: "Отмена",
+                      style: "cancel",
+                    },
+                    {
+                      text: "Да",
+                      style: "destructive",
+                      onPress: async () => {
+                        //запуск в работу
+                        await updateItemInDB("inProgress");
+                        navigation.navigate("Просчет");
+                        navigation.navigate("В работе");
+                      },
+                    },
+                  ],
+                  { cancelable: false }
+                );
+              }}
+              /*  disabled={true} */
+              text="Отправить в работу"
+            />
+            <Divider />
+            <MenuOption
+              onSelect={() => {
+                Alert.alert(
+                  "Подтверждение",
+                  "Вы уверени что хотите удалить просчет?",
+                  [
+                    {
+                      text: "Отмена",
+                      style: "cancel",
+                    },
+                    {
+                      text: "Да",
+                      style: "destructive",
+                      onPress: () => {
+                        //удаление просчета
+                        deleteItemFromDB();
+                        navigation.navigate("Просчет");
+                        navigation.navigate("Архив");
+                      },
+                    },
+                  ],
+                  { cancelable: false }
+                );
+              }}
+            >
+              <Text style={{ color: "red" }}>Удалить</Text>
+            </MenuOption>
+          </MenuOptions>
+        </Menu>
+      </View>
+      <Toast />
+    </MenuProvider>
   );
 }
 
@@ -486,7 +693,7 @@ const styles = StyleSheet.create({
     height: "100%",
     alignItems: "center",
     paddingTop: 5,
-    paddingBottom: 55,
+    paddingBottom: 65,
     paddingTop: 20,
     paddingHorizontal: 20,
   },
