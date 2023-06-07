@@ -15,7 +15,7 @@ const ImagePickerForm = ({ name, image, setImage }) => {
       quality: 1,
     });
 
-    if (!result.cancelled) {
+    if (!result.canceled) {
       const source = { uri: result.assets[0].uri };
       setImage(source);
       setFieldValue(name, result.assets[0].uri);

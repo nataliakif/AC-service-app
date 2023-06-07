@@ -22,17 +22,19 @@ export default function PartRepairTaskExpandable({
   repairTaskName,
   repairTaskPrice,
   isExpanded = false,
-  onPriceChange,
+  onPriceChangeDuringAdd,
   onSubitemExpand,
   canExpand = true,
   numericInputStep = 0.1,
+  changeParamsOfPartFromEstimate,
+  partIndex,
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
 
   useEffect(() => {
     Animated.timing(itemBaseHeight, {
-      toValue: expanded ? 40 : 0,
+      toValue: expanded ? 30 : 0,
       duration: 200,
       useNativeDriver: false,
     }).start();
@@ -72,12 +74,20 @@ export default function PartRepairTaskExpandable({
             totalHeight={35}
             initValue={repairTaskPrice}
             onChange={(value) => {
-              onPriceChange((prevState) => {
-                return {
-                  ...prevState,
-                  ...(prevState.workAmount[repairTaskName] = value),
-                };
-              });
+              if (changeParamsOfPartFromEstimate) {
+                changeParamsOfPartFromEstimate(
+                  partIndex,
+                  repairTaskName,
+                  value
+                );
+              } else {
+                onPriceChangeDuringAdd((prevState) => {
+                  return {
+                    ...prevState,
+                    ...(prevState.workAmount[repairTaskName] = value),
+                  };
+                });
+              }
             }}
             style={styles.priceInput}
             step={numericInputStep}
@@ -110,7 +120,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 8,
+    marginBottom: 5,
   },
   price: {
     fontSize: 14,

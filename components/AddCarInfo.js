@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,72 +9,103 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import uuid from "react-native-uuid";
+
+import Toast from "react-native-toast-message";
+
 import { Formik } from "formik";
 import ImagePickerForm from "./ImagePickerForm";
 import { TextInputMask } from "react-native-masked-text";
-import { ref, set } from "firebase/database";
-import { db, firebase } from "../config/firebase";
 
-const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
+import { firebase } from "../config/firebase";
+
+export const uploadImage = async (uri) => {
+  const response = await fetch(uri);
+  const blob = await response.blob();
+
+  const filename = uri.substring(uri.lastIndexOf("/") + 1);
+  const storageRef = firebase.storage().ref().child(filename);
+  let downloadURL = "";
+  try {
+    const uploadTask = storageRef.put(blob);
+    await uploadTask;
+    Toast.show({
+      type: "success",
+      text1: "Фото загружено в облако",
+      visibilityTime: 2000,
+    });
+    downloadURL = await storageRef.getDownloadURL();
+  } catch (e) {
+    Toast.show({
+      type: "error",
+      text1: e,
+      visibilityTime: 2000,
+    });
+  }
+  return downloadURL;
+};
+
+export const deletePhotoFromStorage = async (photoURL) => {
+  try {
+    const storageRef = firebase.storage().refFromURL(photoURL);
+    await storageRef.delete();
+    Toast.show({
+      type: "info",
+      text1: "Фото удалено из облака",
+      visibilityTime: 2000,
+    });
+  } catch (error) {
+    Toast.show({
+      type: "error",
+      text1: error,
+      visibilityTime: 2000,
+    });
+  }
+};
+
+const AddCarInfoForm = ({
+  setShowAddCarInfoForm,
+  onCarInfoFormSubmit,
+  initialValues,
+}) => {
   const [image, setImage] = useState(null);
-  const navigation = useNavigation();
+  const [isSbtBtnActive, setIsSbtBtnActive] = useState(true);
+
+  useEffect(() => {
+    if (initialValues.photoURL) {
+      setImage({ uri: initialValues.photoURL });
+    }
+  }, []);
   const dismissKeyboard = () => {
     Keyboard.dismiss();
-  };
-
-  const uploadImage = async () => {
-    const response = await fetch(image.uri);
-    const blob = await response.blob();
-
-    const filename = image.uri.substring(image.uri.lastIndexOf("/") + 1);
-    const storageRef = firebase.storage().ref().child(filename);
-    let downloadURL = "";
-    try {
-      const uploadTask = storageRef.put(blob);
-      await uploadTask;
-      downloadURL = await storageRef.getDownloadURL();
-    } catch (e) {
-      console.log(e);
-    }
-    setImage(null);
-    return downloadURL;
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Formik
-        initialValues={{
-          model: "",
-          color: "",
-          number: "",
-          owner: "",
-          vinCode: "",
-          phone: "",
-          startDate: new Date(),
-          description: "",
-        }}
+        initialValues={initialValues}
         onSubmit={async (values) => {
-          const photoURL = await uploadImage();
+          setIsSbtBtnActive(false);
+          let photoURL = initialValues.photoURL;
+          if (image?.uri && initialValues.photoURL !== image.uri) {
+            photoURL = await uploadImage(image.uri);
+            setImage(null);
+          }
+
           const { model, color, number, owner, phone, vinCode, description } =
             values;
-          set(ref(db, "calcs/" + uuid.v1()), {
-            carInfo: {
-              model,
-              color,
-              number,
-              vinCode,
-              owner,
-              phone,
-              description,
-              photoURL,
-            },
-            status: "pending",
-            partsToRepair,
+
+          onCarInfoFormSubmit({
+            model,
+            color,
+            number,
+            vinCode,
+            owner,
+            phone,
+            description,
+            photoURL,
           });
-          navigation.navigate("Архив");
-          setshowAddCarInfoDialog(false);
+
+          setShowAddCarInfoForm(false);
         }}
       >
         {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -159,11 +190,15 @@ const AddCarScreen = ({ partsToRepair, setshowAddCarInfoDialog }) => {
                 />
               </View>
               <TouchableOpacity
+                disabled={!isSbtBtnActive}
                 activeOpacity={0.7}
-                style={styles.button}
+                style={{
+                  ...styles.button,
+                  opacity: isSbtBtnActive ? 1 : 0.2,
+                }}
                 onPress={handleSubmit}
               >
-                <Text style={styles.buttonText}>Подтвердить</Text>
+                <Text style={styles.buttonText}>Cохранить инфо</Text>
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>
@@ -179,7 +214,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
-    paddingBottom: 50,
+    padding: 20,
   },
   formWrapper: {
     alignItems: "center",
@@ -222,7 +257,7 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 36,
     height: 60,
-    paddingHorizontal: 130,
+    alignItems: "center",
     paddingVertical: 20,
     textAlign: "center",
     backgroundColor: "#DB5000",
@@ -231,8 +266,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "500",
-    flexDirection: "row",
   },
 });
 
-export default AddCarScreen;
+export default AddCarInfoForm;
