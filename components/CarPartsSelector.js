@@ -144,7 +144,7 @@ export default function CarPartsSelector({
           onPress={() => {
             //show alert to confirm then modal window set mew item
             setSelectedPartToRepair(
-              generatePartTemplate("Дверь", "Дверь зад. лев.")
+              generatePartTemplate("Дверь", "Дверь задн. лев.")
             );
             setShowConfirmDialog(true);
           }}
@@ -182,7 +182,7 @@ export default function CarPartsSelector({
           onPress={() => {
             //show alert to confirm then modal window set mew item
             setSelectedPartToRepair(
-              generatePartTemplate("Дверь", "Дверь зад. прав.")
+              generatePartTemplate("Дверь", "Дверь задн. прав.")
             );
             setShowConfirmDialog(true);
           }}
@@ -201,7 +201,7 @@ export default function CarPartsSelector({
           onPress={() => {
             //show alert to confirm then modal window set mew item
             setSelectedPartToRepair(
-              generatePartTemplate("Крыло заднее", "Крыло зад. прав.")
+              generatePartTemplate("Крыло заднее", "Крыло задн. прав.")
             );
             setShowConfirmDialog(true);
           }}
@@ -220,7 +220,7 @@ export default function CarPartsSelector({
           onPress={() => {
             //show alert to confirm then modal window set mew item
             setSelectedPartToRepair(
-              generatePartTemplate("Крыло заднее", "Крыло зад. лев.")
+              generatePartTemplate("Крыло заднее", "Крыло задн. лев.")
             );
             setShowConfirmDialog(true);
           }}
