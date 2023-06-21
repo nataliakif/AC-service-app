@@ -1,16 +1,23 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { AuthUserContext } from "../App";
+import UserProfile from "../components/UserProfile";
 
 const Header = ({ title, subtitle, name }) => {
+  const { user } = useContext(AuthUserContext);
   const navigation = useNavigation();
   return (
     <View style={styles.header}>
       <Image source={require("../images/logo.jpeg")} style={styles.logo} />
       <Text style={styles.title}>{title}</Text>
-      <TouchableOpacity onPress={() => navigation.navigate(name)}>
-        <Text style={styles.subtitle}>{subtitle}</Text>
-      </TouchableOpacity>
+      {user ? (
+        <UserProfile></UserProfile>
+      ) : (
+        <TouchableOpacity onPress={() => navigation.navigate(name)}>
+          <Text style={styles.subtitle}>{subtitle}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

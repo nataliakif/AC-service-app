@@ -158,3 +158,4 @@ export default function App() {
     </AuthUserProvider>
   );
 }
+export { AuthUserContext, AuthUserProvider };

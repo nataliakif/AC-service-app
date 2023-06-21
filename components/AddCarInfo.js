@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
-
+import { useRoute } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 
 import { Formik } from "formik";
@@ -66,9 +66,12 @@ const AddCarInfoForm = ({
   setShowAddCarInfoForm,
   onCarInfoFormSubmit,
   initialValues,
+  isEditable = true,
 }) => {
   const [image, setImage] = useState(null);
   const [isSbtBtnActive, setIsSbtBtnActive] = useState(true);
+  const route = useRoute();
+  const { name } = route;
 
   useEffect(() => {
     if (initialValues.photoURL) {
@@ -80,7 +83,7 @@ const AddCarInfoForm = ({
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView showsVerticalScrollIndicator={false}>
       <Formik
         initialValues={initialValues}
         onSubmit={async (values) => {
@@ -111,11 +114,13 @@ const AddCarInfoForm = ({
         {({ handleChange, handleBlur, handleSubmit, values }) => (
           <TouchableWithoutFeedback onPress={dismissKeyboard}>
             <View>
-              <ImagePickerForm
-                name={values.photo}
-                image={image}
-                setImage={setImage}
-              ></ImagePickerForm>
+              {name !== "В работе" && name !== "Сервис" && (
+                <ImagePickerForm
+                  name={values.photo}
+                  image={image}
+                  setImage={setImage}
+                ></ImagePickerForm>
+              )}
               <View style={styles.inputContainer}>
                 <Text style={styles.title}>Основные данные</Text>
                 <Text style={styles.label}>Марка машины:</Text>
@@ -124,6 +129,7 @@ const AddCarInfoForm = ({
                   value={values.model}
                   placeholder="Введите марку"
                   onChangeText={handleChange("model")}
+                  editable={isEditable}
                 />
               </View>
 
@@ -134,6 +140,7 @@ const AddCarInfoForm = ({
                   value={values.color}
                   placeholder="Введите цвет"
                   onChangeText={handleChange("color")}
+                  editable={isEditable}
                 />
               </View>
 
@@ -144,6 +151,7 @@ const AddCarInfoForm = ({
                   value={values.number}
                   placeholder="AB0000BA"
                   onChangeText={handleChange("number")}
+                  editable={isEditable}
                 />
               </View>
               <View style={styles.inputContainer}>
@@ -153,6 +161,7 @@ const AddCarInfoForm = ({
                   value={values.vinCode}
                   placeholder=""
                   onChangeText={handleChange("vinCode")}
+                  editable={isEditable}
                 />
               </View>
 
@@ -163,6 +172,7 @@ const AddCarInfoForm = ({
                   value={values.owner}
                   placeholder="Введите ФИО"
                   onChangeText={handleChange("owner")}
+                  editable={isEditable}
                 />
               </View>
 
@@ -178,6 +188,7 @@ const AddCarInfoForm = ({
                   }}
                   onChangeText={handleChange("phone")}
                   handleBlur={handleBlur("phone")}
+                  editable={isEditable}
                 />
               </View>
 
@@ -187,19 +198,22 @@ const AddCarInfoForm = ({
                   style={{ ...styles.input, ...styles.description }}
                   value={values.description}
                   onChangeText={handleChange("description")}
+                  editable={isEditable}
                 />
               </View>
-              <TouchableOpacity
-                disabled={!isSbtBtnActive}
-                activeOpacity={0.7}
-                style={{
-                  ...styles.button,
-                  opacity: isSbtBtnActive ? 1 : 0.2,
-                }}
-                onPress={handleSubmit}
-              >
-                <Text style={styles.buttonText}>Cохранить инфо</Text>
-              </TouchableOpacity>
+              {name !== "В работе" && name !== "Сервис" && (
+                <TouchableOpacity
+                  disabled={!isSbtBtnActive}
+                  activeOpacity={0.7}
+                  style={{
+                    ...styles.button,
+                    opacity: isSbtBtnActive ? 1 : 0.2,
+                  }}
+                  onPress={handleSubmit}
+                >
+                  <Text style={styles.buttonText}>Cохранить инфо</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </TouchableWithoutFeedback>
         )}
@@ -209,16 +223,6 @@ const AddCarInfoForm = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-    padding: 20,
-  },
-  formWrapper: {
-    alignItems: "center",
-  },
   title: {
     fontWeight: "700",
     fontSize: 24,
