@@ -2,19 +2,14 @@ import React, { useContext, useState, useEffect } from "react";
 import {
   View,
   TouchableOpacity,
-  Image,
-  Switch,
   Text,
-  TextInput,
   StyleSheet,
   Modal,
   TouchableWithoutFeedback,
-  Keyboard,
 } from "react-native";
 
 import { Avatar } from "react-native-paper";
 import { AuthUserContext } from "../App";
-import { auth } from "../config/firebase";
 import UserProfileSettings from "./UserProfileSettings";
 import { getUserFromAsyncStorage } from "./functions";
 
@@ -54,15 +49,6 @@ export default function UserProfile() {
 
   const closeModal = () => {
     setSettingsVisible(false);
-  };
-
-  const handleSaveSettings = () => {
-    // Здесь можно добавить логику сохранения настроек пользователя
-    // Например, обновить имя, аватар и тему приложения
-
-    console.log("Avatar:", avatar);
-    console.log("Dark Theme:", darkTheme);
-    closeModal();
   };
 
   const handleLogoutPress = () => {
@@ -128,7 +114,6 @@ export default function UserProfile() {
           <UserProfileSettings
             settingsVisible={settingsVisible}
             closeModal={closeModal}
-            handleSaveSettings={handleSaveSettings}
             user={userInfo}
           />
         )}
