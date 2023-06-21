@@ -51,74 +51,59 @@ export default function UserProfile() {
     setSettingsVisible(false);
   };
 
-  const handleLogoutPress = () => {
-    handleLogout();
-  };
-
   const toggleModal = () => {
     setMenuVisible(!menuVisible);
   };
 
-  const handlePressOutsideModal = () => {
-    if (menuVisible) {
-      toggleModal();
-    }
-  };
-
   return (
-    <TouchableWithoutFeedback
-      onPress={handlePressOutsideModal}
-      accessible={false}
-    >
-      <View>
-        <TouchableOpacity onPress={toggleModal}>
-          {userInfo.photoURL ? (
-            <Avatar.Image
-              size={60}
-              source={{ uri: userInfo.photoURL }}
-              onPress={toggleModal}
-            />
-          ) : (
-            <Avatar.Text
-              size={60}
-              label={userInfo.email ? userInfo.email[0].toUpperCase() : ""}
-              onPress={toggleModal}
-            />
-          )}
-        </TouchableOpacity>
-        {menuVisible && (
-          <TouchableWithoutFeedback onPressOut={toggleModal}>
-            <Modal
-              visible={menuVisible}
-              transparent={true}
-              animationType="fade"
-              onRequestClose={toggleModal}
-            >
-              <View style={styles.menuContainer}>
-                <TouchableOpacity style={styles.menuItem} onPress={openModal}>
-                  <Text style={styles.menuText}>Настройки</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.menuItem, styles.logoutItem]}
-                  onPress={handleLogoutPress}
-                >
-                  <Text style={[styles.menuText, styles.logoutText]}>
-                    Выйти
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </Modal>
-          </TouchableWithoutFeedback>
-        )}
-        {settingsVisible && (
-          <UserProfileSettings
-            settingsVisible={settingsVisible}
-            closeModal={closeModal}
-            user={userInfo}
+    <View>
+      <TouchableOpacity onPress={toggleModal}>
+        {userInfo.photoURL ? (
+          <Avatar.Image
+            size={60}
+            source={{ uri: userInfo.photoURL }}
+            onPress={toggleModal}
+          />
+        ) : (
+          <Avatar.Text
+            size={60}
+            label={userInfo.email ? userInfo.email[0].toUpperCase() : ""}
+            onPress={toggleModal}
           />
         )}
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableOpacity>
+      {menuVisible && (
+        <TouchableWithoutFeedback onPressOut={toggleModal}>
+          <Modal
+            visible={menuVisible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={toggleModal}
+          >
+            <View style={styles.menuContainer}>
+              <TouchableOpacity style={styles.menuItem} onPress={openModal}>
+                <Text style={styles.menuText}>Настройки</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.menuItem, styles.logoutItem]}
+                onPress={() => {
+                  handleLogout();
+                }}
+              >
+                <Text style={[styles.menuText, styles.logoutText]}>Выйти</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+        </TouchableWithoutFeedback>
+      )}
+      {settingsVisible && (
+        <UserProfileSettings
+          settingsVisible={settingsVisible}
+          closeModal={closeModal}
+          user={userInfo}
+        />
+      )}
+    </View>
   );
 }
 
