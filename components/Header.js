@@ -24,19 +24,18 @@ const Header = ({ title, subtitle, name }) => {
 
 const styles = StyleSheet.create({
   header: {
-    flex: 0.25,
-    marginBottom: 16,
-    height: 52,
+    flex: 0.1,
+    paddingTop: 50,
+    paddingBottom: 10,
+    paddingRight: 15,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    // marginTop: 50,
-    // marginBottom: 28,
     backgroundColor: "#fff",
   },
   logo: {
-    width: 42,
-    height: 55,
+    width: 60,
+    height: 60,
   },
 
   title: {

@@ -4,8 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Импортируйте AsyncStorage
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoginScreen from "./screens/LoginScreen";
 import RegistrationScreen from "./screens/RegistrationScreen";
 import HomeScreen from "./screens/HomeScreen";
@@ -24,16 +23,13 @@ const AuthUserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // При загрузке приложения получаем информацию о пользователе из AsyncStorage
     const fetchUser = async () => {
       try {
         const userData = await AsyncStorage.getItem("user");
         const parsedUser = JSON.parse(userData);
-        if (parsedUser) {
-          setUser(parsedUser);
-        }
+        setUser(parsedUser);
       } catch (error) {
-        console.log(error);
+        console.log("Ошибка получения данных пользователя:", error);
       }
     };
 
@@ -69,7 +65,7 @@ const AuthUserProvider = ({ children }) => {
 
 function AuthStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={() => ({ headerShown: false })}>
       <Stack.Screen name="Логин" component={LoginScreen} />
       <Stack.Screen name="Регистрация" component={RegistrationScreen} />
     </Stack.Navigator>

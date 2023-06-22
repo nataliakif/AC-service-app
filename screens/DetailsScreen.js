@@ -31,6 +31,5 @@ const styles = StyleSheet.create({
     marginTop: 50,
     paddingHorizontal: 15,
     flexDirection: "column",
-    justifyContent: "space-between",
   },
 });

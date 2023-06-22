@@ -76,8 +76,6 @@ const ListItem = ({ data, setModalVisible, selectedZone }) => {
 
           {name === "Сервис" && (
             <View>
-              <Text style={styles.title}>Перечень деталей в работу:</Text>
-
               <StatusDropdown
                 value={selectedStatus}
                 onChange={setSelectedStatus}

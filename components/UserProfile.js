@@ -55,6 +55,12 @@ export default function UserProfile() {
     setMenuVisible(!menuVisible);
   };
 
+  const handleOutsidePress = () => {
+    if (menuVisible) {
+      toggleModal();
+    }
+  };
+
   return (
     <View>
       <TouchableOpacity onPress={toggleModal}>
@@ -73,28 +79,34 @@ export default function UserProfile() {
         )}
       </TouchableOpacity>
       {menuVisible && (
-        <TouchableWithoutFeedback onPressOut={toggleModal}>
-          <Modal
-            visible={menuVisible}
-            transparent={true}
-            animationType="fade"
-            onRequestClose={toggleModal}
-          >
-            <View style={styles.menuContainer}>
-              <TouchableOpacity style={styles.menuItem} onPress={openModal}>
-                <Text style={styles.menuText}>Настройки</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.menuItem, styles.logoutItem]}
-                onPress={() => {
-                  handleLogout();
-                }}
-              >
-                <Text style={[styles.menuText, styles.logoutText]}>Выйти</Text>
-              </TouchableOpacity>
+        <Modal
+          visible={menuVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={toggleModal}
+        >
+          <TouchableWithoutFeedback onPress={handleOutsidePress}>
+            <View style={styles.modalContainer}>
+              <TouchableWithoutFeedback onPress={null}>
+                <View style={styles.menuContainer}>
+                  <TouchableOpacity style={styles.menuItem} onPress={openModal}>
+                    <Text style={styles.menuText}>Настройки</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.menuItem, styles.logoutItem]}
+                    onPress={() => {
+                      handleLogout();
+                    }}
+                  >
+                    <Text style={[styles.menuText, styles.logoutText]}>
+                      Выйти
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableWithoutFeedback>
             </View>
-          </Modal>
-        </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback>
+        </Modal>
       )}
       {settingsVisible && (
         <UserProfileSettings
@@ -113,9 +125,15 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
   },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "transparent",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   menuContainer: {
     position: "absolute",
-    top: 100,
+    top: 110,
     right: 10,
     backgroundColor: "#fff",
     borderRadius: 5,

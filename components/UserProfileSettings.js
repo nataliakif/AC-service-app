@@ -9,56 +9,41 @@ import {
   TextInput,
   StyleSheet,
   Modal,
+  Alert,
 } from "react-native";
 import { AuthUserContext } from "../App";
+import { updateProfile, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../config/firebase";
 import * as ImagePicker from "expo-image-picker";
 
 export default function UserProfileSettings({ settingsVisible, closeModal }) {
   const { user } = useContext(AuthUserContext);
-  // const [user, setUser] = useState();
-  const [name, setName] = useState(user.providerData[0].displayName || "");
-  const [photoURL, setPhotoURL] = useState(user.providerData[0].photoURL || "");
+  const [name, setName] = useState(user.displayName || "");
+  const [photoURL, setPhotoURL] = useState(user.photoURL || "");
   const [darkTheme, setDarkTheme] = useState(false);
 
   useEffect(() => {
-    const getUserProfile = async () => {
-      const user = auth.currentUser;
-      console.log(user);
-      if (user !== null) {
-        // The user object has basic properties such as display name, email, etc.
-        setName(user.displayName);
-        setPhotoURL(user.photoURL);
-      }
-    };
-
-    getUserProfile();
+    setName(user.displayName);
+    setPhotoURL(user.photoURL);
   }, []);
 
-  const updateUserProfile = async ({ name, photoURL }) => {
-    try {
-      const authUser = auth.currentUser;
-      console.log(authUser);
-      if (user) {
-        await authUser.updateProfile({
+  const updateUserProfile = async () => {
+    console.log(name, photoURL);
+    if (user) {
+      try {
+        await updateProfile(user, {
           displayName: name,
           photoURL: photoURL,
         });
+        closeModal();
+        console.log("Updated");
+      } catch (error) {
+        console.error("Error updating user profile:", error);
+        // Обработка ошибок, если не удалось обновить профиль пользователя
       }
-      console.log("Updated");
-    } catch (error) {
-      console.error("Error updating user profile:", error);
-      // Обработка ошибок, если не удалось обновить профиль пользователя
     }
   };
-  const handleSaveSettings = async () => {
-    try {
-      await updateUserProfile(name, photoURL);
-      closeModal();
-    } catch (error) {
-      console.error("Error saving user profile:", error);
-    }
-  };
+
   const handleChoosePhoto = async () => {
     try {
       const { status } =
@@ -82,9 +67,10 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
       console.error("Error choosing photo:", error);
     }
   };
-  const resetPassword = async (email) => {
+  const resetPassword = async () => {
     try {
-      await auth.sendPasswordResetEmail(email);
+      await sendPasswordResetEmail(auth, user.email);
+      Alert.alert("Ссылка для смены пароля отправлена на указанную почту");
       console.log("Email sent successfully");
     } catch (error) {
       console.error("Error sending email:", error);
@@ -115,16 +101,13 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
           placeholder="Введите имя"
           style={styles.textInput}
         />
-        <Button
-          title="Сбросить пароль"
-          onPress={() => resetPassword(user.email)}
-        />
-        {/* <Text>Сменить тему:</Text>
-        <Switch value={darkTheme} onValueChange={setDarkTheme} /> */}
+        <Button title="Сбросить пароль" onPress={resetPassword} />
+        <Text>Сменить тему:</Text>
+        <Switch value={darkTheme} onValueChange={setDarkTheme} />
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
             style={styles.saveButton}
-            onPress={handleSaveSettings}
+            onPress={updateUserProfile}
           >
             <Text style={styles.saveButtonText}>Сохранить</Text>
           </TouchableOpacity>

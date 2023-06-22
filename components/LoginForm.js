@@ -8,12 +8,15 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Alert,
+  Modal,
 } from "react-native";
-import { signInWithEmailAndPassword } from "@firebase/auth";
+import {
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+} from "@firebase/auth";
 import { auth } from "../config/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { SvgUri } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 
 const LoginSchema = Yup.object().shape({
@@ -25,6 +28,8 @@ const LoginSchema = Yup.object().shape({
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isEmailModalVisible, setIsEmailModalVisible] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -34,6 +39,7 @@ const LoginForm = () => {
     if (email !== "" && password !== "") {
       signInWithEmailAndPassword(auth, email, password)
         .then(() => {
+          console.log(auth.currentUser);
           console.log("login success");
         })
         .catch((err) => {
@@ -41,8 +47,24 @@ const LoginForm = () => {
         });
     }
   };
-  const handleGoogleSignIn = () => {
-    console.log("Google вход");
+
+  const resetPassword = async () => {
+    if (isEmailModalVisible) {
+      setIsEmailModalVisible(false);
+      if (resetEmail === "") {
+        Alert.alert("Введите email");
+      } else {
+        try {
+          await sendPasswordResetEmail(auth, resetEmail);
+          Alert.alert("Ссылка для смены пароля отправлена на указанную почту");
+          console.log("Email sent successfully");
+        } catch (error) {
+          console.error("Error sending email:", error);
+        }
+      }
+    } else {
+      setIsEmailModalVisible(true);
+    }
   };
 
   return (
@@ -61,7 +83,7 @@ const LoginForm = () => {
           touched,
         }) => (
           <TouchableWithoutFeedback onPress={dismissKeyboard}>
-            <View>
+            <View style={styles.login}>
               <TextInput
                 style={styles.input}
                 onChangeText={handleChange("email")}
@@ -96,19 +118,10 @@ const LoginForm = () => {
               {touched.password && errors.password && (
                 <Text style={styles.error}>{errors.password}</Text>
               )}
-              {/* <View>
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={styles.googleButton}
-                  onPress={handleGoogleSignIn}
-                >
-                  <Ionicons name="logo-google" size={24} color="#fff" />
-                  <SvgUri uri="../images/google.svg" width={24} height={24} />
-                  <Text style={styles.googleButtonText}>
-                    Ввойдите с помощью Google
-                  </Text>
-                </TouchableOpacity>
-              </View> */}
+
+              <TouchableOpacity onPress={resetPassword}>
+                <Text style={styles.link}>Забыли пароль?</Text>
+              </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={styles.button}
@@ -120,6 +133,20 @@ const LoginForm = () => {
           </TouchableWithoutFeedback>
         )}
       </Formik>
+
+      <Modal visible={isEmailModalVisible}>
+        <View style={styles.modalContainer}>
+          <TextInput
+            style={styles.emailInput}
+            onChangeText={(text) => setResetEmail(text)}
+            value={resetEmail}
+            placeholder="Email"
+          />
+          <TouchableOpacity style={styles.modalButton} onPress={resetPassword}>
+            <Text style={styles.modalButtonText}>OK</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </>
   );
 };
@@ -129,6 +156,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
   },
+  login: { marginTop: 100 },
   input: {
     height: 52,
     borderWidth: 1,
@@ -151,9 +179,9 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
   },
-
+  link: { color: "#007AFF", textAlign: "center", marginTop: 15 },
   button: {
-    marginTop: 110,
+    marginTop: 40,
     height: 60,
     paddingHorizontal: 140,
     paddingVertical: 20,
@@ -163,29 +191,40 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-
     fontWeight: "500",
     flexDirection: "row",
   },
-  googleButton: {
-    marginTop: 16,
-    height: 48,
-    paddingHorizontal: 16,
-    borderRadius: 5,
-    backgroundColor: "#DB4437",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  googleButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    marginLeft: 8,
-  },
+
   iconContainer: {
     position: "absolute",
     top: 15,
     right: 15,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emailInput: {
+    height: 52,
+    borderWidth: 1,
+    paddingLeft: 16,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    width: 200,
+  },
+  modalButton: {
+    backgroundColor: "#DB5000",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
 
