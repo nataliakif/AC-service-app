@@ -28,6 +28,7 @@ export default function PartRepairTaskExpandable({
   numericInputStep = 0.1,
   changeParamsOfPartFromEstimate,
   partIndex,
+  routeName,
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
@@ -67,35 +68,37 @@ export default function PartRepairTaskExpandable({
           <Text style={styles.price}>{`${repairTaskPrice}`}</Text>
         </View>
       </TouchableOpacity>
-      <Animated.View style={{ height: itemBaseHeight, alignItems: "center" }}>
-        {expanded && (
-          <NumericInput
-            rounded
-            totalHeight={35}
-            initValue={repairTaskPrice}
-            onChange={(value) => {
-              if (changeParamsOfPartFromEstimate) {
-                changeParamsOfPartFromEstimate(
-                  partIndex,
-                  repairTaskName,
-                  value
-                );
-              } else {
-                onPriceChangeDuringAdd((prevState) => {
-                  return {
-                    ...prevState,
-                    ...(prevState.workAmount[repairTaskName] = value),
-                  };
-                });
-              }
-            }}
-            style={styles.priceInput}
-            step={numericInputStep}
-            minValue={0}
-            valueType="real"
-          />
-        )}
-      </Animated.View>
+      {routeName !== "В работе" && routeName !== "Сервис" && (
+        <Animated.View style={{ height: itemBaseHeight, alignItems: "center" }}>
+          {expanded && (
+            <NumericInput
+              rounded
+              totalHeight={35}
+              initValue={repairTaskPrice}
+              onChange={(value) => {
+                if (changeParamsOfPartFromEstimate) {
+                  changeParamsOfPartFromEstimate(
+                    partIndex,
+                    repairTaskName,
+                    value
+                  );
+                } else {
+                  onPriceChangeDuringAdd((prevState) => {
+                    return {
+                      ...prevState,
+                      ...(prevState.workAmount[repairTaskName] = value),
+                    };
+                  });
+                }
+              }}
+              style={styles.priceInput}
+              step={numericInputStep}
+              minValue={0}
+              valueType="real"
+            />
+          )}
+        </Animated.View>
+      )}
     </>
   );
 }

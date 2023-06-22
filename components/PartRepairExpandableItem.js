@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
+import { useRoute } from "@react-navigation/native";
 import PartPhotosManager from "./PartPhotosManager";
 import Gear from "../assets/gear.svg";
 import PartRepairTaskExpandable from "./PartRepairTaskExpandable";
@@ -46,6 +46,8 @@ export default function PartRepairExpandableItem({
   const [expanded, setExpanded] = useState(isExpanded);
   const [expandedSubItemsCount, setExpandedSubItemsCount] = useState(0);
   const [showPhotoManger, setShowPhotoManager] = useState(false);
+  const route = useRoute();
+  const { name } = route;
 
   let workAmountToDisplay = Object.keys(selectedPartToRepair.workAmount);
 
@@ -121,7 +123,7 @@ export default function PartRepairExpandableItem({
               )} UAH`}
             </Text>
           </View>
-          {canBeRemoved && (
+          {name !== "В работе" && name !== "Сервис" && canBeRemoved && (
             <TouchableOpacity
               style={styles.button}
               onPress={() => {
@@ -144,6 +146,7 @@ export default function PartRepairExpandableItem({
             {workAmountToDisplay.map((key, index) => (
               <View key={index}>
                 <Divider style={styles.divider} />
+
                 <PartRepairTaskExpandable
                   key={index}
                   repairTaskName={key}
@@ -156,6 +159,7 @@ export default function PartRepairExpandableItem({
                   changeParamsOfPartFromEstimate={
                     changeParamsOfPartFromEstimate
                   }
+                  routeName={name}
                 />
               </View>
             ))}

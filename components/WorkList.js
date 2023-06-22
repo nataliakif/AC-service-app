@@ -1,20 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StyleSheet, View, Image, Text, ScrollView } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
+import { checkCurrentUserAdmin } from "./functions";
+import { FontAwesome, AntDesign, Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
-import { AntDesign } from "@expo/vector-icons";
 import ListItem from "../components/ListItem";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 const WorkList = ({ data, isLoading, selectedZone }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [editable, setEditable] = useState(true);
   const navigation = useNavigation();
+  const route = useRoute();
+  const { name } = route;
+
   const handleItemPress = (item) => {
     setSelectedItem(item);
 
     setModalVisible(true);
   };
+
+  useEffect(() => {
+    checkCurrentUserAdmin()
+      .then((isAdmin) => {
+        console.log(isAdmin);
+        setEditable(isAdmin);
+      })
+      .catch((error) => {
+        console.error("Error fetching user admin status:", error);
+      });
+  }, []);
+
   return (
     <View style={styles.container}>
       {isLoading ? (
@@ -27,21 +43,23 @@ const WorkList = ({ data, isLoading, selectedZone }) => {
                 <TouchableOpacity
                   key={key}
                   onPress={() => {
-                    navigation.navigate("Просчет", {
-                      key,
-                      status,
-                      carInfo,
-                      partsToRepair,
-                      workStatus,
-                    });
-
-                    /* handleItemPress({
-                      key,
-                      carInfo,
-                      status,
-                      partsToRepair,
-                      workStatus,
-                    }) */
+                    if (name === "Архив") {
+                      navigation.navigate("Просчет", {
+                        key,
+                        status,
+                        carInfo,
+                        partsToRepair,
+                        workStatus,
+                      });
+                    } else {
+                      handleItemPress({
+                        key,
+                        carInfo,
+                        status,
+                        partsToRepair,
+                        workStatus,
+                      });
+                    }
                   }}
                   style={styles.carItem}
                 >
@@ -81,25 +99,47 @@ const WorkList = ({ data, isLoading, selectedZone }) => {
         </ScrollView>
       )}
       <Modal
+        data={selectedItem}
         style={styles.modal}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
         animationType="slide"
       >
-        <AntDesign
-          name="arrowleft"
-          size={34}
-          color="#DB5000"
-          onPress={() => {
-            setModalVisible(false);
-          }}
-        />
+        <View>
+          <AntDesign
+            name="arrowleft"
+            size={34}
+            color="#DB5000"
+            onPress={() => {
+              setModalVisible(false);
+            }}
+          />
+          {editable && name === "В работе" && (
+            <Ionicons
+              name="brush"
+              size={24}
+              color="#DB5000"
+              onPress={() => {
+                setModalVisible(false);
+                navigation.navigate("Просчет", {
+                  key: selectedItem.key,
+                  status: selectedItem.status,
+                  carInfo: selectedItem.carInfo,
+                  partsToRepair: selectedItem.partsToRepair,
+                  workStatus: selectedItem.workStatus,
+                });
+              }}
+              style={{ position: "absolute", top: 10, right: 10 }}
+            />
+          )}
+        </View>
 
         {selectedItem && (
           <ListItem
             data={selectedItem}
             setModalVisible={setModalVisible}
             selectedZone={selectedZone}
+            editable={editable}
           ></ListItem>
         )}
       </Modal>

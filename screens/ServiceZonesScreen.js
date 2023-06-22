@@ -49,8 +49,8 @@ export default function ServiceZonesScreen() {
             return (
               item.workStatus &&
               item.workStatus.assemblingStatus !== "delete" &&
-              item.partsToRepair &&
-              Object.values(item.partsToRepair)
+              item.partsToRepair.selectedPartsToRepair &&
+              Object.values(item.partsToRepair.selectedPartsToRepair)
                 .filter(
                   (part) => part.workAmount && part.workAmount.assemblingTime
                 )
@@ -71,9 +71,8 @@ export default function ServiceZonesScreen() {
             return (
               item.workStatus &&
               item.workStatus.mountingStatus !== "delete" &&
-              item.workStatus.assemblingStatus === "delete" &&
-              item.partsToRepair &&
-              Object.values(item.partsToRepair)
+              item.partsToRepair.selectedPartsToRepair &&
+              Object.values(item.partsToRepair.selectedPartsToRepair)
                 .filter(
                   (part) => part.workAmount && part.workAmount.mountingTime
                 )
@@ -84,6 +83,7 @@ export default function ServiceZonesScreen() {
             );
           })
           .map((key) => ({ key, ...data[key] }));
+
         setFilteredData(mountingData);
         break;
       case "Repair":
@@ -93,10 +93,9 @@ export default function ServiceZonesScreen() {
 
             return (
               item.workStatus &&
-              item.workStatus.mountingStatus === "delete" &&
               item.workStatus.repairStatus !== "delete" &&
-              item.partsToRepair &&
-              Object.values(item.partsToRepair)
+              item.partsToRepair.selectedPartsToRepair &&
+              Object.values(item.partsToRepair.selectedPartsToRepair)
                 .filter((part) => part.workAmount && part.workAmount.repairTime)
                 .reduce(
                   (total, part) => total + part.workAmount.repairTime,
@@ -114,10 +113,9 @@ export default function ServiceZonesScreen() {
 
             return (
               item.workStatus &&
-              item.workStatus.repairStatus === "delete" &&
               item.workStatus.paintStatus !== "delete" &&
-              item.partsToRepair &&
-              Object.values(item.partsToRepair)
+              item.partsToRepair.selectedPartsToRepair &&
+              Object.values(item.partsToRepair.selectedPartsToRepair)
                 .filter((part) => part.workAmount && part.workAmount.paintPrice)
                 .reduce(
                   (total, part) => total + part.workAmount.paintPrice,
@@ -134,10 +132,9 @@ export default function ServiceZonesScreen() {
             const item = data[key];
             return (
               item.workStatus &&
-              item.workStatus.paintStatus === "delete" &&
               item.workStatus.polishingStatus !== "delete" &&
-              item.partsToRepair &&
-              Object.values(item.partsToRepair)
+              item.partsToRepair.selectedPartsToRepair &&
+              Object.values(item.partsToRepair.selectedPartsToRepair)
                 .filter((part) => part.workAmount && part.workAmount.paintPrice)
                 .reduce(
                   (total, part) => total + part.workAmount.paintPrice,
@@ -156,8 +153,8 @@ export default function ServiceZonesScreen() {
             return (
               item.workStatus &&
               item.workStatus.orderNewDetailsStatus !== "delete" &&
-              item.partsToRepair &&
-              Object.values(item.partsToRepair)
+              item.partsToRepair.selectedPartsToRepair &&
+              Object.values(item.partsToRepair.selectedPartsToRepair)
                 .filter(
                   (part) =>
                     part.workAmount && part.workAmount.orderNewDetailPrice

@@ -187,7 +187,16 @@ export default function CalculateScreen() {
         carCategory,
         paintCategory,
       },
-      workStatus: route.params.workStatus ? route.params.workStatus : {},
+      workStatus: route.params.workStatus
+        ? route.params.workStatus
+        : {
+            assemblingStatus: "pending",
+            mountingStatus: "pending",
+            paintStatus: "pending",
+            polishingStatus: "pending",
+            repairStatus: "pending",
+            orderNewDetailStatus: "pending",
+          },
       status,
     })
       .then(() => {

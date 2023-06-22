@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-const StatusDropdown = ({ value, onChange, label }) => {
+const StatusDropdown = ({ value, onChange }) => {
   const [selectedStatus, setSelectedStatus] = useState(value);
 
   const handleStatusChange = (value) => {
@@ -19,7 +19,7 @@ const StatusDropdown = ({ value, onChange, label }) => {
       >
         <Picker.Item label="В ожидании" value="pending" />
         <Picker.Item label="Взять в работу" value="inProgress" />
-        <Picker.Item label={label} value="delete" />
+        <Picker.Item label="Завершить" value="delete" />
       </Picker>
       {selectedStatus === "pending" && (
         <View style={[styles.statusIndicator, styles.pendingIndicator]} />

@@ -30,6 +30,7 @@ if (!firebase.apps.length) {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
 export const auth = getAuth();
 export const database = getFirestore();
 //realtime database
