@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, getDoc } from "@firebase/firestore";
-import { auth, database } from "../config/firebase";
+import { database } from "../config/firebase";
 
 const getUserFromAsyncStorage = async () => {
   try {
@@ -16,10 +16,10 @@ const checkCurrentUserAdmin = async () => {
   try {
     // Получение текущего пользователя из AsyncStorage
     const currentUser = await getUserFromAsyncStorage();
-    const { uid } = currentUser;
+    const { email } = currentUser;
 
     // Получение документа пользователя из Firestore
-    const userRef = doc(database, "users", uid);
+    const userRef = doc(database, "users", email);
     const userDoc = await getDoc(userRef);
 
     if (userDoc.exists()) {

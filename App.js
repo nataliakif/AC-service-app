@@ -1,10 +1,9 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoginScreen from "./screens/LoginScreen";
 import RegistrationScreen from "./screens/RegistrationScreen";
 import HomeScreen from "./screens/HomeScreen";
@@ -13,55 +12,10 @@ import CalculateScreen from "./screens/CalculateScreen";
 import ServiceZonesScreen from "./screens/ServiceZonesScreen";
 import SavedCalculationsScreen from "./screens/SavedCalculationScreen";
 import { auth } from "./config/firebase";
+import { AuthUserContext, AuthUserProvider } from "./AuthContext";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-
-const AuthUserContext = createContext();
-
-const AuthUserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await AsyncStorage.getItem("user");
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-      } catch (error) {
-        console.log("Ошибка получения данных пользователя:", error);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  const handleLogin = async (user) => {
-    // При успешной авторизации сохраняем информацию о пользователе в AsyncStorage
-    try {
-      await AsyncStorage.setItem("user", JSON.stringify(user));
-      setUser(user);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleLogout = async () => {
-    // При выходе из учетной записи удаляем информацию о пользователе из AsyncStorage
-    try {
-      await AsyncStorage.removeItem("user");
-      setUser(null);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  return (
-    <AuthUserContext.Provider value={{ user, handleLogin, handleLogout }}>
-      {children}
-    </AuthUserContext.Provider>
-  );
-};
 
 function AuthStack() {
   return (
@@ -154,4 +108,3 @@ export default function App() {
     </AuthUserProvider>
   );
 }
-export { AuthUserContext, AuthUserProvider };

@@ -12,6 +12,7 @@ import { ref, onValue } from "firebase/database";
 import { db } from "../config/firebase";
 import { AntDesign } from "@expo/vector-icons";
 import WorkList from "../components/WorkList";
+import Header from "../components/Header";
 
 export default function ServiceZonesScreen() {
   const [data, setData] = useState(null);
@@ -175,84 +176,87 @@ export default function ServiceZonesScreen() {
   }, [data, selectedZone]);
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.zone}
-        onPress={() => handleZonePress("Assembling")}
-      >
-        <Text style={styles.text}>Cборка/разборка</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.zone}
-        onPress={() => handleZonePress("Mounting")}
-      >
-        <Text style={styles.text}>Снятие/Установка</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.zone}
-        onPress={() => handleZonePress("Repair")}
-      >
-        <Text style={styles.text}>Ремонт/Рихтовка</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.zone}
-        onPress={() => handleZonePress("Paint")}
-      >
-        <Text style={styles.text}>Покраска</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.zone}
-        onPress={() => handleZonePress("Polishing")}
-      >
-        <Text style={styles.text}>Полировка</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.zone}
-        onPress={() => handleZonePress("OrderNewDetails")}
-      >
-        <Text style={styles.text}>Заказ новых деталей</Text>
-      </TouchableOpacity>
-
-      <Modal animationType="slide" visible={modalVisible}>
-        <TouchableWithoutFeedback
-          onPress={() => {
-            Keyboard.dismiss();
-          }}
+    <>
+      <Header></Header>
+      <View style={styles.container}>
+        <TouchableOpacity
+          style={styles.zone}
+          onPress={() => handleZonePress("Assembling")}
         >
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "flex-start",
-              paddingHorizontal: 20,
-              marginTop: 80,
+          <Text style={styles.text}>Cборка/разборка</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.zone}
+          onPress={() => handleZonePress("Mounting")}
+        >
+          <Text style={styles.text}>Снятие/Установка</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.zone}
+          onPress={() => handleZonePress("Repair")}
+        >
+          <Text style={styles.text}>Ремонт/Рихтовка</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.zone}
+          onPress={() => handleZonePress("Paint")}
+        >
+          <Text style={styles.text}>Покраска</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.zone}
+          onPress={() => handleZonePress("Polishing")}
+        >
+          <Text style={styles.text}>Полировка</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.zone}
+          onPress={() => handleZonePress("OrderNewDetails")}
+        >
+          <Text style={styles.text}>Заказ новых деталей</Text>
+        </TouchableOpacity>
+
+        <Modal animationType="slide" visible={modalVisible}>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              Keyboard.dismiss();
             }}
           >
-            <AntDesign
-              name="arrowleft"
-              size={34}
-              color="#DB5000"
-              onPress={() => {
-                setModalVisible(false);
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "flex-start",
+                paddingHorizontal: 20,
+                marginTop: 80,
               }}
-            />
-            <WorkList
-              data={filteredData}
-              isLoading={isLoading}
-              selectedZone={selectedZone}
-            ></WorkList>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-    </View>
+            >
+              <AntDesign
+                name="arrowleft"
+                size={34}
+                color="#DB5000"
+                onPress={() => {
+                  setModalVisible(false);
+                }}
+              />
+              <WorkList
+                data={filteredData}
+                isLoading={isLoading}
+                selectedZone={selectedZone}
+              ></WorkList>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 70,
-    paddingHorizontal: 15,
+    marginTop: 20,
+    paddingHorizontal: 20,
     flexDirection: "column",
     justifyContent: "space-between",
   },

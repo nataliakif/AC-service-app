@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import { Avatar } from "react-native-paper";
-import { AuthUserContext } from "../App";
+import { AuthUserContext } from "../AuthContext";
 import UserProfileSettings from "./UserProfileSettings";
 import { getUserFromAsyncStorage } from "./functions";
 

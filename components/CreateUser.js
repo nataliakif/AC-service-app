@@ -26,16 +26,10 @@ export default function CreateUser() {
     try {
       // Создание нового пользователя в Firebase Authentication
       const password = uuidv4();
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-      const userId = user.uid;
+      await createUserWithEmailAndPassword(auth, email, password);
 
       // Сохранение дополнительных полей в профиле пользователя
-      const userRef = doc(database, "users", userId);
+      const userRef = doc(database, "users", email);
 
       // Создание документа пользователя с дополнительными полями
       await setDoc(userRef, {
@@ -83,7 +77,10 @@ export default function CreateUser() {
   return (
     <Formik
       initialValues={{ email: "", selectedRole: "Сотрудник" }}
-      onSubmit={(values) => handleCreateUser(values)}
+      onSubmit={(values, { resetForm }) => {
+        handleCreateUser(values);
+        resetForm();
+      }}
     >
       {({ handleChange, handleBlur, handleSubmit, values }) => (
         <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -131,7 +128,7 @@ export default function CreateUser() {
               style={styles.button}
               onPress={handleSubmit}
             >
-              <Text style={styles.buttonText}>Отправить приглашение</Text>
+              <Text style={styles.buttonText}>Создать пользователя</Text>
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>

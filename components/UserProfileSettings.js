@@ -11,7 +11,7 @@ import {
   Modal,
   Alert,
 } from "react-native";
-import { AuthUserContext } from "../App";
+import { AuthUserContext } from "../AuthContext";
 import { updateProfile, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../config/firebase";
 import * as ImagePicker from "expo-image-picker";
@@ -28,7 +28,6 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
   }, []);
 
   const updateUserProfile = async () => {
-    console.log(name, photoURL);
     if (user) {
       try {
         await updateProfile(user, {
