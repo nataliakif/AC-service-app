@@ -23,7 +23,6 @@ const WorkList = ({ data, isLoading, selectedZone }) => {
   useEffect(() => {
     checkCurrentUserAdmin()
       .then((isAdmin) => {
-        console.log(isAdmin);
         setEditable(isAdmin);
       })
       .catch((error) => {
