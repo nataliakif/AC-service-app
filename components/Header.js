@@ -25,8 +25,8 @@ const Header = ({ title, subtitle, name }) => {
 const styles = StyleSheet.create({
   header: {
     flex: 0.1,
-    paddingTop: 50,
-    paddingBottom: 10,
+    paddingTop: 60,
+    paddingBottom: 20,
     paddingRight: 15,
     flexDirection: "row",
     alignItems: "center",

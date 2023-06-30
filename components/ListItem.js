@@ -11,16 +11,20 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
 } from "react-native";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
+import Modal from "react-native-modal";
 import EstimateOfSelectedPartsToRepair from "./EstimateOfSelectedPartsToRepair";
 import WorkStatus from "./WorkStatus";
 import StatusDropdown from "./StatusDropdown";
 import AddCarInfoForm from "./AddCarInfo";
 import { useRoute } from "@react-navigation/native";
 import { exportToPDF } from "./exportToPdf";
+import Chat from "./Chat";
 
 const ListItem = ({ data, setModalVisible, selectedZone }) => {
   const { carInfo, key, partsToRepair, workStatus } = data;
   const [selectedStatus, setSelectedStatus] = useState("pending");
+  const [chatVisible, setChatVisible] = useState("false");
   const route = useRoute();
   const { name } = route;
   const dismissKeyboard = () => {
@@ -48,51 +52,59 @@ const ListItem = ({ data, setModalVisible, selectedZone }) => {
     exportToPDF(data);
   };
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      showsVerticalScrollIndicator={false}
-    >
-      <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <View>
-          <Image
-            source={{ uri: carInfo.photoURL }}
-            defaultSource={require("../images/plugPhoto.jpeg")}
-            style={styles.image}
-          />
-          {name === "Сервис" && (
-            <WorkStatus workStatus={workStatus}></WorkStatus>
-          )}
-          <EstimateOfSelectedPartsToRepair
-            selectedPartsToRepair={partsToRepair.selectedPartsToRepair}
-            setPhotoURLToSelectedPart={true}
-            canAddPhoto={true}
-            removePhotoURLFromSelectedPart={true}
-            onRemoveFromEstimate={true}
-            carModel=""
-            changeParamsOfPartFromEstimate={true}
-          />
-          <AddCarInfoForm
-            setShowAddCarInfoForm={true}
-            initialValues={carInfo}
-            isEditable={false}
-          />
+    <>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
+        <TouchableWithoutFeedback onPress={dismissKeyboard}>
+          <View>
+            <Image
+              source={{ uri: carInfo.photoURL }}
+              defaultSource={require("../images/plugPhoto.jpeg")}
+              style={styles.image}
+            />
+            {name === "Сервис" && (
+              <WorkStatus workStatus={workStatus}></WorkStatus>
+            )}
+            <EstimateOfSelectedPartsToRepair
+              selectedPartsToRepair={partsToRepair.selectedPartsToRepair}
+              setPhotoURLToSelectedPart={true}
+              canAddPhoto={true}
+              removePhotoURLFromSelectedPart={true}
+              onRemoveFromEstimate={true}
+              carModel=""
+              changeParamsOfPartFromEstimate={true}
+            />
+            <AddCarInfoForm
+              setShowAddCarInfoForm={true}
+              initialValues={carInfo}
+              isEditable={false}
+            />
 
-          {name === "Сервис" && (
-            <View>
-              <StatusDropdown
-                value={selectedStatus}
-                onChange={setSelectedStatus}
-              />
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={styles.button}
-                onPress={handleStatusChange}
-              >
-                <Text style={styles.buttonText}>Изменить</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {/* {name !== "Сервис" && (
+            {name === "Сервис" && (
+              <View>
+                <StatusDropdown
+                  value={selectedStatus}
+                  onChange={setSelectedStatus}
+                />
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.button}
+                  onPress={handleStatusChange}
+                >
+                  <Text style={styles.buttonText}>Изменить</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.button}
+                  onPress={() => setChatVisible(true)}
+                >
+                  <Text style={styles.buttonText}>Чат</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {/* {name !== "Сервис" && (
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.button}
@@ -101,9 +113,29 @@ const ListItem = ({ data, setModalVisible, selectedZone }) => {
               <Text style={styles.buttonText}>Экспорт в PDF</Text>
             </TouchableOpacity>
           )} */}
+          </View>
+        </TouchableWithoutFeedback>
+      </ScrollView>
+      <Modal
+        style={styles.modal}
+        visible={chatVisible}
+        onRequestClose={() => setChatVisible(false)}
+        animationType="slide"
+      >
+        <View>
+          <AntDesign
+            name="arrowleft"
+            size={34}
+            color="#DB5000"
+            onPress={() => {
+              setChatVisible(false);
+            }}
+          />
+
+          <Chat style={styles.chat}></Chat>
         </View>
-      </TouchableWithoutFeedback>
-    </ScrollView>
+      </Modal>
+    </>
   );
 };
 
@@ -114,6 +146,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
     paddingBottom: 50,
+  },
+  scroll: {
+    flex: 1,
+    width: "100%",
   },
   image: {
     width: 340,
@@ -158,6 +194,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   workAmount: { color: "#757373", marginBottom: 5 },
+  modal: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingVertical: 50,
+    paddingHorizontal: 15,
+  },
+  chat: { height: "100%" },
 });
 
 export default ListItem;

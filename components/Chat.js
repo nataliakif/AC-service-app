@@ -69,6 +69,8 @@ export default function Chat() {
 }
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: "grey",
   },
 });

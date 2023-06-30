@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, View, Image, Text, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Image,
+  TouchableOpacity,
+  Text,
+  ScrollView,
+} from "react-native";
 import { checkCurrentUserAdmin } from "./functions";
 import { FontAwesome, AntDesign, Ionicons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 import ListItem from "../components/ListItem";
 import { useNavigation, useRoute } from "@react-navigation/native";
