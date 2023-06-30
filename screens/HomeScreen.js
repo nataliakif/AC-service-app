@@ -4,6 +4,7 @@ import { ref, onValue } from "firebase/database";
 import { db } from "../config/firebase";
 import SearchBar from "../components/SearchBar";
 import WorkList from "../components/WorkList";
+import Header from "../components/Header";
 
 export default function HomeScreen() {
   const [search, setSearch] = useState("");
@@ -35,20 +36,23 @@ export default function HomeScreen() {
 
       .map((key) => ({ key, ...data[key] }));
   return (
-    <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <View
-        style={{
-          flex: 1,
-          alignItems: "flex-start",
-          justifyContent: "center",
-          paddingHorizontal: 20,
-          marginTop: 80,
-        }}
-      >
-        <SearchBar onSearchChange={handleSearchChange}></SearchBar>
+    <>
+      <Header></Header>
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View
+          style={{
+            flex: 1,
+            alignItems: "flex-start",
+            justifyContent: "center",
+            paddingHorizontal: 20,
+            marginTop: 20,
+          }}
+        >
+          <SearchBar onSearchChange={handleSearchChange}></SearchBar>
 
-        <WorkList data={filteredData} isLoading={isLoading}></WorkList>
-      </View>
-    </TouchableWithoutFeedback>
+          <WorkList data={filteredData} isLoading={isLoading}></WorkList>
+        </View>
+      </TouchableWithoutFeedback>
+    </>
   );
 }

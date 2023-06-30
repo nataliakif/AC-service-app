@@ -4,6 +4,7 @@ import { db } from "../config/firebase";
 import { View, TouchableWithoutFeedback, Keyboard } from "react-native";
 import SearchBar from "../components/SearchBar";
 import WorkList from "../components/WorkList";
+import Header from "../components/Header";
 
 export default function SavedCalculationsScreen() {
   const [search, setSearch] = useState("");
@@ -35,20 +36,23 @@ export default function SavedCalculationsScreen() {
       .map((key) => ({ key, ...data[key] }));
 
   return (
-    <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "flex-start",
-          paddingHorizontal: 20,
-          marginTop: 80,
-        }}
-      >
-        <SearchBar onSearchChange={handleSearchChange}></SearchBar>
+    <>
+      <Header></Header>
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "flex-start",
+            paddingHorizontal: 20,
+            marginTop: 20,
+          }}
+        >
+          <SearchBar onSearchChange={handleSearchChange}></SearchBar>
 
-        <WorkList data={filteredData} isLoading={isLoading}></WorkList>
-      </View>
-    </TouchableWithoutFeedback>
+          <WorkList data={filteredData} isLoading={isLoading}></WorkList>
+        </View>
+      </TouchableWithoutFeedback>
+    </>
   );
 }
