@@ -90,17 +90,20 @@ const ListItem = ({ data, setModalVisible, selectedZone }) => {
                 />
                 <TouchableOpacity
                   activeOpacity={0.7}
-                  style={styles.button}
-                  onPress={handleStatusChange}
+                  onPress={() => setChatVisible(true)}
                 >
-                  <Text style={styles.buttonText}>Изменить</Text>
+                  <Ionicons
+                    name="chatbubble-ellipses-outline"
+                    size={46}
+                    color="#DB5000"
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity
                   activeOpacity={0.7}
                   style={styles.button}
-                  onPress={() => setChatVisible(true)}
+                  onPress={handleStatusChange}
                 >
-                  <Text style={styles.buttonText}>Чат</Text>
+                  <Text style={styles.buttonText}>Изменить</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -132,7 +135,7 @@ const ListItem = ({ data, setModalVisible, selectedZone }) => {
             }}
           />
 
-          <Chat style={styles.chat}></Chat>
+          <Chat></Chat>
         </View>
       </Modal>
     </>
@@ -200,7 +203,6 @@ const styles = StyleSheet.create({
     paddingVertical: 50,
     paddingHorizontal: 15,
   },
-  chat: { height: "100%" },
 });
 
 export default ListItem;
