@@ -7,40 +7,14 @@ import {
   Modal,
   TouchableWithoutFeedback,
 } from "react-native";
-
 import { Avatar } from "react-native-paper";
 import { AuthUserContext } from "../App";
 import UserProfileSettings from "./UserProfileSettings";
-import { getUserFromAsyncStorage } from "./functions";
 
 export default function UserProfile() {
-  const [userInfo, setUserInfo] = useState("");
-
-  const { handleLogout } = useContext(AuthUserContext);
+  const { user, handleLogout } = useContext(AuthUserContext);
   const [menuVisible, setMenuVisible] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const currentUser = await getUserFromAsyncStorage();
-
-        const { uid, email, photoURL } = currentUser;
-
-        const user = {
-          uid,
-          email,
-          photoURL,
-        };
-
-        setUserInfo(user);
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
 
   const openModal = () => {
     setMenuVisible(false);
@@ -64,16 +38,16 @@ export default function UserProfile() {
   return (
     <View>
       <TouchableOpacity onPress={toggleModal}>
-        {userInfo.photoURL ? (
+        {user.photoURL ? (
           <Avatar.Image
             size={60}
-            source={{ uri: userInfo.photoURL }}
+            source={{ uri: user.photoURL }}
             onPress={toggleModal}
           />
         ) : (
           <Avatar.Text
             size={60}
-            label={userInfo.email ? userInfo.email[0].toUpperCase() : ""}
+            label={user.email ? user.email[0].toUpperCase() : ""}
             onPress={toggleModal}
           />
         )}
@@ -112,7 +86,6 @@ export default function UserProfile() {
         <UserProfileSettings
           settingsVisible={settingsVisible}
           closeModal={closeModal}
-          user={userInfo}
         />
       )}
     </View>

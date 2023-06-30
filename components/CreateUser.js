@@ -44,6 +44,7 @@ export default function CreateUser() {
 
       Alert.alert("Пользователь создан успешно");
       // Отправка письма с приглашением на указанный адрес электронной почты
+
       const response = await axios.post(
         "https://api.sendgrid.com/v3/mail/send",
         {
@@ -68,7 +69,7 @@ export default function CreateUser() {
           },
         }
       );
-
+      console.log(response);
       if (response.status === 202) {
         Alert.alert("Успех", "Пользователь создан, и приглашение отправлено");
       } else {

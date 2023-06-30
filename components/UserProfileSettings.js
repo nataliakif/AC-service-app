@@ -11,10 +11,16 @@ import {
   Modal,
   Alert,
 } from "react-native";
+<<<<<<< Updated upstream
 import { AuthUserContext } from "../App";
+=======
+import { Avatar } from "react-native-paper";
+import { AuthUserContext } from "../AuthContext";
+>>>>>>> Stashed changes
 import { updateProfile, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../config/firebase";
 import * as ImagePicker from "expo-image-picker";
+import { uploadImage } from "./AddCarInfo";
 
 export default function UserProfileSettings({ settingsVisible, closeModal }) {
   const { user } = useContext(AuthUserContext);
@@ -61,12 +67,14 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
 
       if (!result.cancelled) {
         const { uri } = result;
-        setPhotoURL(uri);
+        const url = await uploadImage(uri);
+        setPhotoURL(url);
       }
     } catch (error) {
       console.error("Error choosing photo:", error);
     }
   };
+
   const resetPassword = async () => {
     try {
       await sendPasswordResetEmail(auth, user.email);
@@ -82,14 +90,13 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
         <Text style={styles.modalTitle}>Настройки</Text>
 
         <View style={styles.avatarContainer}>
-          {photoURL ? (
-            <Image style={styles.avatar} source={{ uri: photoURL }} />
+          {user.photoURL ? (
+            <Avatar.Image size={60} source={{ uri: user.photoURL }} />
           ) : (
-            <View style={styles.avatarPlaceholder}>
-              <Text style={styles.avatarInitial}>
-                {user.email ? user.email[0].toUpperCase() : ""}
-              </Text>
-            </View>
+            <Avatar.Text
+              size={60}
+              label={user.email ? user.email[0].toUpperCase() : ""}
+            />
           )}
           <Button title="Изменить фото" onPress={handleChoosePhoto} />
         </View>

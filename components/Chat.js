@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { GiftedChat } from "react-native-gifted-chat";
+import { TouchableOpacity, Text } from "react-native-gesture-handler";
 import {
   collection,
   addDoc,

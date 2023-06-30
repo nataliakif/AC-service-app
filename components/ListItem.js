@@ -16,6 +16,7 @@ import WorkStatus from "./WorkStatus";
 import StatusDropdown from "./StatusDropdown";
 import AddCarInfoForm from "./AddCarInfo";
 import { useRoute } from "@react-navigation/native";
+import { exportToPDF } from "./exportToPdf";
 
 const ListItem = ({ data, setModalVisible, selectedZone }) => {
   const { carInfo, key, partsToRepair, workStatus } = data;
@@ -43,7 +44,9 @@ const ListItem = ({ data, setModalVisible, selectedZone }) => {
         console.log(error);
       });
   };
-
+  const handleExportToPDF = () => {
+    exportToPDF(data);
+  };
   return (
     <ScrollView
       contentContainerStyle={styles.container}
@@ -89,6 +92,15 @@ const ListItem = ({ data, setModalVisible, selectedZone }) => {
               </TouchableOpacity>
             </View>
           )}
+          {/* {name !== "Сервис" && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.button}
+              onPress={handleExportToPDF}
+            >
+              <Text style={styles.buttonText}>Экспорт в PDF</Text>
+            </TouchableOpacity>
+          )} */}
         </View>
       </TouchableWithoutFeedback>
     </ScrollView>

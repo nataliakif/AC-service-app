@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { View, Button, StyleSheet } from "react-native";
 import { checkCurrentUserAdmin } from "../components/functions";
 import CreateUser from "../components/CreateUser";
+import Chat from "../components/Chat";
 
 import Header from "../components/Header";
 
@@ -22,6 +23,7 @@ export default function DetailsScreen() {
     <>
       <Header></Header>
       <View style={styles.container}>{editable && <CreateUser />}</View>
+      <Chat></Chat>
     </>
   );
 }
