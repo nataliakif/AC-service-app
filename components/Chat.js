@@ -77,13 +77,14 @@ export default function Chat({ chatId }) {
     }
   };
 
-  const sendPhotoMessage = (photo) => {
+  const sendPhotoMessage = (url) => {
     const message = {
       _id: String(Date.now()),
-      image: photo,
+      image: url,
       createdAt: new Date(),
       user: {
         _id: userId,
+        name: user.displayName,
       },
     };
 
@@ -95,7 +96,7 @@ export default function Chat({ chatId }) {
   };
 
   const onSend = (newMessages = []) => {
-    const { _id, text, createdAt, user } = newMessages[0];
+    const { _id, text, createdAt, user, image } = newMessages[0];
 
     const message = {
       _id,
@@ -103,7 +104,9 @@ export default function Chat({ chatId }) {
       createdAt: createdAt || new Date(),
       user: {
         _id: userId,
+        name: user.displayName,
       },
+      image, // Добавляем поле с изображением в сообщение
     };
 
     try {
@@ -151,17 +154,32 @@ export default function Chat({ chatId }) {
         messagesContainerStyle={styles.container}
         renderUsername={renderUsername}
         renderAvatar={renderAvatar}
-        renderBubble={(props) => (
-          <Bubble
-            {...props}
-            wrapperStyle={{
-              left: { backgroundColor: "F5F5F5" },
-              right: {
-                backgroundColor: " rgba(255, 174, 37, 1)",
-              },
-            }}
-          />
-        )}
+        renderBubble={(props) => {
+          if (props.currentMessage.image) {
+            // Если это сообщение с изображением, отображаем его
+            return (
+              <View>
+                <Image
+                  source={{ uri: props.currentMessage.image }}
+                  style={{ width: 200, height: 200 }}
+                />
+              </View>
+            );
+          } else {
+            // В остальных случаях отображаем обычное сообщение
+            return (
+              <Bubble
+                {...props}
+                wrapperStyle={{
+                  left: { backgroundColor: "F5F5F5" },
+                  right: {
+                    backgroundColor: "rgba(255, 174, 37, 1)",
+                  },
+                }}
+              />
+            );
+          }
+        }}
         renderActions={() => (
           <TouchableOpacity
             style={styles.iconButton}
