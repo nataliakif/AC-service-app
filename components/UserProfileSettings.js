@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect } from "react";
 import {
   View,
   TouchableOpacity,
-  Image,
   Switch,
   Text,
   Button,
@@ -17,14 +16,13 @@ import { AuthUserContext } from "../AuthContext";
 import { updateProfile, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../config/firebase";
 import * as ImagePicker from "expo-image-picker";
-import { uploadImage } from "./AddCarInfo";
+import { uploadImage } from "./functions";
 
 export default function UserProfileSettings({ settingsVisible, closeModal }) {
   const { user } = useContext(AuthUserContext);
   const [name, setName] = useState(user.displayName || "");
   const [photoURL, setPhotoURL] = useState(user.photoURL || "");
   const [darkTheme, setDarkTheme] = useState(false);
-
   useEffect(() => {
     setName(user.displayName);
     setPhotoURL(user.photoURL);
@@ -61,9 +59,13 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
         quality: 1,
       });
 
-      if (!result.cancelled) {
-        const { uri } = result;
-        const url = await uploadImage(uri);
+      if (!result.canceled) {
+        // Используйте 'canceled' вместо 'cancelled'
+        const selectedImage = result.assets[0]; // Получите доступ к выбранному ресурсу через 'assets'
+
+        const { uri } = selectedImage; // Доступ к URI изображения
+        const url = await uploadImage(uri, "avatars");
+
         setPhotoURL(url);
       }
     } catch (error) {

@@ -24,6 +24,10 @@ const firebaseConfig = {
   // appId: Constants.manifest.extra.appId,
 };
 
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);

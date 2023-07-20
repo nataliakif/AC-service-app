@@ -4,6 +4,7 @@ import { checkCurrentUserAdmin } from "../components/functions";
 import CreateUser from "../components/CreateUser";
 import Chat from "../components/Chat";
 import Header from "../components/Header";
+import ChatList from "../components/ChatList";
 
 export default function DetailsScreen() {
   const [editable, setEditable] = useState(true);
@@ -22,8 +23,8 @@ export default function DetailsScreen() {
   return (
     <>
       <Header></Header>
+      {/* <ChatList></ChatList> */}
       <View style={styles.container}>{editable && <CreateUser />}</View>
-      {/* <Chat></Chat> */}
     </>
   );
 }

@@ -1,6 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, getDoc } from "@firebase/firestore";
 import { database } from "../config/firebase";
+import { firebase } from "../config/firebase";
+import Toast from "react-native-toast-message";
 
 const getUserFromAsyncStorage = async () => {
   try {
@@ -41,5 +43,35 @@ const checkCurrentUserAdmin = async () => {
 };
 
 // Вызов функции для проверки админского статуса текущего пользователя
+const uploadImage = async (uri, folderPath) => {
+  const response = await fetch(uri);
+  const blob = await response.blob();
 
-export { getUserFromAsyncStorage, checkCurrentUserAdmin };
+  const filename = uri.substring(uri.lastIndexOf("/") + 1);
+  const storageRef = firebase
+    .storage()
+    .ref()
+    .child(`${folderPath}/${filename}`);
+  let downloadURL = "";
+
+  try {
+    const uploadTask = storageRef.put(blob);
+    await uploadTask;
+    Toast.show({
+      type: "success",
+      text1: "Фото загружено в облако",
+      visibilityTime: 2000,
+    });
+    downloadURL = await storageRef.getDownloadURL();
+  } catch (e) {
+    Toast.show({
+      type: "error",
+      text1: e,
+      visibilityTime: 2000,
+    });
+  }
+
+  return downloadURL;
+};
+
+export { getUserFromAsyncStorage, checkCurrentUserAdmin, uploadImage };
