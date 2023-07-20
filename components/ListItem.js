@@ -88,16 +88,7 @@ const ListItem = ({ data, setModalVisible, selectedZone }) => {
                   value={selectedStatus}
                   onChange={setSelectedStatus}
                 />
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={() => setChatVisible(true)}
-                >
-                  <Ionicons
-                    name="chatbubble-ellipses-outline"
-                    size={46}
-                    color="#DB5000"
-                  />
-                </TouchableOpacity>
+
                 <TouchableOpacity
                   activeOpacity={0.7}
                   style={styles.button}
@@ -119,25 +110,6 @@ const ListItem = ({ data, setModalVisible, selectedZone }) => {
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
-      <Modal
-        style={styles.modal}
-        visible={chatVisible}
-        onRequestClose={() => setChatVisible(false)}
-        animationType="slide"
-      >
-        <View>
-          <AntDesign
-            name="arrowleft"
-            size={34}
-            color="#DB5000"
-            onPress={() => {
-              setChatVisible(false);
-            }}
-          />
-
-          <Chat></Chat>
-        </View>
-      </Modal>
     </>
   );
 };

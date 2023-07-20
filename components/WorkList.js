@@ -12,9 +12,12 @@ import { FontAwesome, AntDesign, Ionicons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import ListItem from "../components/ListItem";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import Chat from "./Chat";
+
 const WorkList = ({ data, isLoading, selectedZone }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [chatVisible, setChatVisible] = useState(false);
   const [editable, setEditable] = useState(true);
   const navigation = useNavigation();
   const route = useRoute();
@@ -119,6 +122,18 @@ const WorkList = ({ data, isLoading, selectedZone }) => {
               setModalVisible(false);
             }}
           />
+          {name === "Сервис" && (
+            <Ionicons
+              name="chatbubble-ellipses-outline"
+              size={34}
+              color="#DB5000"
+              style={{ position: "absolute", top: 5, right: 10 }}
+              onPress={() => {
+                setChatVisible(true);
+                setModalVisible(false);
+              }}
+            />
+          )}
           {editable && name === "В работе" && (
             <Ionicons
               name="brush"
@@ -148,13 +163,43 @@ const WorkList = ({ data, isLoading, selectedZone }) => {
           ></ListItem>
         )}
       </Modal>
+      <View style={styles.modalContainer}>
+        {chatVisible && (
+          <Modal
+            style={styles.modal}
+            visible={chatVisible}
+            onRequestClose={() => setChatVisible(false)}
+            animationType="slide"
+          >
+            <View style={styles.chatContainer}>
+              <View style={styles.headerContainer}>
+                <AntDesign
+                  name="arrowleft"
+                  size={34}
+                  color="#DB5000"
+                  onPress={() => setChatVisible(false)}
+                />
+
+                <Text style={styles.chatTitle}>
+                  {selectedItem.carInfo.model}
+                </Text>
+                <Image
+                  source={{ uri: selectedItem.carInfo.photoURL }}
+                  style={styles.carChatImage}
+                />
+              </View>
+
+              <Chat chatId={selectedItem.key} visible={chatVisible}></Chat>
+            </View>
+          </Modal>
+        )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   scroll: {
-    flex: 1,
     width: "100%",
   },
   container: {
@@ -193,10 +238,45 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   modal: {
+    flex: 1,
     margin: 0,
     backgroundColor: "#fff",
     paddingVertical: 50,
     paddingHorizontal: 15,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  chatContainer: {
+    flex: 1,
+    width: "100%",
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 5,
+    borderTopWidth: 1,
+    borderBottomWidth: 2,
+    borderBottomColor: "#DB5000",
+    borderRadius: 20,
+    borderRadius: 20,
+    // Другие стили верхней части контейнера
+  },
+  carChatImage: {
+    width: 50,
+    height: 50,
+    resizeMode: "cover",
+    marginRight: 10,
+    borderRadius: 50,
+    // Другие стили фото машины
+  },
+  chatTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    // Другие стили названия чата
   },
 });
 
