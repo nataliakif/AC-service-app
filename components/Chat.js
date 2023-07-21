@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { GiftedChat, Bubble, MessageImage } from "react-native-gifted-chat";
 import { TouchableOpacity, Text } from "react-native-gesture-handler";
 import * as ImagePicker from "expo-image-picker";
 import { uploadImage } from "./functions";
@@ -84,7 +84,6 @@ export default function Chat({ chatId }) {
       createdAt: new Date(),
       user: {
         _id: userId,
-        name: user.displayName,
       },
     };
 
@@ -104,6 +103,7 @@ export default function Chat({ chatId }) {
       createdAt: createdAt || new Date(),
       user: {
         _id: userId,
+        name: userName,
       },
     };
 
@@ -135,7 +135,9 @@ export default function Chat({ chatId }) {
     return (
       <View style={styles.usernameContainer}>
         <Text style={styles.usernameText}>
-          {currentMessage.user._id === userId ? "Вы" : userName}
+          {currentMessage.user._id === userId
+            ? "Вы"
+            : currentMessage.user.userName}
         </Text>
       </View>
     );
@@ -157,9 +159,11 @@ export default function Chat({ chatId }) {
             {...props}
             wrapperStyle={{
               left: { backgroundColor: "F5F5F5" },
-              right: {
-                backgroundColor: " rgba(255, 174, 37, 1)",
-              },
+              right: { backgroundColor: "rgba(255, 174, 37, 1)" },
+            }}
+            imageStyle={{
+              left: { width: 200, height: 200 }, // Примерные значения размеров для левых изображений
+              right: { width: 200, height: 200 }, // Примерные значения размеров для правых изображений
             }}
           />
         )}

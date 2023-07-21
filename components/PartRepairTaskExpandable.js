@@ -29,6 +29,7 @@ export default function PartRepairTaskExpandable({
   changeParamsOfPartFromEstimate,
   partIndex,
   routeName,
+  editable,
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
@@ -64,8 +65,9 @@ export default function PartRepairTaskExpandable({
               {vocabularyTasks[repairTaskName]}
             </Text>
           </View>
-
-          <Text style={styles.price}>{`${repairTaskPrice}`}</Text>
+          <Text style={styles.price}>
+            {editable ? `${repairTaskPrice}` : ""}
+          </Text>
         </View>
       </TouchableOpacity>
       {routeName !== "В работе" && routeName !== "Сервис" && (

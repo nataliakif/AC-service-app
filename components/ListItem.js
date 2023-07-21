@@ -11,20 +11,16 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
 } from "react-native";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
-import Modal from "react-native-modal";
 import EstimateOfSelectedPartsToRepair from "./EstimateOfSelectedPartsToRepair";
 import WorkStatus from "./WorkStatus";
 import StatusDropdown from "./StatusDropdown";
 import AddCarInfoForm from "./AddCarInfo";
 import { useRoute } from "@react-navigation/native";
 import { exportToPDF } from "./exportToPdf";
-import Chat from "./Chat";
 
-const ListItem = ({ data, setModalVisible, selectedZone }) => {
+const ListItem = ({ data, setModalVisible, selectedZone, editable }) => {
   const { carInfo, key, partsToRepair, workStatus } = data;
   const [selectedStatus, setSelectedStatus] = useState("pending");
-  const [chatVisible, setChatVisible] = useState("false");
   const route = useRoute();
   const { name } = route;
   const dismissKeyboard = () => {
@@ -75,6 +71,7 @@ const ListItem = ({ data, setModalVisible, selectedZone }) => {
               onRemoveFromEstimate={true}
               carModel=""
               changeParamsOfPartFromEstimate={true}
+              editable={editable}
             />
             <AddCarInfoForm
               setShowAddCarInfoForm={true}

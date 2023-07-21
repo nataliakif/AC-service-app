@@ -15,27 +15,30 @@ export default function EstimateOfSelectedPartsToRepair({
   canAddPhoto = false,
   carModel = "",
   changeParamsOfPartFromEstimate,
+  editable,
 }) {
   return (
     <View style={{ display: "flex", alignItems: "center", paddingTop: 15 }}>
-      <View
-        style={
-          isPartsSelectorExpanded
-            ? styles.totalPriceContExp
-            : styles.totalPriceCont
-        }
-      >
-        {!isPartsSelectorExpanded && (
-          <>
-            <Text style={styles.totalPrice}>
-              {selectedPartsToRepair
-                .map((part) => calculateTotalSumPerPart(part.workAmount))
-                .reduce((prev, cur) => prev + cur, 0) + ` UAH`}
-            </Text>
-            <Text style={styles.priceText}>Стоимость</Text>
-          </>
-        )}
-      </View>
+      {editable && (
+        <View
+          style={
+            isPartsSelectorExpanded
+              ? styles.totalPriceContExp
+              : styles.totalPriceCont
+          }
+        >
+          {!isPartsSelectorExpanded && (
+            <>
+              <Text style={styles.totalPrice}>
+                {selectedPartsToRepair
+                  .map((part) => calculateTotalSumPerPart(part.workAmount))
+                  .reduce((prev, cur) => prev + cur, 0) + ` UAH`}
+              </Text>
+              <Text style={styles.priceText}>Стоимость</Text>
+            </>
+          )}
+        </View>
+      )}
       <View style={styles.container}>
         <Text style={styles.title}>Расчет {carModel}</Text>
         {selectedPartsToRepair.map((part, partIndex) => (
@@ -52,6 +55,7 @@ export default function EstimateOfSelectedPartsToRepair({
               removePhotoURLFromSelectedPart={removePhotoURLFromSelectedPart}
               partIndex={partIndex}
               changeParamsOfPartFromEstimate={changeParamsOfPartFromEstimate}
+              editable={editable}
             />
 
             <Divider style={styles.divider} />

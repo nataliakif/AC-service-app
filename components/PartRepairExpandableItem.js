@@ -41,6 +41,7 @@ export default function PartRepairExpandableItem({
   removePhotoURLFromSelectedPart,
   changeParamsOfPartFromEstimate,
   setPhotoURLToSelectedPart,
+  editable,
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
@@ -114,15 +115,19 @@ export default function PartRepairExpandableItem({
               </Text>
             )}
           </View>
-          <View
-            style={canExpandSubItems ? styles.priceContModal : styles.priceCont}
-          >
-            <Text style={styles.priceText}>
-              {`${calculateTotalSumPerPart(
-                selectedPartToRepair.workAmount
-              )} UAH`}
-            </Text>
-          </View>
+          {editable && (
+            <View
+              style={
+                canExpandSubItems ? styles.priceContModal : styles.priceCont
+              }
+            >
+              <Text style={styles.priceText}>
+                {`${calculateTotalSumPerPart(
+                  selectedPartToRepair.workAmount
+                )} UAH`}
+              </Text>
+            </View>
+          )}
           {name !== "В работе" && name !== "Сервис" && canBeRemoved && (
             <TouchableOpacity
               style={styles.button}
@@ -160,6 +165,7 @@ export default function PartRepairExpandableItem({
                     changeParamsOfPartFromEstimate
                   }
                   routeName={name}
+                  editable={editable}
                 />
               </View>
             ))}

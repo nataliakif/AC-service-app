@@ -11,8 +11,10 @@ import DetailsScreen from "./screens/DetailsScreen";
 import CalculateScreen from "./screens/CalculateScreen";
 import ServiceZonesScreen from "./screens/ServiceZonesScreen";
 import SavedCalculationsScreen from "./screens/SavedCalculationScreen";
+import ChatsScreen from "./screens/ChatsScreen";
 import { auth } from "./config/firebase";
 import { AuthUserContext, AuthUserProvider } from "./AuthContext";
+import { checkCurrentUserAdmin } from "./components/functions";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -27,6 +29,15 @@ function AuthStack() {
 }
 
 function AppStack() {
+  const [editable, setEditable] = useState(true);
+  checkCurrentUserAdmin()
+    .then((isAdmin) => {
+      setEditable(isAdmin);
+    })
+    .catch((error) => {
+      console.error("Error fetching user admin status:", error);
+    });
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -47,6 +58,11 @@ function AppStack() {
             case "Архив":
               iconName = focused ? "save" : "save-outline";
               break;
+            case "Чаты":
+              iconName = focused
+                ? "chatbubble-ellipses"
+                : "chatbubble-ellipses-outline";
+              break;
             case "Ещё":
               iconName = focused
                 ? "ellipsis-horizontal"
@@ -66,7 +82,8 @@ function AppStack() {
       />
       <Tab.Screen name="Сервис" component={ServiceZonesScreen} />
       <Tab.Screen name="Архив" component={SavedCalculationsScreen} />
-      <Tab.Screen name="Ещё" component={DetailsScreen} />
+      <Tab.Screen name="Чаты" component={ChatsScreen} />
+      {editable && <Tab.Screen name="Ещё" component={DetailsScreen} />}
     </Tab.Navigator>
   );
 }

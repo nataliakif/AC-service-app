@@ -5,39 +5,48 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { collection, getDocs } from "firebase/firestore";
 import { database } from "../config/firebase";
 
 const ChatList = ({ navigation }) => {
   const [chats, setChats] = useState([]);
+  const [loading, setLoading] = useState(true); // Добавляем состояние loading
 
   useEffect(() => {
-    // Получение данных о чатах из Firebase Firestore
     const getChatIds = async () => {
       try {
-        // Получаем ссылку на коллекцию "chats"
         const chatsRef = collection(database, "chats");
-
-        // Выполняем запрос на получение всех документов в коллекции "chats"
         const querySnapshot = await getDocs(chatsRef);
+        console.log(querySnapshot.docs);
 
-        // Обрабатываем полученные данные и извлекаем chatId каждого документа
-        const chatIds = querySnapshot.docs.map((doc) => doc);
-        console.log(chatIds); // Здесь выведется массив с chatId всех документов в коллекции "chats"
-        return chatIds;
+        // Обновляем состояние "chats" данными о чатах
+        setChats();
+
+        // Устанавливаем loading в значение false, так как данные успешно получены
+        setLoading(false);
       } catch (error) {
         console.error("Error getting chatIds:", error);
-        return [];
+        setChats([1, 2, 3]); // Если произошла ошибка, устанавливаем пустой массив чатов
+        setLoading(false); // Устанавливаем loading в значение false
       }
     };
+
+    // Вызываем функцию getChatIds() один раз при загрузке компонента
     getChatIds();
   }, []);
+  if (loading) {
+    // Показываем индикатор загрузки, пока данные еще загружаются
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   const handleOpenChat = (chatId) => {
-    // Здесь можно добавить навигацию к компоненту чата с использованием React Navigation
     // Например, navigation.navigate('Chat', { chatId });
-    console.log(`Opening chat with ID: ${chatId}`);
   };
 
   const renderChatItem = ({ item }) => (

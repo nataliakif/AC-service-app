@@ -22,19 +22,22 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
   const { user } = useContext(AuthUserContext);
   const [name, setName] = useState(user.displayName || "");
   const [photoURL, setPhotoURL] = useState(user.photoURL || "");
+  const [selectedImage, setSelectedImage] = useState("");
   const [darkTheme, setDarkTheme] = useState(false);
-  useEffect(() => {
-    setName(user.displayName);
-    setPhotoURL(user.photoURL);
-  }, []);
+  useEffect(() => {}, []);
 
   const updateUserProfile = async () => {
     if (user) {
       try {
+        const url = await uploadImage(selectedImage, "avatars");
+
+        setPhotoURL(url);
+
         await updateProfile(user, {
           displayName: name,
-          photoURL: photoURL,
+          photoURL: url, // Используем новый URL
         });
+
         closeModal();
         console.log("Updated");
       } catch (error) {
@@ -60,13 +63,9 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
       });
 
       if (!result.canceled) {
-        // Используйте 'canceled' вместо 'cancelled'
-        const selectedImage = result.assets[0]; // Получите доступ к выбранному ресурсу через 'assets'
+        setSelectedImage(result.assets[0].uri);
 
-        const { uri } = selectedImage; // Доступ к URI изображения
-        const url = await uploadImage(uri, "avatars");
-
-        setPhotoURL(url);
+        console.log(selectedImage);
       }
     } catch (error) {
       console.error("Error choosing photo:", error);
@@ -88,8 +87,11 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
         <Text style={styles.modalTitle}>Настройки</Text>
 
         <View style={styles.avatarContainer}>
-          {user.photoURL ? (
-            <Avatar.Image size={60} source={{ uri: user.photoURL }} />
+          {photoURL ? (
+            <Avatar.Image
+              size={60}
+              source={{ uri: selectedImage || photoURL }}
+            />
           ) : (
             <Avatar.Text
               size={60}
