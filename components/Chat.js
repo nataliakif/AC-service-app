@@ -1,11 +1,21 @@
 import React, { useEffect, useState, useContext } from "react";
-import { GiftedChat, Bubble, MessageImage } from "react-native-gifted-chat";
-import { TouchableOpacity, Text } from "react-native-gesture-handler";
+import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
-import { uploadImage } from "./functions";
+import * as MediaLibrary from "expo-media-library";
 import { FontAwesome } from "@expo/vector-icons";
 import { AuthUserContext } from "../AuthContext";
 import { Avatar } from "react-native-paper";
+import { ActivityIndicator } from "react-native";
+import {
+  View,
+  Modal,
+  StyleSheet,
+  Alert,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+
 import {
   collection,
   addDoc,
@@ -14,10 +24,13 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { database } from "../config/firebase";
-import { StyleSheet, View } from "react-native";
+import { uploadImage } from "./functions";
 
 export default function Chat({ chatId }) {
   const [messages, setMessages] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImageURL, setModalImageURL] = useState("");
+  const [loading, setLoading] = useState(false);
   const { user } = useContext(AuthUserContext);
   const userId = user ? user.uid : null;
   const userName = user ? user.displayName : "Неизвестный";
@@ -31,10 +44,11 @@ export default function Chat({ chatId }) {
       ),
       (snapshot) => {
         const newMessages = snapshot.docs.map((doc) => {
-          const { _id, text, createdAt, user } = doc.data();
+          const { _id, text, createdAt, user, image } = doc.data();
           return {
             _id,
             text,
+            image,
             createdAt: createdAt.toDate(),
             user,
           };
@@ -47,6 +61,11 @@ export default function Chat({ chatId }) {
       unsubscribe();
     };
   }, [chatId]);
+
+  const handleOpenModal = (imageURL) => {
+    setModalImageURL(imageURL);
+    setModalVisible(true);
+  };
 
   const handleChoosePhoto = async () => {
     try {
@@ -64,42 +83,58 @@ export default function Chat({ chatId }) {
       });
 
       if (!result.canceled) {
-        // Используйте 'canceled' вместо 'cancelled'
         const selectedImage = result.assets[0]; // Получите доступ к выбранному ресурсу через 'assets'
 
         const { uri } = selectedImage; // Доступ к URI изображения
+        setLoading(true);
         const url = await uploadImage(uri, "chats");
 
-        sendPhotoMessage(url);
+        onSend(
+          (newMessages = [
+            {
+              _id: String(Date.now()),
+              image: url,
+              text: "",
+              createdAt: new Date(),
+              user: {
+                _id: userId,
+              },
+            },
+          ])
+        );
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error choosing photo:", error);
     }
   };
 
-  const sendPhotoMessage = (photo) => {
-    const message = {
-      _id: String(Date.now()),
-      image: photo,
-      createdAt: new Date(),
-      user: {
-        _id: userId,
-      },
-    };
-
+  const handleDownloadPhoto = async (imageUri) => {
     try {
-      addDoc(collection(database, "chats", chatId, "messages"), message);
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        console.error("Permission denied");
+        return;
+      }
+      setLoading(true);
+      const fileUri = FileSystem.cacheDirectory + "photo.jpg";
+      await FileSystem.downloadAsync(imageUri, fileUri);
+      const asset = await MediaLibrary.createAssetAsync(fileUri);
+      await MediaLibrary.createAlbumAsync("Download", [asset], false);
+      Alert.alert("Фото успешно загружено");
+      setLoading(false);
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error("Ошибка скачивания фотографии:", error);
     }
   };
 
   const onSend = (newMessages = []) => {
-    const { _id, text, createdAt, user } = newMessages[0];
+    const { _id, text, createdAt, user, image } = newMessages[0];
 
     const message = {
       _id,
-      text,
+      text: text,
+      image: image || "",
       createdAt: createdAt || new Date(),
       user: {
         _id: userId,
@@ -131,13 +166,11 @@ export default function Chat({ chatId }) {
   };
   const renderUsername = (props) => {
     const { currentMessage } = props;
-    console.log(props);
+
     return (
       <View style={styles.usernameContainer}>
         <Text style={styles.usernameText}>
-          {currentMessage.user._id === userId
-            ? "Вы"
-            : currentMessage.user.userName}
+          {currentMessage.user._id === userId ? "Вы" : currentMessage.user.name}
         </Text>
       </View>
     );
@@ -161,11 +194,22 @@ export default function Chat({ chatId }) {
               left: { backgroundColor: "F5F5F5" },
               right: { backgroundColor: "rgba(255, 174, 37, 1)" },
             }}
-            imageStyle={{
-              left: { width: 200, height: 200 }, // Примерные значения размеров для левых изображений
-              right: { width: 200, height: 200 }, // Примерные значения размеров для правых изображений
-            }}
           />
+        )}
+        renderMessageImage={(props) => (
+          <TouchableOpacity
+            onPress={() => handleOpenModal(props.currentMessage.image)}
+          >
+            {/* {loading ? (
+              <ActivityIndicator size="large" color="#fff" />
+            ) : ( */}
+            <Image
+              source={{ uri: props.currentMessage.image }}
+              style={{ width: 150, height: 100 }} // Укажите размер миниатюры изображения
+              resizeMode="cover"
+            />
+            {/* )} */}
+          </TouchableOpacity>
         )}
         renderActions={() => (
           <TouchableOpacity
@@ -176,6 +220,39 @@ export default function Chat({ chatId }) {
           </TouchableOpacity>
         )}
       />
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+          }}
+          onPress={() => setModalVisible(false)}
+        >
+          {!loading ? ( // Проверяем состояние загрузки, если true, отображаем Loader
+            <ActivityIndicator size="large" color="#fff" />
+          ) : (
+            <>
+              <Image
+                source={{ uri: modalImageURL }}
+                style={{ width: 300, height: 400 }}
+                // resizeMode="contain"
+              />
+              <TouchableOpacity
+                style={styles.downloadButton}
+                onPress={() => handleDownloadPhoto(modalImageURL)}
+              >
+                <FontAwesome name="download" size={24} color="#DB5000" />
+              </TouchableOpacity>
+            </>
+          )}
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -188,5 +265,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
   },
+  downloadButton: { marginTop: 20 },
   usernameText: { color: "red" },
 });

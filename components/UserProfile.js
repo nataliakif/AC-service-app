@@ -64,8 +64,9 @@ export default function UserProfile() {
               <TouchableWithoutFeedback onPress={null}>
                 <View style={styles.menuContainer}>
                   <TouchableOpacity style={styles.menuItem} onPress={openModal}>
-                    <Text style={styles.menuText}>Настройки</Text>
+                    <Text style={styles.menuText}>Профиль</Text>
                   </TouchableOpacity>
+
                   <TouchableOpacity
                     style={[styles.menuItem, styles.logoutItem]}
                     onPress={() => {

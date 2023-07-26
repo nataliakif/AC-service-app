@@ -8,7 +8,12 @@ const Header = ({ title, subtitle, name }) => {
   const { user } = useContext(AuthUserContext);
   const navigation = useNavigation();
   return (
-    <View style={styles.header}>
+    <View
+      style={[
+        styles.header,
+        Platform.OS === "android" ? styles.androidStyle : styles.iosStyle,
+      ]}
+    >
       <Image source={require("../images/logo.jpeg")} style={styles.logo} />
       <Text style={styles.title}>{title}</Text>
       {user ? (
@@ -25,13 +30,18 @@ const Header = ({ title, subtitle, name }) => {
 const styles = StyleSheet.create({
   header: {
     flex: 0.1,
-    paddingTop: 60,
-    paddingBottom: 20,
+    paddingBottom: 10,
     paddingRight: 15,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#fff",
+  },
+  androidStyle: {
+    paddingTop: 20,
+  },
+  iosStyle: {
+    paddingTop: 60,
   },
   logo: {
     width: 60,

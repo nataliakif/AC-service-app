@@ -19,13 +19,17 @@ const StatusDropdown = ({ value, onChange }) => {
       >
         <Picker.Item label="В ожидании" value="pending" />
         <Picker.Item label="Взять в работу" value="inProgress" />
-        <Picker.Item label="Завершить" value="delete" />
+        <Picker.Item label="Завершить" value="finished" />
+        <Picker.Item label="Удалить из списка" value="delete" />
       </Picker>
       {selectedStatus === "pending" && (
         <View style={[styles.statusIndicator, styles.pendingIndicator]} />
       )}
       {selectedStatus === "inProgress" && (
         <View style={[styles.statusIndicator, styles.inProgressIndicator]} />
+      )}
+      {selectedStatus === "finished" && (
+        <View style={[styles.statusIndicator, styles.finishedIndicator]} />
       )}
       {selectedStatus === "delete" && (
         <View style={[styles.statusIndicator, styles.deleteIndicator]} />
@@ -45,13 +49,16 @@ const styles = StyleSheet.create({
     top: 100,
   },
   inProgressIndicator: {
-    backgroundColor: "#77eb34",
+    backgroundColor: "#eb4334",
+  },
+  finishedIndicator: {
+    backgroundColor: "#2db83d",
   },
   pendingIndicator: {
-    backgroundColor: "yellow",
+    backgroundColor: "#ffc100",
   },
   deleteIndicator: {
-    backgroundColor: "#eb4334",
+    backgroundColor: "#808080",
   },
 });
 
