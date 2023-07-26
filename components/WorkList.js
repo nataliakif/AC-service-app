@@ -82,17 +82,19 @@ const WorkList = ({ data, isLoading, selectedZone }) => {
                   />
                   <View style={styles.carDetails}>
                     <View style={styles.modelWrapper}>
-                      <FontAwesome
-                        name="circle"
-                        size={20}
-                        color={
-                          status === "pending"
-                            ? "#34a8eb"
-                            : status === "inProgress"
-                            ? "#77eb34"
-                            : "#eb4334"
-                        }
-                      />
+                      {name !== "Сервис" && (
+                        <FontAwesome
+                          name="circle"
+                          size={20}
+                          color={
+                            status === "pending"
+                              ? "#34a8eb"
+                              : status === "inProgress"
+                              ? "#77eb34"
+                              : "#eb4334"
+                          }
+                        />
+                      )}
                       <Text style={styles.carModel}>{carInfo?.model}</Text>
                     </View>
                     <Text style={styles.carInfo}>{carInfo?.number}</Text>

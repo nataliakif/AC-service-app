@@ -11,7 +11,7 @@ import DetailsScreen from "./screens/DetailsScreen";
 import CalculateScreen from "./screens/CalculateScreen";
 import ServiceZonesScreen from "./screens/ServiceZonesScreen";
 import SavedCalculationsScreen from "./screens/SavedCalculationScreen";
-import ChatsScreen from "./screens/ChatsScreen";
+// import ChatsScreen from "./screens/ChatsScreen";
 import { auth } from "./config/firebase";
 import { AuthUserContext, AuthUserProvider } from "./AuthContext";
 import { checkCurrentUserAdmin } from "./components/functions";
@@ -58,11 +58,11 @@ function AppStack() {
             case "Архив":
               iconName = focused ? "save" : "save-outline";
               break;
-            case "Чаты":
-              iconName = focused
-                ? "chatbubble-ellipses"
-                : "chatbubble-ellipses-outline";
-              break;
+            // case "Чаты":
+            //   iconName = focused
+            //     ? "chatbubble-ellipses"
+            //     : "chatbubble-ellipses-outline";
+            //   break;
             case "Ещё":
               iconName = focused
                 ? "ellipsis-horizontal"
@@ -82,7 +82,7 @@ function AppStack() {
       />
       <Tab.Screen name="Сервис" component={ServiceZonesScreen} />
       <Tab.Screen name="Архив" component={SavedCalculationsScreen} />
-      <Tab.Screen name="Чаты" component={ChatsScreen} />
+      {/* <Tab.Screen name="Чаты" component={ChatsScreen} /> */}
       {editable && <Tab.Screen name="Ещё" component={DetailsScreen} />}
     </Tab.Navigator>
   );

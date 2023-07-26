@@ -39,7 +39,6 @@ const LoginForm = () => {
     if (email !== "" && password !== "") {
       signInWithEmailAndPassword(auth, email, password)
         .then(() => {
-          console.log(auth.currentUser);
           console.log("login success");
         })
         .catch((err) => {

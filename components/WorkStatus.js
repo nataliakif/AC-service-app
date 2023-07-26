@@ -2,16 +2,74 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 const WorkStatus = ({ workStatus }) => {
-  const getStatusColor = (status) => {
+  const getStatusText = (status) => {
     switch (status) {
       case "pending":
-        return "#FFC107"; // Цвет для статуса "pending"
+        return (
+          <>
+            <Text style={{ color: "#ffc100", fontWeight: "500" }}>
+              В ожидании
+            </Text>
+            <View
+              style={[
+                styles.statusIndicator,
+                {
+                  backgroundColor: "#ffc100",
+                },
+              ]}
+            />
+          </>
+        );
       case "inProgress":
-        return "#77eb34"; // Цвет для статуса "inProgress"
+        return (
+          <>
+            <Text style={{ color: "#eb4334", fontWeight: "500" }}>
+              В работе
+            </Text>
+            <View
+              style={[
+                styles.statusIndicator,
+                {
+                  backgroundColor: "#eb4334",
+                },
+              ]}
+            />
+          </>
+        );
+      case "finished":
+        return (
+          <>
+            <Text style={{ color: "#2db83d", fontWeight: "500" }}>
+              Завершен
+            </Text>
+            <View
+              style={[
+                styles.statusIndicator,
+                {
+                  backgroundColor: "#2db83d",
+                },
+              ]}
+            />
+          </>
+        );
       case "delete":
-        return "#eb4334"; // Цвет для статуса "delete"
+        return (
+          <>
+            <Text style={{ color: "#808080", fontWeight: "500" }}>
+              Удален из списка
+            </Text>
+            <View
+              style={[
+                styles.statusIndicator,
+                {
+                  backgroundColor: "#808080",
+                },
+              ]}
+            />
+          </>
+        );
       default:
-        return "#000000"; // Цвет по умолчанию
+        return ""; // Цвет по умолчанию
     }
   };
 
@@ -19,65 +77,27 @@ const WorkStatus = ({ workStatus }) => {
     <View style={styles.container}>
       <View style={styles.statusContainer}>
         <Text style={styles.work}>Зборка/Разборка</Text>
-
-        <View
-          style={[
-            styles.statusIndicator,
-            { backgroundColor: getStatusColor(workStatus.assemblingStatus) },
-          ]}
-        />
+        {getStatusText(workStatus.assemblingStatus)}
       </View>
       <View style={styles.statusContainer}>
         <Text style={styles.work}>Снятие/Установка</Text>
-
-        <View
-          style={[
-            styles.statusIndicator,
-            { backgroundColor: getStatusColor(workStatus.mountingStatus) },
-          ]}
-        />
+        {getStatusText(workStatus.mountingStatus)}
       </View>
       <View style={styles.statusContainer}>
         <Text style={styles.work}>Ремонт/Рихтовка</Text>
-
-        <View
-          style={[
-            styles.statusIndicator,
-            { backgroundColor: getStatusColor(workStatus.repairStatus) },
-          ]}
-        />
+        {getStatusText(workStatus.repairStatus)}
       </View>
       <View style={styles.statusContainer}>
         <Text style={styles.work}>Покраска</Text>
-
-        <View
-          style={[
-            styles.statusIndicator,
-            { backgroundColor: getStatusColor(workStatus.paintStatus) },
-          ]}
-        />
+        {getStatusText(workStatus.paintStatus)}
       </View>
       <View style={styles.statusContainer}>
         <Text style={styles.work}>Полировка</Text>
-
-        <View
-          style={[
-            styles.statusIndicator,
-            { backgroundColor: getStatusColor(workStatus.polishingStatus) },
-          ]}
-        />
+        {getStatusText(workStatus.polishingStatus)}
       </View>
       <View style={styles.statusContainer}>
         <Text style={styles.work}>Заказ деталей</Text>
-
-        <View
-          style={[
-            styles.statusIndicator,
-            {
-              backgroundColor: getStatusColor(workStatus.orderNewDetailStatus),
-            },
-          ]}
-        />
+        {getStatusText(workStatus.orderNewDetailStatus)}
       </View>
     </View>
   );
@@ -104,6 +124,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
+    marginLeft: 10,
   },
 });
 
