@@ -473,34 +473,6 @@ export default function CalculateScreen() {
                   />
                 </View>
               )}
-              <AntDesign
-                name="arrowleft"
-                size={34}
-                color="#DB5000"
-                style={styles.backBtn}
-                onPress={() => {
-                  Alert.alert(
-                    "Подтверждение",
-                    "Вы уверени что хотите выйти без сохранения данных?",
-                    [
-                      {
-                        text: "Отмена",
-                        style: "cancel",
-                      },
-                      {
-                        text: "Да",
-                        style: "destructive",
-                        onPress: () => {
-                          clearCalculation();
-                          navigation.navigate("Просчет");
-                          navigation.navigate("В работе");
-                        },
-                      },
-                    ],
-                    { cancelable: false }
-                  );
-                }}
-              />
             </View>
 
             {showSpecificPartsDialog && (
@@ -611,6 +583,35 @@ export default function CalculateScreen() {
           </>
         )}
       </Provider>
+
+      <AntDesign
+        name="arrowleft"
+        size={34}
+        color="#DB5000"
+        style={styles.backBtn}
+        onPress={() => {
+          Alert.alert(
+            "Подтверждение",
+            "Вы уверени что хотите выйти без сохранения данных?",
+            [
+              {
+                text: "Отмена",
+                style: "cancel",
+              },
+              {
+                text: "Да",
+                style: "destructive",
+                onPress: () => {
+                  clearCalculation();
+                  navigation.navigate("Просчет");
+                  navigation.navigate("В работе");
+                },
+              },
+            ],
+            { cancelable: false }
+          );
+        }}
+      />
 
       <View style={{ position: "absolute", bottom: 0, right: 0 }}>
         <Menu opened={showMenu} onBackdropPress={() => setShowMenu(false)}>
