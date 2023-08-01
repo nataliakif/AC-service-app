@@ -33,7 +33,7 @@ export default function PartRepairTaskExpandable({
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
-  console.log(editable);
+
   useEffect(() => {
     Animated.timing(itemBaseHeight, {
       toValue: expanded ? 30 : 0,
