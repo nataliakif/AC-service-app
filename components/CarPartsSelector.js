@@ -1,11 +1,22 @@
 import CarModelImage from "../components/CarModelImage";
-import { TouchableOpacity, Text } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { View } from "react-native";
 import { useState } from "react";
 import ConfirmPartAddDialog from "./ConfirmPartAddDialog";
 import PartParamsAddDialog from "./PartParamsAddDialog";
 
-const partListData = require("../config/price.json");
+import { ref, onValue } from "firebase/database";
+import { db } from "../config/firebase";
+
+let partListData = [];
+async function getPriceFromDB() {
+  const dataRef = ref(db, "price");
+
+  onValue(dataRef, (snapshot) => {
+    partListData = snapshot.val();
+  });
+}
+getPriceFromDB();
 
 export default function CarPartsSelector({
   alreadySelectedPartsToRepair,
