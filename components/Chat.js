@@ -234,23 +234,23 @@ export default function Chat({ chatId }) {
           }}
           onPress={() => setModalVisible(false)}
         >
-          {!loading ? ( // Проверяем состояние загрузки, если true, отображаем Loader
+          {/* {!loading ? ( // Проверяем состояние загрузки, если true, отображаем Loader
             <ActivityIndicator size="large" color="#fff" />
-          ) : (
-            <>
-              <Image
-                source={{ uri: modalImageURL }}
-                style={{ width: 300, height: 400 }}
-                // resizeMode="contain"
-              />
-              <TouchableOpacity
-                style={styles.downloadButton}
-                onPress={() => handleDownloadPhoto(modalImageURL)}
-              >
-                <FontAwesome name="download" size={24} color="#DB5000" />
-              </TouchableOpacity>
-            </>
-          )}
+          ) : ( */}
+          <>
+            <Image
+              source={{ uri: modalImageURL }}
+              style={{ width: 300, height: 400 }}
+              // resizeMode="contain"
+            />
+            <TouchableOpacity
+              style={styles.downloadButton}
+              onPress={() => handleDownloadPhoto(modalImageURL)}
+            >
+              <FontAwesome name="download" size={24} color="#DB5000" />
+            </TouchableOpacity>
+          </>
+          {/* )} */}
         </TouchableOpacity>
       </Modal>
     </View>
