@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,10 +11,30 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-import data from "../config/price.json";
+import Toast from "react-native-toast-message";
 
-// Исходный объект с ценами
-const initialPrices = data;
+import { ref, set, onValue } from "firebase/database";
+import { db } from "../config/firebase";
+
+let partListData = [];
+async function getPriceFromDB() {
+  const dataRef = ref(db, "price");
+
+  onValue(dataRef, (snapshot) => {
+    partListData = snapshot.val();
+  });
+}
+getPriceFromDB();
+
+async function savePriceToDb(price) {
+  set(ref(db, "price"), price).then(() => {
+    Toast.show({
+      type: "success",
+      text1: "Цена в базе данных изменена",
+      visibilityTime: 2000,
+    });
+  });
+}
 
 // Компонент для редактирования цен каждой части
 const PartPriceEditor = ({ part, onSave }) => {
@@ -74,23 +94,28 @@ const PartPriceEditor = ({ part, onSave }) => {
 
 // Компонент PriceEditor, который рендерит список частей и позволяет их редактировать
 const PriceEditor = () => {
-  const [prices, setPrices] = useState(initialPrices);
+  const [prices, setPrices] = useState(partListData);
   const filterPrices = (prices) => {
     return prices.filter(
       (item) =>
         item.workAmount.paintPrice.reduce((sum, price) => sum + price, 0) !== 0
     );
   };
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
   const filteredPrices = filterPrices(prices);
   const handleSavePartPrice = (updatedPart) => {
-    setPrices((prevPrices) =>
-      prevPrices.map((part) =>
-        part.partName === updatedPart.partName ? updatedPart : part
-      )
-    );
+    setPrices((prevPrices) => {
+      const prevState = [...prevPrices];
+      const itemToChangeIndex = prevState.findIndex(
+        (item) => item.partName === updatedPart.partName
+      );
+      prevState[itemToChangeIndex] = updatedPart;
+      savePriceToDb(prevState);
+      return prevState;
+    });
   };
 
   const handleSaveAll = () => {
@@ -99,20 +124,23 @@ const PriceEditor = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <ScrollView style={styles.container}>
-        {filteredPrices.map((part) => (
-          <PartPriceEditor
-            key={part.partName}
-            part={part}
-            onSave={handleSavePartPrice}
-          />
-        ))}
-        {/* <TouchableOpacity style={styles.saveButton} onPress={handleSaveAll}>
+    <>
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <ScrollView style={styles.container}>
+          {filteredPrices.map((part) => (
+            <PartPriceEditor
+              key={part.partName}
+              part={part}
+              onSave={handleSavePartPrice}
+            />
+          ))}
+          {/* <TouchableOpacity style={styles.saveButton} onPress={handleSaveAll}>
           <Text style={styles.saveButtonText}>Сохранить</Text>
         </TouchableOpacity> */}
-      </ScrollView>
-    </TouchableWithoutFeedback>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+      <Toast />
+    </>
   );
 };
 

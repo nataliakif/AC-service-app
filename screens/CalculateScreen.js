@@ -23,7 +23,7 @@ import GestureRecognizer from "react-native-swipe-detect";
 import Modal from "react-native-modal";
 import { AntDesign } from "@expo/vector-icons";
 import uuid from "react-native-uuid";
-import { ref, set, update, remove } from "firebase/database";
+import { ref, set, update, remove, onValue } from "firebase/database";
 import { db } from "../config/firebase";
 
 import CarPartsSelector from "../components/CarPartsSelector";
@@ -42,7 +42,18 @@ import {
   MenuProvider,
 } from "react-native-popup-menu";
 
-const partListData = require("../config/price.json");
+export let partListData = [];
+async function getPriceFromDB() {
+  const dataRef = ref(db, "price");
+
+  onValue(dataRef, (snapshot) => {
+    partListData = snapshot.val();
+  });
+}
+
+export async function savePriceToDb(price) {
+  set(ref(db, "price"), price);
+}
 
 export const vocabularyTasks = {
   mountingTime: "снятие / установка",
@@ -79,6 +90,8 @@ export default function CalculateScreen() {
   const navigation = useNavigation();
   const [editMode, setEditMode] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+
+  getPriceFromDB();
 
   useEffect(() => {
     if (!route.params) {
@@ -702,9 +715,8 @@ const styles = StyleSheet.create({
     position: "relative",
     height: "100%",
     alignItems: "center",
-    paddingTop: 5,
     paddingBottom: 65,
-    paddingTop: 20,
+    paddingTop: 30,
     paddingHorizontal: 20,
   },
   headerContainer: {
@@ -719,7 +731,7 @@ const styles = StyleSheet.create({
   expandBtn: {
     alignItems: "center",
     position: "absolute",
-    top: 30,
+    top: 40,
   },
 
   paramsSwitcherCont: {
@@ -776,6 +788,6 @@ const styles = StyleSheet.create({
   backBtn: {
     position: "absolute",
     left: 10,
-    top: 40,
+    top: 50,
   },
 });
