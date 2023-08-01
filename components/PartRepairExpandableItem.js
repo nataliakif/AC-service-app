@@ -41,7 +41,7 @@ export default function PartRepairExpandableItem({
   removePhotoURLFromSelectedPart,
   changeParamsOfPartFromEstimate,
   setPhotoURLToSelectedPart,
-  editable,
+  editable = true,
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);

@@ -15,7 +15,7 @@ export default function EstimateOfSelectedPartsToRepair({
   canAddPhoto = false,
   carModel = "",
   changeParamsOfPartFromEstimate,
-  editable,
+  editable = true,
 }) {
   return (
     <View style={{ display: "flex", alignItems: "center", paddingTop: 15 }}>
