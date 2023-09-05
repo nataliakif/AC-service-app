@@ -10,68 +10,55 @@ import {
   Alert,
   Modal,
 } from "react-native";
-import {
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-} from "@firebase/auth";
+import { createUserWithEmailAndPassword } from "@firebase/auth";
 import { auth } from "../config/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
 
-const LoginSchema = Yup.object().shape({
+const RegistrationSchema = Yup.object().shape({
   email: Yup.string()
     .email("Введите правильный email")
     .required("Введите email"),
   password: Yup.string().required("Пароль обязателен"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Пароли должны совпадать")
+    .required("Подтвердите пароль"),
 });
 
-const LoginForm = () => {
+const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isEmailModalVisible, setIsEmailModalVisible] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
 
-  const handleLoginForm = ({ email, password }) => {
+  const handleRegistrationForm = async ({ email, password }) => {
     if (email !== "" && password !== "") {
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          console.log("login success");
-        })
-        .catch((err) => {
-          Alert.alert("Login Error", err.message);
-        });
-    }
-  };
-
-  const resetPassword = async () => {
-    if (isEmailModalVisible) {
-      setIsEmailModalVisible(false);
-      if (resetEmail === "") {
-        Alert.alert("Введите email");
-      } else {
-        try {
-          await sendPasswordResetEmail(auth, resetEmail);
-          Alert.alert("Ссылка для смены пароля отправлена на указанную почту");
-          console.log("Email sent successfully");
-        } catch (error) {
-          console.error("Error sending email:", error);
-        }
+      try {
+        // Создание нового пользователя в Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        Alert.alert(
+          "Пользователь успешно зарегистрирован:",
+          userCredential.user
+        );
+      } catch (error) {
+        Alert.alert("Registration Error", error.message);
       }
-    } else {
-      setIsEmailModalVisible(true);
     }
   };
 
   return (
     <>
       <Formik
-        initialValues={{ email: "", password: "" }}
-        validationSchema={LoginSchema}
-        onSubmit={(values) => handleLoginForm(values)}
+        initialValues={{ email: "", password: "", confirmPassword: "" }}
+        validationSchema={RegistrationSchema}
+        onSubmit={(values) => handleRegistrationForm(values)}
       >
         {({
           handleChange,
@@ -117,35 +104,41 @@ const LoginForm = () => {
               {touched.password && errors.password && (
                 <Text style={styles.error}>{errors.password}</Text>
               )}
+              <View>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={handleChange("confirmPassword")}
+                  onBlur={handleBlur("confirmPassword")}
+                  value={values.confirmPassword}
+                  placeholder="Подтвердите пароль"
+                  secureTextEntry={!showConfirmPassword}
+                />
+                <TouchableOpacity
+                  style={styles.iconContainer}
+                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  <Ionicons
+                    name={showConfirmPassword ? "eye-off" : "eye"}
+                    size={24}
+                    color="gray"
+                  />
+                </TouchableOpacity>
+              </View>
+              {touched.confirmPassword && errors.confirmPassword && (
+                <Text style={styles.error}>{errors.confirmPassword}</Text>
+              )}
 
-              <TouchableOpacity onPress={resetPassword}>
-                <Text style={styles.link}>Забыли пароль?</Text>
-              </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={styles.button}
                 onPress={handleSubmit}
               >
-                <Text style={styles.buttonText}>Логин</Text>
+                <Text style={styles.buttonText}>Зарегистрироваться</Text>
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>
         )}
       </Formik>
-
-      <Modal visible={isEmailModalVisible}>
-        <View style={styles.modalContainer}>
-          <TextInput
-            style={styles.emailInput}
-            onChangeText={(text) => setResetEmail(text)}
-            value={resetEmail}
-            placeholder="Email"
-          />
-          <TouchableOpacity style={styles.modalButton} onPress={resetPassword}>
-            <Text style={styles.modalButtonText}>OK</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
     </>
   );
 };
@@ -154,8 +147,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
+    alignItems: "center",
   },
-  login: { marginTop: 100 },
+  login: {
+    marginTop: 100,
+    flex: 1,
+    flexDirection: "column",
+  },
   input: {
     height: 52,
     borderWidth: 1,
@@ -176,13 +174,14 @@ const styles = StyleSheet.create({
     },
   },
   error: {
+    alignSelf: "center",
     color: "red",
   },
   link: { color: "#007AFF", textAlign: "center", marginTop: 15 },
   button: {
     marginTop: 40,
     height: 60,
-    paddingHorizontal: 140,
+    paddingHorizontal: 100,
     paddingVertical: 20,
     textAlign: "center",
     backgroundColor: "#DB5000",
@@ -191,6 +190,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "500",
+
     flexDirection: "row",
   },
 
@@ -199,32 +199,6 @@ const styles = StyleSheet.create({
     top: 15,
     right: 15,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  emailInput: {
-    height: 52,
-    borderWidth: 1,
-    paddingLeft: 16,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    marginBottom: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    width: 200,
-  },
-  modalButton: {
-    backgroundColor: "#DB5000",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  modalButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
 });
 
-export default LoginForm;
+export default RegistrationForm;

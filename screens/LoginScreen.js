@@ -10,7 +10,7 @@ export default function LoginScreen() {
     <View style={styles.container}>
       {isLogin ? (
         <>
-          <Header title="Log In" />
+          <Header title="Вход" subtitle="Регистрация" name="Регистрация" />
           <LoginForm />
         </>
       ) : (

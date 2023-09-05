@@ -1,21 +1,21 @@
-import RegistrationForm from "../components/RegistratonForm";
+import React, { useState } from "react";
 import Header from "../components/Header";
+import RegistrationForm from "../components/RegistrationForm";
 import { StyleSheet, View, StatusBar } from "react-native";
 
 export default function RegistrationScreen() {
-  const isLogin = Math.random() < 0.5;
   return (
     <View style={styles.container}>
-      {!isLogin && (
-        <>
-          <Header title="Sign Up" subtitle="Log In" name="Логин"></Header>
-          <RegistrationForm></RegistrationForm>
-        </>
-      )}
+      <>
+        <Header title="Регистрация" subtitle="Вход" name="Логин" />
+        <RegistrationForm />
+      </>
+
       <StatusBar style="auto" />
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -6,6 +6,7 @@ import UserProfile from "../components/UserProfile";
 
 const Header = ({ title, subtitle, name }) => {
   const { user } = useContext(AuthUserContext);
+
   const navigation = useNavigation();
   return (
     <View
@@ -31,10 +32,10 @@ const styles = StyleSheet.create({
   header: {
     flex: 0.1,
     paddingBottom: 10,
-    paddingRight: 15,
+
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     backgroundColor: "#fff",
   },
   androidStyle: {
@@ -52,9 +53,11 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "600",
     lineHeight: 37,
+    marginLeft: 50,
   },
   subtitle: {
     fontSize: 16,
+    marginLeft: 30,
     color: "#DB5000",
     fontWeight: "500",
     lineHeight: 20,
