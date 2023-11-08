@@ -17,8 +17,8 @@ export default {
     },
     assetBundlePatterns: ["**/*"],
     ios: {
-      supportsTablet: true,
-      bundleIdentifier: "9c1afb50-3cee-463c-924f-4b2cf94cf484",
+      bundleIdentifier: "com.ac-service.ac-service",
+      buildNumber: "1.0.0",
     },
     android: {
       package: "com.ac.service",

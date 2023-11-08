@@ -8,10 +8,10 @@ export default function DetailsScreen() {
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [showPriceEditor, setShowPriceEditor] = useState(false);
 
-  // const handleCreateUserClick = () => {
-  //   setShowCreateUser(!showCreateUser);
-  //   setShowPriceEditor(false);
-  // };
+  const handleCreateUserClick = () => {
+    setShowCreateUser(!showCreateUser);
+    setShowPriceEditor(false);
+  };
 
   const handlePriceEditorClick = () => {
     setShowPriceEditor(!showPriceEditor);
@@ -23,9 +23,9 @@ export default function DetailsScreen() {
       <Header />
 
       <View style={styles.container}>
-        {/* <TouchableOpacity style={styles.link} onPress={handleCreateUserClick}>
-          <Text style={styles.linkText}>Добавить пользователя</Text>
-        </TouchableOpacity> */}
+        <TouchableOpacity style={styles.link} onPress={handleCreateUserClick}>
+          <Text style={styles.linkText}>Права доступа</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.linkB} onPress={handlePriceEditorClick}>
           <Text style={styles.linkText}>Изменить цены</Text>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -11,68 +11,43 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import { RadioButton } from "react-native-paper";
-import { createUserWithEmailAndPassword } from "@firebase/auth";
 import { doc, setDoc } from "@firebase/firestore";
-import { auth, database } from "../config/firebase";
-import { v4 as uuidv4 } from "uuid";
-import axios from "axios";
+import { database } from "../config/firebase";
+import { Picker } from "@react-native-picker/picker";
+import { collection, getDocs } from "@firebase/firestore";
+import { updateDoc } from "@firebase/firestore";
 
 export default function CreateUser() {
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
+  const [users, setUsers] = useState([]);
 
-  const handleCreateUser = async ({ email, selectedRole }) => {
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const usersCollection = collection(database, "users");
+      const usersSnapshot = await getDocs(usersCollection);
+      const usersList = usersSnapshot.docs.map((doc) => doc.id);
+      setUsers(usersList);
+    };
+
+    fetchUsers();
+  }, []);
+
+  const handleUpdateUserRole = async (email, newRole) => {
     try {
-      // Создание нового пользователя в Firebase Authentication
-      const password = uuidv4();
-      await createUserWithEmailAndPassword(auth, email, password);
-
-      // Сохранение дополнительных полей в профиле пользователя
+      // Получаем ссылку на документ пользователя в базе данных
       const userRef = doc(database, "users", email);
 
-      // Создание документа пользователя с дополнительными полями
-      await setDoc(userRef, {
-        role: selectedRole,
+      // Обновляем роль пользователя
+      await updateDoc(userRef, {
+        role: newRole,
       });
 
-      Alert.alert("Пользователь создан успешно");
-      // Отправка письма с приглашением на указанный адрес электронной почты
-
-      const response = await axios.post(
-        "https://api.sendgrid.com/v3/mail/send",
-        {
-          personalizations: [
-            {
-              to: [{ email: email }],
-              subject: "Приглашение для скачивания приложения",
-            },
-          ],
-          from: { email: "nataliakif@gmail.com" },
-          content: [
-            {
-              type: "text/plain",
-              value: `Вы были приглашены для скачивания приложения. Логин: ${email}, Пароль: ${password}.`,
-            },
-          ],
-        },
-        {
-          headers: {
-            Authorization:
-              // "Bearer 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",
-              "Bearer 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",
-          },
-        }
-      );
-      console.log(response);
-      if (response.status === 202) {
-        Alert.alert("Успех", "Пользователь создан, и приглашение отправлено");
-      } else {
-        Alert.alert("Ошибка", "Не удалось отправить письмо");
-      }
+      Alert.alert("Права доступа пользователя обновлены успешно");
     } catch (error) {
-      Alert.alert("Ошибка", "Не удалось создать пользователя");
-      console.error("Error creating user:", error);
+      Alert.alert("Ошибка", "Не удалось обновить права доступа пользователя");
+      console.error("Error updating user role:", error);
     }
   };
 
@@ -80,21 +55,30 @@ export default function CreateUser() {
     <Formik
       initialValues={{ email: "", selectedRole: "Сотрудник" }}
       onSubmit={(values, { resetForm }) => {
-        handleCreateUser(values);
+        handleUpdateUserRole(values.email, values.selectedRole);
         resetForm();
       }}
     >
-      {({ handleChange, handleBlur, handleSubmit, values }) => (
+      {({ handleChange, handleSubmit, values }) => (
         <TouchableWithoutFeedback onPress={dismissKeyboard}>
           <View>
-            <Text style={styles.title}>Cоздать нового пользователя</Text>
-            <TextInput
-              style={styles.input}
-              onChangeText={handleChange("email")}
-              onBlur={handleBlur("email")}
-              value={values.email}
-              placeholder="Email"
-            />
+            <Text style={styles.title}>
+              Cменить права доступа для пользователя
+            </Text>
+
+            <Picker
+              selectedValue={values.email}
+              onValueChange={handleChange("email")}
+            >
+              {users.map((email) => (
+                <Picker.Item
+                  style={styles.pickerItem}
+                  key={email}
+                  label={email}
+                  value={email}
+                />
+              ))}
+            </Picker>
 
             <View style={styles.radioContainer}>
               <View style={styles.radioButtons}>
@@ -130,7 +114,7 @@ export default function CreateUser() {
               style={styles.button}
               onPress={handleSubmit}
             >
-              <Text style={styles.buttonText}>Создать пользователя</Text>
+              <Text style={styles.buttonText}>Изменить</Text>
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>
@@ -146,7 +130,6 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   title: {
-    marginBottom: 20,
     fontSize: 20,
     fontWeight: "500",
     textAlign: "center",
@@ -178,17 +161,17 @@ const styles = StyleSheet.create({
     marginTop: 40,
     marginHorizontal: 30,
     height: 60,
-    paddingHorizontal: 60,
-    paddingVertical: 20,
-    textAlign: "center",
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#DB5000",
     borderRadius: 5,
   },
   buttonText: {
     color: "#fff",
     fontWeight: "500",
-    flexDirection: "row",
+    fontSize: 16,
   },
+
   iconContainer: {
     position: "absolute",
     top: 15,
@@ -205,5 +188,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginRight: 16,
+  },
+  pickerItem: {
+    backgroundColor: "red",
   },
 });

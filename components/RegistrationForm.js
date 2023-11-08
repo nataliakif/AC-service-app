@@ -8,10 +8,11 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Alert,
-  Modal,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { doc, setDoc } from "@firebase/firestore";
+import { auth, database } from "../config/firebase";
 import { createUserWithEmailAndPassword } from "@firebase/auth";
-import { auth } from "../config/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,7 +21,9 @@ const RegistrationSchema = Yup.object().shape({
   email: Yup.string()
     .email("Введите правильный email")
     .required("Введите email"),
-  password: Yup.string().required("Пароль обязателен"),
+  password: Yup.string()
+    .min(6, "Пароль должен содержать не менее 6 символов")
+    .required("Пароль обязателен"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password"), null], "Пароли должны совпадать")
     .required("Подтвердите пароль"),
@@ -29,6 +32,7 @@ const RegistrationSchema = Yup.object().shape({
 const RegistrationForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigation = useNavigation();
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -38,17 +42,20 @@ const RegistrationForm = () => {
     if (email !== "" && password !== "") {
       try {
         // Создание нового пользователя в Firebase Authentication
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        Alert.alert(
-          "Пользователь успешно зарегистрирован:",
-          userCredential.user
-        );
+        await createUserWithEmailAndPassword(auth, email, password);
+
+        const userRef = doc(database, "users", email);
+
+        // Создание документа пользователя с дополнительными полями
+        await setDoc(userRef, {
+          role: "Сотрудник",
+        });
+
+        Alert.alert("Успех", "Пользователь успешно зарегистрирован:");
+        navigation.navigate("Логин"); // предполагается, что ваш экран для входа называется 'Login'
       } catch (error) {
-        Alert.alert("Registration Error", error.message);
+        Alert.alert("Ошибка", "Не удалось создать пользователя", error);
+        console.error("Error creating user:", error);
       }
     }
   };
@@ -56,7 +63,11 @@ const RegistrationForm = () => {
   return (
     <>
       <Formik
-        initialValues={{ email: "", password: "", confirmPassword: "" }}
+        initialValues={{
+          email: "",
+          password: "",
+          confirmPassword: "",
+        }}
         validationSchema={RegistrationSchema}
         onSubmit={(values) => handleRegistrationForm(values)}
       >
