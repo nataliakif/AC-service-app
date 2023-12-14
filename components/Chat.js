@@ -6,6 +6,8 @@ import * as MediaLibrary from "expo-media-library";
 import { FontAwesome } from "@expo/vector-icons";
 import { AuthUserContext } from "../AuthContext";
 import { Avatar } from "react-native-paper";
+import ImageZoomViewer from "react-native-image-zoom-viewer";
+
 import { ActivityIndicator } from "react-native";
 import {
   View,
@@ -240,9 +242,10 @@ export default function Chat({ chatId }) {
           <>
             <Image
               source={{ uri: modalImageURL }}
-              style={{ width: 300, height: 400 }}
-              // resizeMode="contain"
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="contain"
             />
+
             <TouchableOpacity
               style={styles.downloadButton}
               onPress={() => handleDownloadPhoto(modalImageURL)}
