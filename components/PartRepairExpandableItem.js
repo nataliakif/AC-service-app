@@ -124,7 +124,7 @@ export default function PartRepairExpandableItem({
               <Text style={styles.priceText}>
                 {`${calculateTotalSumPerPart(
                   selectedPartToRepair.workAmount
-                )} UAH`}
+                )} $`}
               </Text>
             </View>
           )}

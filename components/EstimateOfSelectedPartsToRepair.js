@@ -32,7 +32,7 @@ export default function EstimateOfSelectedPartsToRepair({
               <Text style={styles.totalPrice}>
                 {selectedPartsToRepair
                   .map((part) => calculateTotalSumPerPart(part.workAmount))
-                  .reduce((prev, cur) => prev + cur, 0) + ` UAH`}
+                  .reduce((prev, cur) => prev + cur, 0) + ` $ `}
               </Text>
               <Text style={styles.priceText}>Стоимость</Text>
             </>

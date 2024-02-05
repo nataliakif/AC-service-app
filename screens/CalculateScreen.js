@@ -51,16 +51,10 @@ async function getPriceFromDB() {
   });
 }
 
-export async function savePriceToDb(price) {
-  set(ref(db, "price"), price);
-}
-
 export const vocabularyTasks = {
-  mountingTime: "снятие / установка",
-  assemblingTime: "разборка / сборка",
-  repairTime: "ремонт / рихтовка",
+  assemblingPrice: "разборка / сборка",
+  repairPrice: "ремонт / рихтовка",
   paintPrice: "покраска",
-  //polishingPrice: "полировка",
   orderNewDetailPrice: "заказ новой детали",
 };
 
@@ -510,6 +504,7 @@ export default function CalculateScreen() {
                   ...styles.partListDialog,
                 }}
               >
+                {/* добавление деталей из базы в меню "ВЫБОР ДЕТАЛИ" */}
                 {partListData.map((part, index) => (
                   <ListItem
                     key={index}
@@ -519,13 +514,11 @@ export default function CalculateScreen() {
                       setSpecificPartToRepair({
                         partName: part.partName,
                         workAmount: {
-                          mountingTime:
-                            part.workAmount.mountingTime[carCategory],
-                          assemblingTime:
-                            part.workAmount.assemblingTime[carCategory],
-                          repairTime: part.workAmount.repairTime,
-                          paintPrice: part.workAmount.paintPrice[paintCategory],
-                          repairTime: 0,
+                          assemblingPrice:
+                            part.workAmount.assemblingPrice[carCategory] || 0,
+                          repairPrice: part.workAmount.repairPrice || 0,
+                          paintPrice:
+                            part.workAmount.paintPrice[paintCategory] || 0,
                           orderNewDetailPrice: 0,
                         },
                         specific: true,
@@ -542,11 +535,9 @@ export default function CalculateScreen() {
                     setSpecificPartToRepair({
                       partName: "",
                       workAmount: {
-                        mountingTime: 0,
-                        assemblingTime: 0,
-                        repairTime: 0,
+                        assemblingPrice: 0,
                         paintPrice: 0,
-                        repairTime: 0,
+                        repairPrice: 0,
                         orderNewDetailPrice: 0,
                       },
                       photoURL: [],

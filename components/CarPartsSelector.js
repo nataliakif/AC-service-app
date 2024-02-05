@@ -35,10 +35,9 @@ export default function CarPartsSelector({
     return {
       partName: partNameToShow,
       workAmount: {
-        mountingTime: partTemplate.workAmount.mountingTime[currentCarCategory],
-        assemblingTime:
-          partTemplate.workAmount.assemblingTime[currentCarCategory],
-        repairTime: 0,
+        assemblingPrice:
+          partTemplate.workAmount.assemblingPrice[currentCarCategory],
+        repairPrice: 0,
         paintPrice: partTemplate.workAmount.paintPrice[currentPaintCategory],
         orderNewDetailPrice: 0,
       },

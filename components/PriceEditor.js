@@ -24,6 +24,7 @@ async function getPriceFromDB() {
     partListData = snapshot.val();
   });
 }
+
 getPriceFromDB();
 
 async function savePriceToDb(price) {
@@ -105,7 +106,9 @@ const PriceEditor = () => {
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
+
   const filteredPrices = filterPrices(prices);
+
   const handleSavePartPrice = (updatedPart) => {
     setPrices((prevPrices) => {
       const prevState = [...prevPrices];

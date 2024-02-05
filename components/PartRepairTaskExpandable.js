@@ -10,11 +10,9 @@ import NumericInput from "react-native-numeric-input";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 const vocabularyTasks = {
-  mountingTime: "снятие / установка",
-  assemblingTime: "разборка / сборка",
-  repairTime: "ремонт / рихтовка",
+  assemblingPrice: "разборка / сборка",
+  repairPrice: "ремонт / рихтовка",
   paintPrice: "покраска",
-  //polishingPrice: "полировка",
   orderNewDetailPrice: "заказ новой детали",
 };
 
