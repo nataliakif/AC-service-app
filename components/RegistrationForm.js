@@ -179,10 +179,10 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    /*     shadowOffset: {
+    shadowOffset: {
       width: 0,
       height: 2,
-    }, */
+    },
   },
   error: {
     alignSelf: "center",
