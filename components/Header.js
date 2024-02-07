@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { AuthUserContext } from "../AuthContext";
 import UserProfile from "../components/UserProfile";
+import { Platform } from "react-native";
 
 const Header = ({ title, subtitle, name }) => {
   const { user } = useContext(AuthUserContext);
