@@ -6,6 +6,7 @@ import * as MediaLibrary from "expo-media-library";
 import { FontAwesome } from "@expo/vector-icons";
 import { AuthUserContext } from "../AuthContext";
 import { Avatar } from "react-native-paper";
+
 import ImageZoomViewer from "react-native-image-zoom-viewer";
 
 import { ActivityIndicator } from "react-native";
@@ -15,6 +16,7 @@ import {
   StyleSheet,
   Alert,
   Image,
+  Text,
   TouchableOpacity,
 } from "react-native";
 
@@ -34,9 +36,11 @@ export default function Chat({ chatId }) {
   const [modalImageURL, setModalImageURL] = useState("");
   const [loading, setLoading] = useState(false);
   const { user } = useContext(AuthUserContext);
+
   const userId = user ? user.uid : null;
   const userName = user ? user.displayName : "Неизвестный";
   const userAvatar = user ? user.photoURL : null;
+  const userEmail = user ? user.email : null;
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -100,6 +104,9 @@ export default function Chat({ chatId }) {
               createdAt: new Date(),
               user: {
                 _id: userId,
+                name: userEmail,
+                avatar: userAvatar,
+                email: userEmail,
               },
             },
           ])
@@ -115,18 +122,32 @@ export default function Chat({ chatId }) {
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
-        console.error("Permission denied");
+        alert("Для сохранения фото нужно разрешение");
         return;
       }
       setLoading(true);
-      const fileUri = FileSystem.cacheDirectory + "photo.jpg";
-      await FileSystem.downloadAsync(imageUri, fileUri);
-      const asset = await MediaLibrary.createAssetAsync(fileUri);
-      await MediaLibrary.createAlbumAsync("Download", [asset], false);
-      Alert.alert("Фото успешно загружено");
-      setLoading(false);
+
+      // Генерируем локальный URI для изображения на основе текущего времени
+      const fileName = imageUri.split("/").pop();
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+
+      // Загружаем изображение из сети в локальное хранилище
+      const downloadResult = await FileSystem.downloadAsync(imageUri, fileUri);
+
+      // Сохраняем изображение из локального хранилища в альбом на устройстве
+      const asset = await MediaLibrary.createAssetAsync(downloadResult.uri);
+      const album = await MediaLibrary.getAlbumAsync("Скачанные из чата");
+      if (album === null) {
+        await MediaLibrary.createAlbumAsync("Скачанные из чата", asset, false);
+      } else {
+        await MediaLibrary.addAssetsToAlbumAsync([asset], album.id, false);
+      }
+      alert("Фото успешно загружено в галерею");
     } catch (error) {
-      console.error("Ошибка скачивания фотографии:", error);
+      console.error("Ошибка при сохранении фото:", error);
+      alert("Ошибка при сохранении фото");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -141,6 +162,8 @@ export default function Chat({ chatId }) {
       user: {
         _id: userId,
         name: userName,
+        avatar: userAvatar,
+        email: userEmail,
       },
     };
 
@@ -150,25 +173,57 @@ export default function Chat({ chatId }) {
       console.error("Error sending message:", error);
     }
   };
+  const renderBubble = (props) => {
+    return (
+      <View style={{ maxWidth: "70%", marginVertical: 6 }}>
+        {props.position === "left" && (
+          <Text
+            style={{
+              marginBottom: 5,
+              marginLeft: 0,
+              fontSize: 14,
+              color: "#DB5000",
+              fontWeight: "500",
+            }}
+          >
+            {props.currentMessage.user.name}
+          </Text>
+        )}
+        <Bubble
+          {...props}
+          wrapperStyle={{
+            left: { backgroundColor: "#F0F0F0" },
+            right: { backgroundColor: "rgba(219, 80, 0, 0.7)" },
+          }}
+        />
+      </View>
+    );
+  };
 
   const renderAvatar = (props) => {
+    // Получаем аватар email отправителя из текущего сообщения
+    const messageUserAvatar = props.currentMessage.user.avatar;
+    const messageUserEmail = props.currentMessage.user.email;
+
     return (
       <View>
-        {userAvatar ? (
-          <Avatar.Image size={60} source={{ uri: userAvatar }} />
+        {messageUserAvatar ? (
+          <Avatar.Image size={60} source={{ uri: messageUserAvatar }} />
         ) : (
           <Avatar.Text
             size={60}
-            label={user.email ? user.email[0].toUpperCase() : ""}
+            label={messageUserEmail ? messageUserEmail[0].toUpperCase() : ""}
             style={{ color: "#fff" }}
           />
         )}
       </View>
     );
   };
+
   const renderUsername = (props) => {
     const { currentMessage } = props;
 
+    // Сравниваем ID отправителя сообщения с ID текущего пользователя
     return (
       <View style={styles.usernameContainer}>
         <Text style={styles.usernameText}>
@@ -185,19 +240,14 @@ export default function Chat({ chatId }) {
         onSend={onSend}
         user={{
           _id: userId,
+          name: userName,
+          avatar: userAvatar,
+          email: userEmail,
         }}
         messagesContainerStyle={styles.container}
         renderUsername={renderUsername}
         renderAvatar={renderAvatar}
-        renderBubble={(props) => (
-          <Bubble
-            {...props}
-            wrapperStyle={{
-              left: { backgroundColor: "F5F5F5" },
-              right: { backgroundColor: "rgba(255, 174, 37, 1)" },
-            }}
-          />
-        )}
+        renderBubble={renderBubble}
         renderMessageImage={(props) => (
           <TouchableOpacity
             onPress={() => handleOpenModal(props.currentMessage.image)}
@@ -207,7 +257,7 @@ export default function Chat({ chatId }) {
             ) : ( */}
             <Image
               source={{ uri: props.currentMessage.image }}
-              style={{ width: 150, height: 100 }} // Укажите размер миниатюры изображения
+              style={{ width: 150, height: 100 }}
               resizeMode="cover"
             />
             {/* )} */}
@@ -235,25 +285,25 @@ export default function Chat({ chatId }) {
             backgroundColor: "rgba(0, 0, 0, 0.8)",
           }}
           onPress={() => setModalVisible(false)}
+          activeOpacity={1}
         >
-          {/* {!loading ? ( // Проверяем состояние загрузки, если true, отображаем Loader
-            <ActivityIndicator size="large" color="#fff" />
-          ) : ( */}
-          <>
-            <Image
-              source={{ uri: modalImageURL }}
-              style={{ width: "100%", height: "100%" }}
-              resizeMode="contain"
-            />
-
-            <TouchableOpacity
-              style={styles.downloadButton}
-              onPress={() => handleDownloadPhoto(modalImageURL)}
-            >
-              <FontAwesome name="download" size={24} color="#DB5000" />
-            </TouchableOpacity>
-          </>
-          {/* )} */}
+          <Image
+            source={{ uri: modalImageURL }}
+            style={{ width: "100%", height: "100%", resizeMode: "contain" }}
+          />
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              bottom: 20,
+              right: 20,
+              backgroundColor: "rgba(0, 0, 0, 0.6)",
+              padding: 10,
+              borderRadius: 30,
+            }}
+            onPress={() => handleDownloadPhoto(modalImageURL)}
+          >
+            <FontAwesome name="download" size={24} color="#FFF" />
+          </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
     </View>
@@ -269,5 +319,4 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   downloadButton: { marginTop: 20 },
-  usernameText: { color: "red" },
 });

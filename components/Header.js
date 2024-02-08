@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { AuthUserContext } from "../AuthContext";
+import { Platform } from "react-native";
 import UserProfile from "../components/UserProfile";
 
 const Header = ({ title, subtitle, name }) => {

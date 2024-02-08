@@ -18,6 +18,7 @@ import { auth } from "../config/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
@@ -30,7 +31,7 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isEmailModalVisible, setIsEmailModalVisible] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
-
+  const navigation = useNavigation();
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
