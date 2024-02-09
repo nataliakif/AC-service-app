@@ -13,7 +13,7 @@ async function getPriceFromDB() {
   const dataRef = ref(db, "price");
 
   onValue(dataRef, (snapshot) => {
-    partListData = snapshot.val();
+    partListData = Object.values(snapshot.val());
   });
 }
 getPriceFromDB();

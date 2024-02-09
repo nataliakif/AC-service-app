@@ -28,7 +28,7 @@ export default function DetailsScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.linkB} onPress={handlePriceEditorClick}>
-          <Text style={styles.linkText}>Изменить цены</Text>
+          <Text style={styles.linkText}>Изменить прайс лист</Text>
         </TouchableOpacity>
         {showCreateUser && (
           <CreateUser onClose={() => setShowCreateUser(false)} />

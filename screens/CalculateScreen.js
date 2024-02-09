@@ -44,10 +44,10 @@ import {
 
 export let partListData = [];
 async function getPriceFromDB() {
-  const dataRef = ref(db, "price");
+  const dataRef = ref(db, "price/");
 
   onValue(dataRef, (snapshot) => {
-    partListData = snapshot.val();
+    partListData = Object.values(snapshot.val());
   });
 }
 
@@ -489,7 +489,7 @@ export default function CalculateScreen() {
                 setShowParamsDialog={setShowSpecificPartsDialog}
                 setSelectedPartToRepair={setSpecificPartToRepair}
                 onAddPart={addPartToSelectedOnes}
-                specificDetailAdding={true}
+                specificDetailAdding={specificPartToRepair.specific}
               />
             )}
 
@@ -521,7 +521,7 @@ export default function CalculateScreen() {
                             part.workAmount.paintPrice[paintCategory] || 0,
                           orderNewDetailPrice: 0,
                         },
-                        specific: true,
+                        specific: false,
                         photoURL: [],
                       });
                     }}
@@ -544,7 +544,7 @@ export default function CalculateScreen() {
                       specific: true,
                     });
                   }}
-                  title={"..."}
+                  title={"... Другое"}
                 />
               </ScrollView>
 
