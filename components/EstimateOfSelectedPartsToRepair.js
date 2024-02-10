@@ -16,6 +16,7 @@ export default function EstimateOfSelectedPartsToRepair({
   carModel = "",
   changeParamsOfPartFromEstimate,
   editable = true,
+  hideInfoFromCustomer = false,
 }) {
   return (
     <View style={{ display: "flex", alignItems: "center", paddingTop: 15 }}>
@@ -24,6 +25,12 @@ export default function EstimateOfSelectedPartsToRepair({
           style={
             isPartsSelectorExpanded
               ? styles.totalPriceContExp
+              : hideInfoFromCustomer
+              ? {
+                  ...styles.totalPriceCont,
+                  marginTop: 5,
+                  marginBottom: 5,
+                }
               : styles.totalPriceCont
           }
         >
@@ -32,7 +39,7 @@ export default function EstimateOfSelectedPartsToRepair({
               <Text style={styles.totalPrice}>
                 {selectedPartsToRepair
                   .map((part) => calculateTotalSumPerPart(part.workAmount))
-                  .reduce((prev, cur) => prev + cur, 0) + ` UAH`}
+                  .reduce((prev, cur) => prev + cur, 0) + ` $ `}
               </Text>
               <Text style={styles.priceText}>Стоимость</Text>
             </>
@@ -56,6 +63,7 @@ export default function EstimateOfSelectedPartsToRepair({
               partIndex={partIndex}
               changeParamsOfPartFromEstimate={changeParamsOfPartFromEstimate}
               editable={editable}
+              hideInfoFromCustomer={hideInfoFromCustomer}
             />
 
             <Divider style={styles.divider} />

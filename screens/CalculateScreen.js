@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Animated,
@@ -26,6 +26,10 @@ import uuid from "react-native-uuid";
 import { ref, set, update, remove, onValue } from "firebase/database";
 import { db } from "../config/firebase";
 
+import ViewShot from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
+
 import CarPartsSelector from "../components/CarPartsSelector";
 import EstimateOfSelectedPartsToRepair from "../components/EstimateOfSelectedPartsToRepair";
 import PartParamsAddDialog from "../components/PartParamsAddDialog";
@@ -44,23 +48,17 @@ import {
 
 export let partListData = [];
 async function getPriceFromDB() {
-  const dataRef = ref(db, "price");
+  const dataRef = ref(db, "price/");
 
   onValue(dataRef, (snapshot) => {
-    partListData = snapshot.val();
+    partListData = Object.values(snapshot.val());
   });
 }
 
-export async function savePriceToDb(price) {
-  set(ref(db, "price"), price);
-}
-
 export const vocabularyTasks = {
-  mountingTime: "снятие / установка",
-  assemblingTime: "разборка / сборка",
-  repairTime: "ремонт / рихтовка",
+  assemblingPrice: "разборка / сборка",
+  repairPrice: "ремонт / рихтовка",
   paintPrice: "покраска",
-  //polishingPrice: "полировка",
   orderNewDetailPrice: "заказ новой детали",
 };
 
@@ -90,6 +88,8 @@ export default function CalculateScreen() {
   const navigation = useNavigation();
   const [editMode, setEditMode] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const viewShotRef = useRef();
+  const [makeScreenShot, setMakeScreenShot] = useState(false);
 
   getPriceFromDB();
 
@@ -261,6 +261,19 @@ export default function CalculateScreen() {
     ]);
   };
 
+  const handleCapture = async () => {
+    try {
+      const uri = await viewShotRef.current.capture();
+      await Sharing.shareAsync(uri, {
+        mimeType: "image/jpeg",
+        dialogTitle: "Send to",
+      });
+    } catch (error) {
+      console.error("Помилка при створенні скріншота:", error);
+    }
+    setMakeScreenShot(false);
+  };
+
   return (
     <MenuProvider>
       <Provider>
@@ -424,21 +437,32 @@ export default function CalculateScreen() {
               <ScrollView style={styles.scrollContainer} alwaysBounceVertical>
                 {selectedPartsToRepair.length > 0 && (
                   <>
-                    <EstimateOfSelectedPartsToRepair
-                      selectedPartsToRepair={selectedPartsToRepair}
-                      isPartsSelectorExpanded={isPartsSelectorExpanded}
-                      onRemoveFromEstimate={removePartFromSelectedOnes}
-                      setShowAddCarInfoForm={setShowAddCarInfoForm}
-                      setPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
-                      removePhotoURLFromSelectedPart={
-                        removePhotoURLFromSelectedPart
-                      }
-                      carModel={carInfo.model}
-                      canAddPhoto={editMode}
-                      changeParamsOfPartFromEstimate={
-                        changeParamsOfPartFromEstimate
-                      }
-                    />
+                    <ViewShot
+                      style={{ backgroundColor: "#fff" }}
+                      ref={viewShotRef}
+                      options={{ format: "jpg", quality: 0.9 }}
+                    >
+                      <EstimateOfSelectedPartsToRepair
+                        selectedPartsToRepair={selectedPartsToRepair}
+                        isPartsSelectorExpanded={isPartsSelectorExpanded}
+                        onRemoveFromEstimate={removePartFromSelectedOnes}
+                        setShowAddCarInfoForm={setShowAddCarInfoForm}
+                        setPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
+                        removePhotoURLFromSelectedPart={
+                          removePhotoURLFromSelectedPart
+                        }
+                        carModel={
+                          makeScreenShot
+                            ? carInfo.model + " " + carInfo.owner
+                            : carInfo.model
+                        }
+                        canAddPhoto={editMode}
+                        changeParamsOfPartFromEstimate={
+                          changeParamsOfPartFromEstimate
+                        }
+                        hideInfoFromCustomer={makeScreenShot}
+                      />
+                    </ViewShot>
 
                     <View style={styles.buttonContainer}>
                       {/* <TouchableOpacity
@@ -473,18 +497,31 @@ export default function CalculateScreen() {
               </ScrollView>
 
               {!isPartsSelectorExpanded && (
-                <View style={styles.expandBtn}>
-                  <IconButton
-                    icon={(props) => (
-                      <Ionicons name="car-sport-outline" {...props} />
-                    )}
-                    onPress={() => setIsPartsSelectorExpanded(true)}
-                  />
-                  <Ionicons
-                    style={{ position: "absolute", top: 35 }}
-                    name="chevron-down-outline"
-                  />
-                </View>
+                <>
+                  <View style={styles.expandBtn}>
+                    <IconButton
+                      icon={(props) => (
+                        <Ionicons name="car-sport-outline" {...props} />
+                      )}
+                      onPress={() => setIsPartsSelectorExpanded(true)}
+                    />
+                    <Ionicons
+                      style={{ position: "absolute", top: 35 }}
+                      name="chevron-down-outline"
+                    />
+                  </View>
+                  <View style={styles.exportBtn}>
+                    <IconButton
+                      icon={(props) => (
+                        <Ionicons name="send-outline" {...props} />
+                      )}
+                      onPress={() => {
+                        setMakeScreenShot(true);
+                        handleCapture();
+                      }}
+                    />
+                  </View>
+                </>
               )}
             </View>
 
@@ -495,7 +532,7 @@ export default function CalculateScreen() {
                 setShowParamsDialog={setShowSpecificPartsDialog}
                 setSelectedPartToRepair={setSpecificPartToRepair}
                 onAddPart={addPartToSelectedOnes}
-                specificDetailAdding={true}
+                specificDetailAdding={specificPartToRepair.specific}
               />
             )}
 
@@ -510,6 +547,7 @@ export default function CalculateScreen() {
                   ...styles.partListDialog,
                 }}
               >
+                {/* добавление деталей из базы в меню "ВЫБОР ДЕТАЛИ" */}
                 {partListData.map((part, index) => (
                   <ListItem
                     key={index}
@@ -519,16 +557,14 @@ export default function CalculateScreen() {
                       setSpecificPartToRepair({
                         partName: part.partName,
                         workAmount: {
-                          mountingTime:
-                            part.workAmount.mountingTime[carCategory],
-                          assemblingTime:
-                            part.workAmount.assemblingTime[carCategory],
-                          repairTime: part.workAmount.repairTime,
-                          paintPrice: part.workAmount.paintPrice[paintCategory],
-                          repairTime: 0,
+                          assemblingPrice:
+                            part.workAmount.assemblingPrice[carCategory] || 0,
+                          repairPrice: part.workAmount.repairPrice || 0,
+                          paintPrice:
+                            part.workAmount.paintPrice[paintCategory] || 0,
                           orderNewDetailPrice: 0,
                         },
-                        specific: true,
+                        specific: false,
                         photoURL: [],
                       });
                     }}
@@ -542,18 +578,16 @@ export default function CalculateScreen() {
                     setSpecificPartToRepair({
                       partName: "",
                       workAmount: {
-                        mountingTime: 0,
-                        assemblingTime: 0,
-                        repairTime: 0,
+                        assemblingPrice: 0,
                         paintPrice: 0,
-                        repairTime: 0,
+                        repairPrice: 0,
                         orderNewDetailPrice: 0,
                       },
                       photoURL: [],
                       specific: true,
                     });
                   }}
-                  title={"..."}
+                  title={"... Другое"}
                 />
               </ScrollView>
 
@@ -712,6 +746,7 @@ export default function CalculateScreen() {
 const styles = StyleSheet.create({
   scrollContainer: { width: "100%" },
   container: {
+    backgroundColor: "#fff",
     position: "relative",
     height: "100%",
     alignItems: "center",
@@ -732,6 +767,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "absolute",
     top: 40,
+  },
+
+  exportBtn: {
+    alignItems: "center",
+    position: "absolute",
+    top: 40,
+    right: 5,
   },
 
   paramsSwitcherCont: {
