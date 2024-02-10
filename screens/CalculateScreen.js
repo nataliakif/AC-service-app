@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Animated,
@@ -25,6 +25,10 @@ import { AntDesign } from "@expo/vector-icons";
 import uuid from "react-native-uuid";
 import { ref, set, update, remove, onValue } from "firebase/database";
 import { db } from "../config/firebase";
+
+import ViewShot from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
 
 import CarPartsSelector from "../components/CarPartsSelector";
 import EstimateOfSelectedPartsToRepair from "../components/EstimateOfSelectedPartsToRepair";
@@ -84,6 +88,8 @@ export default function CalculateScreen() {
   const navigation = useNavigation();
   const [editMode, setEditMode] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const viewShotRef = useRef();
+  const [makeScreenShot, setMakeScreenShot] = useState(false);
 
   getPriceFromDB();
 
@@ -255,6 +261,19 @@ export default function CalculateScreen() {
     ]);
   };
 
+  const handleCapture = async () => {
+    try {
+      const uri = await viewShotRef.current.capture();
+      await Sharing.shareAsync(uri, {
+        mimeType: "image/jpeg",
+        dialogTitle: "Send to",
+      });
+    } catch (error) {
+      console.error("Помилка при створенні скріншота:", error);
+    }
+    setMakeScreenShot(false);
+  };
+
   return (
     <MenuProvider>
       <Provider>
@@ -418,21 +437,32 @@ export default function CalculateScreen() {
               <ScrollView style={styles.scrollContainer} alwaysBounceVertical>
                 {selectedPartsToRepair.length > 0 && (
                   <>
-                    <EstimateOfSelectedPartsToRepair
-                      selectedPartsToRepair={selectedPartsToRepair}
-                      isPartsSelectorExpanded={isPartsSelectorExpanded}
-                      onRemoveFromEstimate={removePartFromSelectedOnes}
-                      setShowAddCarInfoForm={setShowAddCarInfoForm}
-                      setPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
-                      removePhotoURLFromSelectedPart={
-                        removePhotoURLFromSelectedPart
-                      }
-                      carModel={carInfo.model}
-                      canAddPhoto={editMode}
-                      changeParamsOfPartFromEstimate={
-                        changeParamsOfPartFromEstimate
-                      }
-                    />
+                    <ViewShot
+                      style={{ backgroundColor: "#fff" }}
+                      ref={viewShotRef}
+                      options={{ format: "jpg", quality: 0.9 }}
+                    >
+                      <EstimateOfSelectedPartsToRepair
+                        selectedPartsToRepair={selectedPartsToRepair}
+                        isPartsSelectorExpanded={isPartsSelectorExpanded}
+                        onRemoveFromEstimate={removePartFromSelectedOnes}
+                        setShowAddCarInfoForm={setShowAddCarInfoForm}
+                        setPhotoURLToSelectedPart={setPhotoURLToSelectedPart}
+                        removePhotoURLFromSelectedPart={
+                          removePhotoURLFromSelectedPart
+                        }
+                        carModel={
+                          makeScreenShot
+                            ? carInfo.model + " " + carInfo.owner
+                            : carInfo.model
+                        }
+                        canAddPhoto={editMode}
+                        changeParamsOfPartFromEstimate={
+                          changeParamsOfPartFromEstimate
+                        }
+                        hideInfoFromCustomer={makeScreenShot}
+                      />
+                    </ViewShot>
 
                     <View style={styles.buttonContainer}>
                       {/* <TouchableOpacity
@@ -467,18 +497,31 @@ export default function CalculateScreen() {
               </ScrollView>
 
               {!isPartsSelectorExpanded && (
-                <View style={styles.expandBtn}>
-                  <IconButton
-                    icon={(props) => (
-                      <Ionicons name="car-sport-outline" {...props} />
-                    )}
-                    onPress={() => setIsPartsSelectorExpanded(true)}
-                  />
-                  <Ionicons
-                    style={{ position: "absolute", top: 35 }}
-                    name="chevron-down-outline"
-                  />
-                </View>
+                <>
+                  <View style={styles.expandBtn}>
+                    <IconButton
+                      icon={(props) => (
+                        <Ionicons name="car-sport-outline" {...props} />
+                      )}
+                      onPress={() => setIsPartsSelectorExpanded(true)}
+                    />
+                    <Ionicons
+                      style={{ position: "absolute", top: 35 }}
+                      name="chevron-down-outline"
+                    />
+                  </View>
+                  <View style={styles.exportBtn}>
+                    <IconButton
+                      icon={(props) => (
+                        <Ionicons name="send-outline" {...props} />
+                      )}
+                      onPress={() => {
+                        setMakeScreenShot(true);
+                        handleCapture();
+                      }}
+                    />
+                  </View>
+                </>
               )}
             </View>
 
@@ -703,6 +746,7 @@ export default function CalculateScreen() {
 const styles = StyleSheet.create({
   scrollContainer: { width: "100%" },
   container: {
+    backgroundColor: "#fff",
     position: "relative",
     height: "100%",
     alignItems: "center",
@@ -723,6 +767,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "absolute",
     top: 40,
+  },
+
+  exportBtn: {
+    alignItems: "center",
+    position: "absolute",
+    top: 40,
+    right: 5,
   },
 
   paramsSwitcherCont: {

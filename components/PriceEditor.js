@@ -38,14 +38,8 @@ async function getPriceFromDB() {
 
 getPriceFromDB();
 
-/* savePriceToDb(
-  partListData.map((item) => {
-    return { id: uuid.v1(), ...item };
-  })
-); */
-
 async function saveNewPriceItemToDb(item) {
-  set(ref(db, "price/" + uuid.v1()), item).then(() => {
+  set(ref(db, "price/" + item.id), item).then(() => {
     Toast.show({
       type: "success",
       text1: `"${item.partName}" добавлен в базу данных`,
@@ -132,6 +126,10 @@ const PartPriceEditor = ({
     };
     if (newPriceItemAdding) {
       updatedPart.partName = newPriceItemName;
+      updatedPart.id = uuid.v1();
+      saveNewPriceItemToDb(updatedPart);
+      onSave(updatedPart);
+      return;
     }
     onSave(updatedPart);
     setWasEdited(false);
@@ -281,6 +279,14 @@ const PriceEditor = () => {
     });
   };
 
+  const handleAddPartToPrice = (part) => {
+    setShowAddPartPriceDialog(false);
+    setPrices((prevPrices) => {
+      return [part, ...prevPrices];
+    });
+    console.log(part);
+  };
+
   return (
     <Provider>
       {showAddPartPriceDialog && (
@@ -293,7 +299,7 @@ const PriceEditor = () => {
           <View style={{ padding: 5 }}>
             <PartPriceEditor
               newPriceItemAdding
-              onSave={saveNewPriceItemToDb}
+              onSave={handleAddPartToPrice}
               part={{
                 workAmount: {
                   assemblingPrice: [0, 0, 0],
@@ -306,21 +312,21 @@ const PriceEditor = () => {
       )}
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <>
-          <IconButton
-            color="#fff"
-            backgroundColor="#DB5000"
-            icon={(props) => (
-              <Ionicons
-                name="add-outline"
-                {...props}
-                onPress={() => {
-                  console.log("Показ");
-                  setShowAddPartPriceDialog(true);
-                }}
-              />
-            )}
-          />
           <ScrollView style={styles.container}>
+            <IconButton
+              color="#fff"
+              backgroundColor="#DB5000"
+              icon={(props) => (
+                <Ionicons
+                  name="add-outline"
+                  {...props}
+                  onPress={() => {
+                    console.log("Показ");
+                    setShowAddPartPriceDialog(true);
+                  }}
+                />
+              )}
+            />
             {prices.map((part) => (
               <PartPriceEditor
                 key={part.id}
