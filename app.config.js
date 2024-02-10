@@ -4,7 +4,7 @@ export default {
   expo: {
     name: "AC-service-app",
     slug: "ac-service-app",
-    version: "1.0.0",
+    version: "1.3.0",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
@@ -18,7 +18,7 @@ export default {
     assetBundlePatterns: ["**/*"],
     ios: {
       bundleIdentifier: "com.ac-service.ac-service",
-      buildNumber: "1.0.0",
+      buildNumber: "1.3.0",
     },
     android: {
       package: "com.ac.service",

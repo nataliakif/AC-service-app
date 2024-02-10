@@ -30,13 +30,15 @@ function AuthStack() {
 
 function AppStack() {
   const [editable, setEditable] = useState(true);
-  checkCurrentUserAdmin()
-    .then((isAdmin) => {
-      setEditable(isAdmin);
-    })
-    .catch((error) => {
-      console.error("Error fetching user admin status:", error);
-    });
+  useEffect(() => {
+    checkCurrentUserAdmin()
+      .then((isAdmin) => {
+        setEditable(isAdmin);
+      })
+      .catch((error) => {
+        console.error("Error fetching user admin status:", error);
+      });
+  }, []);
 
   return (
     <Tab.Navigator
