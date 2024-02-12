@@ -41,6 +41,7 @@ const LoginForm = () => {
       signInWithEmailAndPassword(auth, email, password)
         .then(() => {
           console.log("login success");
+          // Здесь код обновления состояния user
         })
         .catch((err) => {
           Alert.alert("Login Error", err.message);

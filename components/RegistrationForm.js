@@ -52,7 +52,7 @@ const RegistrationForm = () => {
         });
 
         Alert.alert("Успех", "Пользователь успешно зарегистрирован:");
-        navigation.navigate("Логин"); // предполагается, что ваш экран для входа называется 'Login'
+        navigation.navigate("Логин");
       } catch (error) {
         Alert.alert("Ошибка", "Не удалось создать пользователя", error);
         console.error("Error creating user:", error);
