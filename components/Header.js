@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { AuthUserContext } from "../AuthContext";
 import { Platform } from "react-native";
 import UserProfile from "../components/UserProfile";
+import { Platform } from "react-native";
 
 const Header = ({ title, subtitle, name }) => {
   const { user } = useContext(AuthUserContext);

@@ -42,6 +42,7 @@ export default function PartRepairExpandableItem({
   changeParamsOfPartFromEstimate,
   setPhotoURLToSelectedPart,
   editable = true,
+  hideInfoFromCustomer = false,
 }) {
   const [itemBaseHeight] = useState(new Animated.Value(0));
   const [expanded, setExpanded] = useState(isExpanded);
@@ -82,7 +83,7 @@ export default function PartRepairExpandableItem({
       >
         <View style={styles.titleCont}>
           <View style={styles.partNameTitleCont}>
-            {canAddPhoto && (
+            {!hideInfoFromCustomer && canAddPhoto && (
               <TouchableOpacity
                 onPress={async () => {
                   //show part photo manager
@@ -97,7 +98,8 @@ export default function PartRepairExpandableItem({
               </TouchableOpacity>
             )}
 
-            {!canAddPhoto && <Gear style={styles.icon} />}
+            {!canAddPhoto ||
+              (hideInfoFromCustomer && <Gear style={styles.icon} />)}
 
             {specificDetailAdding ? (
               <TextInput
@@ -124,20 +126,23 @@ export default function PartRepairExpandableItem({
               <Text style={styles.priceText}>
                 {`${calculateTotalSumPerPart(
                   selectedPartToRepair.workAmount
-                )} UAH`}
+                )} $`}
               </Text>
             </View>
           )}
-          {name !== "В работе" && name !== "Сервис" && canBeRemoved && (
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                onRemoveFromSelected(selectedPartToRepair.partName);
-              }}
-            >
-              <Text style={styles.buttonText}>Удалить</Text>
-            </TouchableOpacity>
-          )}
+          {name !== "В работе" &&
+            name !== "Сервис" &&
+            canBeRemoved &&
+            !hideInfoFromCustomer && (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                  onRemoveFromSelected(selectedPartToRepair.partName);
+                }}
+              >
+                <Text style={styles.buttonText}>Удалить</Text>
+              </TouchableOpacity>
+            )}
         </View>
       </TouchableOpacity>
 
