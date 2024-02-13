@@ -2,7 +2,7 @@ import { StyleSheet, View, Text } from "react-native";
 import { Divider } from "@react-native-material/core";
 
 import PartRepairExpandableItem from "./PartRepairExpandableItem";
-import React from "react";
+import React, { useEffect } from "react";
 
 import { calculateTotalSumPerPart } from "../components/PartRepairExpandableItem";
 
