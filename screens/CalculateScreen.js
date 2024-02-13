@@ -13,10 +13,10 @@ import {
   Provider,
   DialogActions,
   Dialog,
-  Button,
   ListItem,
   DialogHeader,
 } from "@react-native-material/core";
+import { Button } from "react-native-paper";
 import Toast from "react-native-toast-message";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import GestureRecognizer from "react-native-swipe-detect";
@@ -270,8 +270,9 @@ export default function CalculateScreen() {
       });
     } catch (error) {
       console.error("Помилка при створенні скріншота:", error);
+    } finally {
+      setMakeScreenShot(false);
     }
-    setMakeScreenShot(false);
   };
 
   return (
@@ -287,6 +288,7 @@ export default function CalculateScreen() {
               }}
               title="Виберите категорию авто и цвета"
             />
+
             <View style={styles.paramsSwitcherCont}>
               <View style={styles.paramsSwitcherView}>
                 <Ionicons size={25} name="car-outline" />
@@ -306,18 +308,19 @@ export default function CalculateScreen() {
             </View>
             <DialogActions>
               <Button
-                title="Сохранить"
-                variant="text"
+                mode="contained"
                 onPress={() => {
                   setShowCarStartParamsDialog(false);
                 }}
-                color="#fff"
                 style={{
                   backgroundColor: "#DB5000",
-                  flex: 2,
+                  flex: 1,
+                  borderRadius: 5,
                   textTransform: "none",
                 }}
-              />
+              >
+                Сохранить
+              </Button>
             </DialogActions>
           </Dialog>
         )}
@@ -326,47 +329,57 @@ export default function CalculateScreen() {
           <>
             <View style={styles.container}>
               <View style={styles.headerContainer}>
-                <IconButton
-                  color="#fff"
-                  backgroundColor="#DB5000"
-                  icon={(props) => (
-                    <Ionicons
-                      name="add-outline"
-                      {...props}
-                      onPress={() => {
-                        setShowPartsListDialog(true);
-                      }}
-                    />
-                  )}
-                />
+                {!makeScreenShot && (
+                  <IconButton
+                    color="#fff"
+                    backgroundColor="#DB5000"
+                    icon={(props) => (
+                      <Ionicons
+                        name="add-outline"
+                        {...props}
+                        onPress={() => {
+                          setShowPartsListDialog(true);
+                        }}
+                      />
+                    )}
+                  />
+                )}
 
-                <TouchableOpacity
-                  style={styles.currentCarCategory}
-                  onPress={() => setShowCarStartParamsDialog(true)}
-                >
-                  <Ionicons size={25} name="car-outline" />
-                  <Text style>
-                    {" "}
-                    -{" "}
-                    {carCategory === 0 ? "I" : carCategory === 1 ? "II" : "III"}
-                  </Text>
-                </TouchableOpacity>
+                {!makeScreenShot && (
+                  <>
+                    <TouchableOpacity
+                      style={styles.currentCarCategory}
+                      onPress={() => setShowCarStartParamsDialog(true)}
+                    >
+                      <Ionicons size={25} name="car-outline" />
+                      <Text style>
+                        {" "}
+                        -{" "}
+                        {carCategory === 0
+                          ? "I"
+                          : carCategory === 1
+                          ? "II"
+                          : "III"}
+                      </Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.currentPaintCategory}
-                  onPress={() => setShowCarStartParamsDialog(true)}
-                >
-                  <Ionicons size={25} name="color-palette-outline" />
-                  <Text style>
-                    {" "}
-                    -{" "}
-                    {paintCategory === 0
-                      ? "I"
-                      : paintCategory === 1
-                      ? "II"
-                      : "III"}
-                  </Text>
-                </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.currentPaintCategory}
+                      onPress={() => setShowCarStartParamsDialog(true)}
+                    >
+                      <Ionicons size={25} name="color-palette-outline" />
+                      <Text style>
+                        {" "}
+                        -{" "}
+                        {paintCategory === 0
+                          ? "I"
+                          : paintCategory === 1
+                          ? "II"
+                          : "III"}
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
 
                 {!editMode && (
                   <IconButton
@@ -394,7 +407,7 @@ export default function CalculateScreen() {
                   />
                 )}
 
-                {editMode && (
+                {editMode && !makeScreenShot && (
                   <IconButton
                     color="#fff"
                     backgroundColor="#DB5000"
@@ -463,9 +476,9 @@ export default function CalculateScreen() {
                         hideInfoFromCustomer={makeScreenShot}
                       />
                     </ViewShot>
-
-                    <View style={styles.buttonContainer}>
-                      {/* <TouchableOpacity
+                    {!makeScreenShot && (
+                      <View style={styles.buttonContainer}>
+                        {/* <TouchableOpacity
                       activeOpacity={0.7}
                       style={styles.button}
                       onPress={() => {
@@ -474,53 +487,76 @@ export default function CalculateScreen() {
                     >
                       <Text style={styles.buttonText}>Инфо о авто</Text>
                     </TouchableOpacity> */}
-                      <IconButton
-                        /* color="#fff"
+                        <IconButton
+                          /* color="#fff"
                       backgroundColor="#DB5000" */
-                        icon={(props) => (
-                          <Ionicons
-                            name={
-                              carInfo.model
-                                ? "document-text"
-                                : "document-text-outline"
-                            }
-                            {...props}
-                            onPress={() => {
-                              setShowAddCarInfoForm(true);
-                            }}
-                          />
-                        )}
-                      />
-                    </View>
+                          icon={(props) => (
+                            <Ionicons
+                              name={
+                                carInfo.model
+                                  ? "document-text"
+                                  : "document-text-outline"
+                              }
+                              {...props}
+                              onPress={() => {
+                                setShowAddCarInfoForm(true);
+                              }}
+                            />
+                          )}
+                        />
+                      </View>
+                    )}
                   </>
                 )}
               </ScrollView>
 
               {!isPartsSelectorExpanded && (
                 <>
-                  <View style={styles.expandBtn}>
+                  {!makeScreenShot && (
+                    <View style={styles.expandBtn}>
+                      <IconButton
+                        icon={(props) => (
+                          <Ionicons name="car-sport-outline" {...props} />
+                        )}
+                        onPress={() => setIsPartsSelectorExpanded(true)}
+                      />
+                      <Ionicons
+                        style={{ position: "absolute", top: 35 }}
+                        name="chevron-down-outline"
+                      />
+                    </View>
+                  )}
+
+                  <View style={styles.hideInfoBtn}>
                     <IconButton
                       icon={(props) => (
-                        <Ionicons name="car-sport-outline" {...props} />
-                      )}
-                      onPress={() => setIsPartsSelectorExpanded(true)}
-                    />
-                    <Ionicons
-                      style={{ position: "absolute", top: 35 }}
-                      name="chevron-down-outline"
-                    />
-                  </View>
-                  <View style={styles.exportBtn}>
-                    <IconButton
-                      icon={(props) => (
-                        <Ionicons name="send-outline" {...props} />
+                        <Ionicons
+                          name={
+                            makeScreenShot ? `eye-outline` : `eye-off-outline`
+                          }
+                          {...props}
+                        />
                       )}
                       onPress={() => {
-                        setMakeScreenShot(true);
-                        handleCapture();
+                        setMakeScreenShot(!makeScreenShot);
+                        // handleCapture();
                       }}
                     />
                   </View>
+                  {makeScreenShot && (
+                    <View style={styles.exportBtn}>
+                      <IconButton
+                        color="#fff"
+                        backgroundColor="#DB5000"
+                        icon={(props) => (
+                          <Ionicons name="send-outline" {...props} />
+                        )}
+                        onPress={() => {
+                          handleCapture();
+                        }}
+                      />
+                    </View>
+                  )}
                 </>
               )}
             </View>
@@ -639,7 +675,7 @@ export default function CalculateScreen() {
         onPress={() => {
           Alert.alert(
             "Подтверждение",
-            "Вы уверени что хотите выйти без сохранения данных?",
+            "Вы уверены, что хотите выйти без сохранения данных?",
             [
               {
                 text: "Отмена",
@@ -769,10 +805,17 @@ const styles = StyleSheet.create({
     top: 40,
   },
 
+  hideInfoBtn: {
+    alignItems: "center",
+    position: "absolute",
+    top: 50,
+    right: 5,
+  },
+
   exportBtn: {
     alignItems: "center",
     position: "absolute",
-    top: 40,
+    top: 110,
     right: 5,
   },
 

@@ -1,5 +1,6 @@
 import React from "react";
-import { Button, DialogActions, Dialog } from "@react-native-material/core";
+import { DialogActions, Dialog } from "@react-native-material/core";
+import { Button } from "react-native-paper";
 import { View } from "react-native";
 import PartRepairExpandableItem from "./PartRepairExpandableItem";
 
@@ -38,35 +39,39 @@ export default function PartParamsAddDialog({
 
         <DialogActions style={{ marginTop: 60 }}>
           <Button
-            title="Добавить"
-            variant="text"
+            mode="contained"
             style={{
+              borderRadius: 8,
               backgroundColor: "#DB5000",
               flex: 2,
             }}
-            color="#fff"
             onPress={() => {
               onAddPart(selectedPartToRepair);
               setSelectedPartToRepair(null);
               setShowParamsDialog(false);
             }}
-          />
+          >
+            Добавить
+          </Button>
           <Button
-            title="Отмена"
-            variant="text"
+            mode="contained"
+            buttonColor="fff"
+            textColor="#DB5000"
             onPress={() => {
               //console.log("closed");
               setShowParamsDialog(false);
               setSelectedPartToRepair(null);
             }}
-            color="#DB5000"
             style={{
-              borderColor: "#DB5000",
               borderWidth: 1,
+              borderRadius: 8,
+              borderColor: "#DB5000",
               flex: 2,
               marginLeft: 8,
             }}
-          />
+          >
+            Отмена
+          </Button>
         </DialogActions>
       </View>
     </Dialog>

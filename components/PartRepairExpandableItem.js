@@ -59,6 +59,7 @@ export default function PartRepairExpandableItem({
     );
   }
   const subItemHeight = 50;
+
   useEffect(() => {
     Animated.timing(itemBaseHeight, {
       toValue: expanded
@@ -179,7 +180,7 @@ export default function PartRepairExpandableItem({
       )}
       {/* Фото начало */}
 
-      {showPhotoManger && (
+      {!hideInfoFromCustomer && showPhotoManger && (
         <PartPhotosManager
           photoURL={selectedPartToRepair.photoURL}
           removePhotoURLFromSelectedPart={removePhotoURLFromSelectedPart}
