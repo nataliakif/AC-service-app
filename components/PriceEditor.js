@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   Keyboard,
   ScrollView,
   StyleSheet,
@@ -11,6 +10,7 @@ import {
   TouchableWithoutFeedback,
   Alert,
 } from "react-native";
+import { Button } from "react-native-paper";
 import {
   IconButton,
   Dialog,
@@ -243,11 +243,16 @@ const PartPriceEditor = ({
         />
       </View>
       <Button
-        color={wasEdited ? "red" : "#DB5000"}
-        title="Сохранить"
         onPress={handleSave}
+        mode="contained"
         disabled={newPriceItemAdding && newPriceItemName.length < 3}
-      />
+        style={{
+          backgroundColor: wasEdited ? "red" : "#DB5000",
+          borderRadius: 8,
+        }}
+      >
+        Сохранить
+      </Button>
     </View>
   );
 };
@@ -296,7 +301,17 @@ const PriceEditor = () => {
             setShowAddPartPriceDialog(false);
           }}
         >
-          <View style={{ padding: 5 }}>
+          <View style={{ padding: 5, align: "center" }}>
+            <Text
+              style={{
+                display: "flex",
+                textAlign: "center",
+                marginBottom: 5,
+                fontSize: 18,
+              }}
+            >
+              Добавление новой детали
+            </Text>
             <PartPriceEditor
               newPriceItemAdding
               onSave={handleAddPartToPrice}
