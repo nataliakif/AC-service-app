@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   StyleSheet,
   View,
@@ -19,6 +19,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { AuthUserContext } from "../AuthContext";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
@@ -35,11 +36,13 @@ const LoginForm = () => {
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
+  const { handleLogin } = useContext(AuthUserContext);
 
   const handleLoginForm = ({ email, password }) => {
     if (email !== "" && password !== "") {
       signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
+        .then((userCredential) => {
+          handleLogin(userCredential.user);
           console.log("login success");
           // Здесь код обновления состояния user
         })

@@ -51,7 +51,7 @@ const RegistrationForm = () => {
           role: "Сотрудник",
         });
 
-        Alert.alert("Успех", "Пользователь успешно зарегистрирован:");
+        Alert.alert("Пользователь успешно зарегистрирован:");
         navigation.navigate("Логин");
       } catch (error) {
         Alert.alert("Ошибка", "Не удалось создать пользователя", error);
