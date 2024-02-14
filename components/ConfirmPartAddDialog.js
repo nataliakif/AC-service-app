@@ -1,10 +1,10 @@
 import React from "react";
 import {
-  Button,
   DialogHeader,
   DialogActions,
   Dialog,
 } from "@react-native-material/core";
+import { Button } from "react-native-paper";
 import { View } from "react-native";
 
 export default function ConfirmPartAddDialog({
@@ -28,22 +28,34 @@ export default function ConfirmPartAddDialog({
           <DialogHeader title={`${partName}?`} />
           <DialogActions>
             <Button
-              title="Да"
-              variant="text"
-              style={{ backgroundColor: "#DB5000", flex: 2, marginRight: 10 }}
-              color="#fff"
+              mode="contained"
+              style={{
+                backgroundColor: "#DB5000",
+                borderRadius: 8,
+                flex: 2,
+                marginRight: 10,
+              }}
               onPress={() => {
                 showParamsDialog(true);
                 showConfirmDialog(false);
               }}
-            />
+            >
+              Да
+            </Button>
             <Button
-              title="Нет"
-              variant="text"
+              mode="contained"
               onPress={() => showConfirmDialog(false)}
-              color="#DB5000"
-              style={{ borderColor: "#DB5000", borderWidth: 1, flex: 2 }}
-            />
+              buttonColor="fff"
+              textColor="#DB5000"
+              style={{
+                borderColor: "#DB5000",
+                borderRadius: 8,
+                borderWidth: 1,
+                flex: 2,
+              }}
+            >
+              Нет
+            </Button>
           </DialogActions>
         </View>
       </Dialog>
