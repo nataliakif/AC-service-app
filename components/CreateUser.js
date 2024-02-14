@@ -189,7 +189,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 16,
   },
-  pickerItem: {
-    backgroundColor: "red",
-  },
 });

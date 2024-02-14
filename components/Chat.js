@@ -104,7 +104,7 @@ export default function Chat({ chatId }) {
               createdAt: new Date(),
               user: {
                 _id: userId,
-                name: userEmail,
+                name: userName || "Аноним",
                 avatar: userAvatar,
                 email: userEmail,
               },
@@ -159,10 +159,11 @@ export default function Chat({ chatId }) {
       text: text,
       image: image || "",
       createdAt: createdAt || new Date(),
+
       user: {
         _id: userId,
-        name: userName,
-        avatar: userAvatar,
+        name: userName || "Аноним",
+        avatar: userAvatar || null,
         email: userEmail,
       },
     };

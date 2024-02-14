@@ -62,13 +62,15 @@ const uploadImage = async (uri, folderPath) => {
   let downloadURL = "";
 
   try {
-    await uploadTask; // Это дожидается завершения загрузки, но не предоставляет доступ к результату
-    // После завершения загрузки получаем URL
-    downloadURL = await storageRef.getDownloadURL();
-    Toast.show({
-      type: "success",
-      text1: "Фото загружено в облако",
-      visibilityTime: 2000,
+    const uploadTask = storageRef.put(blob);
+    await uploadTask.then(async () => {
+      // После завершения загрузки получаем URL
+      downloadURL = await storageRef.getDownloadURL();
+      Toast.show({
+        type: "success",
+        text1: "Фото загружено в облако",
+        visibilityTime: 2000,
+      });
     });
   } catch (e) {
     Toast.show({

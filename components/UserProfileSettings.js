@@ -27,22 +27,20 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
   useEffect(() => {}, []);
 
   const updateUserProfile = async () => {
-    if (user) {
+    const currentUser = auth.currentUser; // Получаем текущего пользователя напрямую из Firebase
+    console.log("user", currentUser);
+    if (currentUser) {
       try {
         const url = await uploadImage(selectedImage, "avatars");
-
         setPhotoURL(url);
-
-        await updateProfile(user, {
+        await updateProfile(currentUser, {
           displayName: name,
           photoURL: url, // Используем новый URL
         });
-
         closeModal();
-        console.log("Updated");
+        console.log("Profile updated");
       } catch (error) {
         console.error("Error updating user profile:", error);
-        // Обработка ошибок, если не удалось обновить профиль пользователя
       }
     }
   };
@@ -64,8 +62,6 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
 
       if (!result.canceled) {
         setSelectedImage(result.assets[0].uri);
-
-        console.log(selectedImage);
       }
     } catch (error) {
       console.error("Error choosing photo:", error);
