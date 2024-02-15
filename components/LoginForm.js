@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -18,8 +18,6 @@ import { auth } from "../config/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { AuthUserContext } from "../AuthContext";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
@@ -32,19 +30,16 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isEmailModalVisible, setIsEmailModalVisible] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
-  const navigation = useNavigation();
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
-  const { handleLogin } = useContext(AuthUserContext);
 
   const handleLoginForm = ({ email, password }) => {
     if (email !== "" && password !== "") {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          handleLogin(userCredential.user);
-          console.log("login success");
-          // Здесь код обновления состояния user
+          console.log("login success", userCredential.user);
         })
         .catch((err) => {
           Alert.alert("Login Error", err.message);

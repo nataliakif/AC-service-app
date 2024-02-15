@@ -83,4 +83,9 @@ const uploadImage = async (uri, folderPath) => {
   return downloadURL;
 };
 
-export { getUserFromAsyncStorage, checkCurrentUserAdmin, uploadImage };
+export {
+  getUserFromAsyncStorage,
+  updateUserInAsyncStorage,
+  checkCurrentUserAdmin,
+  uploadImage,
+};

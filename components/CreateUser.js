@@ -27,8 +27,17 @@ export default function CreateUser() {
     const fetchUsers = async () => {
       const usersCollection = collection(database, "users");
       const usersSnapshot = await getDocs(usersCollection);
-      const usersList = usersSnapshot.docs.map((doc) => doc.id);
-      setUsers(usersList);
+      // Теперь извлекаем не только id, но и данные документа
+      const usersData = usersSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Фильтруем пользователей, исключая админов
+      const filteredUsers = usersData
+        .filter((user) => user.role !== "Админ")
+        .map((nonAdminUser) => nonAdminUser.id);
+      setUsers(filteredUsers);
     };
 
     fetchUsers();

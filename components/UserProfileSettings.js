@@ -24,7 +24,20 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
   const [photoURL, setPhotoURL] = useState(user.photoURL || "");
   const [selectedImage, setSelectedImage] = useState("");
   const [darkTheme, setDarkTheme] = useState(false);
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      if (currentUser) {
+        // Пользователь вошел в систему
+        console.log("User is signed in", currentUser);
+      } else {
+        // Пользователь не вошел в систему
+        console.log("No user is signed in");
+      }
+    });
+
+    // Отписываемся от слушателя при размонтировании компонента
+    return () => unsubscribe();
+  }, []);
 
   const updateUserProfile = async () => {
     const currentUser = auth.currentUser; // Получаем текущего пользователя напрямую из Firebase
@@ -83,7 +96,7 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
         <Text style={styles.modalTitle}>Настройки</Text>
 
         <View style={styles.avatarContainer}>
-          {photoURL ? (
+          {selectedImage || photoURL ? (
             <Avatar.Image
               size={60}
               source={{ uri: selectedImage || photoURL }}
@@ -96,7 +109,6 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
           )}
           <Button title="Изменить фото" onPress={handleChoosePhoto} />
         </View>
-
         <Text>Изменить имя:</Text>
         <TextInput
           value={name}

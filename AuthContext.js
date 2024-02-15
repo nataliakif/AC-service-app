@@ -22,14 +22,8 @@ export const AuthUserProvider = ({ children }) => {
 
   const handleLogin = async (user) => {
     try {
-      // Проверяем, является ли пользователь только что созданным
-      // Если пользователь только что создан, не выполняем сохранение в AsyncStorage
-      const isNewlyCreatedUser =
-        user.metadata.creationTime === user.metadata.lastSignInTime;
-      if (!isNewlyCreatedUser) {
-        await AsyncStorage.setItem("user", JSON.stringify(user));
-        setUser(user);
-      }
+      await AsyncStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
     } catch (error) {
       console.log(error);
     }
