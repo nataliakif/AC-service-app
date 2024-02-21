@@ -17,6 +17,7 @@ import { updateProfile, sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../config/firebase";
 import * as ImagePicker from "expo-image-picker";
 import { uploadImage } from "./functions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function UserProfileSettings({ settingsVisible, closeModal }) {
   const { user } = useContext(AuthUserContext);
@@ -24,24 +25,25 @@ export default function UserProfileSettings({ settingsVisible, closeModal }) {
   const [photoURL, setPhotoURL] = useState(user.photoURL || "");
   const [selectedImage, setSelectedImage] = useState("");
   const [darkTheme, setDarkTheme] = useState(false);
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      if (currentUser) {
-        // Пользователь вошел в систему
-        console.log("User is signed in", currentUser);
-      } else {
-        // Пользователь не вошел в систему
-        console.log("No user is signed in");
-      }
-    });
+  // useEffect(() => {
+  //   const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+  //     if (currentUser) {
+  //       // Пользователь вошел в систему
+  //       console.log("User is signed in", currentUser);
+  //     } else {
+  //       // Пользователь не вошел в систему
+  //       console.log("No user is signed in");
+  //     }
+  //   });
 
-    // Отписываемся от слушателя при размонтировании компонента
-    return () => unsubscribe();
-  }, []);
+  //   // Отписываемся от слушателя при размонтировании компонента
+  //   return () => unsubscribe();
+  // }, []);
 
   const updateUserProfile = async () => {
     const currentUser = auth.currentUser; // Получаем текущего пользователя напрямую из Firebase
     console.log("user", currentUser);
+
     if (currentUser) {
       try {
         const url = await uploadImage(selectedImage, "avatars");

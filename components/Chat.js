@@ -6,7 +6,13 @@ import * as MediaLibrary from "expo-media-library";
 import { FontAwesome } from "@expo/vector-icons";
 import { AuthUserContext } from "../AuthContext";
 import { Avatar } from "react-native-paper";
-import { doc, setDoc, getDoc } from "@firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+} from "@firebase/firestore";
 
 import ImageZoomViewer from "react-native-image-zoom-viewer";
 
@@ -127,11 +133,21 @@ export default function Chat({ chatId }) {
         return;
       }
       setLoading(true);
+      // Определяем путь к директории
+      const directoryUri = `${FileSystem.documentDirectory}chats/`;
+
+      // Проверяем, существует ли директория
+      const directoryInfo = await FileSystem.getInfoAsync(directoryUri);
+      if (!directoryInfo.exists) {
+        // Если директория не существует, создаем ее
+        await FileSystem.makeDirectoryAsync(directoryUri, {
+          intermediates: true,
+        });
+      }
 
       // Генерируем локальный URI для изображения на основе текущего времени
       const fileName = imageUri.split("/").pop();
       const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-
       // Загружаем изображение из сети в локальное хранилище
       const downloadResult = await FileSystem.downloadAsync(imageUri, fileUri);
 

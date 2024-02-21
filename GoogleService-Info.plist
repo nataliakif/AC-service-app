@@ -32,5 +32,8 @@
 	<string>1:930416677434:ios:26d1a30da995f246d25b03</string>
 	<key>DATABASE_URL</key>
 	<string>https://ac-service-33617-default-rtdb.europe-west1.firebasedatabase.app</string>
+	
+
+
 </dict>
 </plist>
