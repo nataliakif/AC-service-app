@@ -10,57 +10,12 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
-import Toast from "react-native-toast-message";
 
 import { Formik } from "formik";
 import ImagePickerForm from "./ImagePickerForm";
 import { TextInputMask } from "react-native-masked-text";
 
-import { firebase } from "../config/firebase";
-
-export const uploadImage = async (uri) => {
-  const response = await fetch(uri);
-  const blob = await response.blob();
-
-  const filename = uri.substring(uri.lastIndexOf("/") + 1);
-  const storageRef = firebase.storage().ref().child(filename);
-  let downloadURL = "";
-  try {
-    const uploadTask = storageRef.put(blob);
-    await uploadTask;
-    Toast.show({
-      type: "success",
-      text1: "Фото загружено в облако",
-      visibilityTime: 2000,
-    });
-    downloadURL = await storageRef.getDownloadURL();
-  } catch (e) {
-    Toast.show({
-      type: "error",
-      text1: e,
-      visibilityTime: 2000,
-    });
-  }
-  return downloadURL;
-};
-
-export const deletePhotoFromStorage = async (photoURL) => {
-  try {
-    const storageRef = firebase.storage().refFromURL(photoURL);
-    await storageRef.delete();
-    Toast.show({
-      type: "info",
-      text1: "Фото удалено из облака",
-      visibilityTime: 2000,
-    });
-  } catch (error) {
-    Toast.show({
-      type: "error",
-      text1: error,
-      visibilityTime: 2000,
-    });
-  }
-};
+import { uploadImage } from "./functions";
 
 const AddCarInfoForm = ({
   setShowAddCarInfoForm,

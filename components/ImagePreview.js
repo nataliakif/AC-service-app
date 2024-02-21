@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, TouchableOpacity, Image } from "react-native";
 import ImageView from "react-native-image-viewing";
-import { deletePhotoFromStorage } from "./AddCarInfo";
+import { deletePhotoFromStorage } from "./functions";
 import Ionicons from "react-native-vector-icons/Ionicons";
 export const ImagePreview = ({
   imageUrl,

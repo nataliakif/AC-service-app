@@ -11,10 +11,13 @@ import DetailsScreen from "./screens/DetailsScreen";
 import CalculateScreen from "./screens/CalculateScreen";
 import ServiceZonesScreen from "./screens/ServiceZonesScreen";
 import SavedCalculationsScreen from "./screens/SavedCalculationScreen";
-// import ChatsScreen from "./screens/ChatsScreen";
 import { auth } from "./config/firebase";
 import { AuthUserContext, AuthUserProvider } from "./AuthContext";
-import { checkCurrentUserAdmin } from "./components/functions";
+import {
+  checkCurrentUserAdmin,
+  handleUpdateUserToken,
+} from "./components/functions";
+import * as Notifications from "expo-notifications";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -102,8 +105,35 @@ function RootNavigator() {
       setLoading(false);
     });
 
+    async function registerForPushNotificationsAsync() {
+      // Проверяем, есть ли разрешение на получение уведомлений
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      // Теперь, когда мы уверены, что user определён, можно безопасно обновить токен
+      if (user?.email) {
+        handleUpdateUserToken(user.email, token)
+          .then(() => console.log("Token updated for user:", user.email))
+          .catch((error) => console.error("Error updating token:", error));
+      }
+    }
+
+    // Вызываем функцию регистрации уведомлений, если пользователь определён
+    if (user) {
+      registerForPushNotificationsAsync();
+    }
+
     return () => unsubscribe();
-  }, []);
+  }, [user]); // Зависимость от user
 
   if (loading) {
     return (

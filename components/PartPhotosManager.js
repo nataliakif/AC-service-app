@@ -3,7 +3,7 @@ import ImagePreview from "./ImagePreview";
 import { Dimensions, TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import * as ImagePicker from "expo-image-picker";
-import { uploadImage } from "./AddCarInfo";
+import { uploadImage } from "./functions";
 
 const screenWidth = Dimensions.get("window").width;
 // Calculate the width and height of each photo

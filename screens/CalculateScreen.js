@@ -34,7 +34,8 @@ import CarPartsSelector from "../components/CarPartsSelector";
 import EstimateOfSelectedPartsToRepair from "../components/EstimateOfSelectedPartsToRepair";
 import PartParamsAddDialog from "../components/PartParamsAddDialog";
 import ParamsSwitcher from "../components/ParamsSwitcher";
-import AddCarInfo, { deletePhotoFromStorage } from "../components/AddCarInfo";
+import AddCarInfo from "../components/AddCarInfo";
+import  { deletePhotoFromStorage } from "../components/functions"
 import { Divider } from "@react-native-material/core";
 import { useNavigation, useRoute } from "@react-navigation/native";
 

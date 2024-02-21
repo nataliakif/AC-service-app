@@ -6,6 +6,7 @@ import * as MediaLibrary from "expo-media-library";
 import { FontAwesome } from "@expo/vector-icons";
 import { AuthUserContext } from "../AuthContext";
 import { Avatar } from "react-native-paper";
+import { doc, setDoc, getDoc } from "@firebase/firestore";
 
 import ImageZoomViewer from "react-native-image-zoom-viewer";
 
@@ -151,7 +152,7 @@ export default function Chat({ chatId }) {
     }
   };
 
-  const onSend = (newMessages = []) => {
+  const onSend = async (newMessages = []) => {
     const { _id, text, createdAt, user, image } = newMessages[0];
 
     const message = {
@@ -170,6 +171,28 @@ export default function Chat({ chatId }) {
 
     try {
       addDoc(collection(database, "chats", chatId, "messages"), message);
+      const chatRef = doc(database, "chats", chatId);
+      const chatDoc = await getDoc(chatRef);
+
+      if (chatDoc.exists()) {
+        const chatData = chatDoc.data();
+        // Если у чата есть поле participants как массив email'ов
+        if (!chatData.participants.includes(userEmail)) {
+          // Обновляем документ чата, добавляя email пользователя в массив участников
+          await updateDoc(chatRef, {
+            participants: arrayUnion(userEmail),
+          });
+        }
+      } else {
+        // Если в документе чата нет списка участников, создаем его
+        await setDoc(
+          chatRef,
+          {
+            participants: [userEmail],
+          },
+          { merge: true }
+        );
+      }
     } catch (error) {
       console.error("Error sending message:", error);
     }
